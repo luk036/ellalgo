@@ -4,7 +4,7 @@ from __future__ import print_function
 import numpy as np
 
 from ellalgo.cutting_plane import CUTStatus, cutting_plane_dc
-from ellalgo.ell import ell
+from ellalgo.ell_stable import ell_stable
 
 
 def my_oracle2(z):
@@ -55,7 +55,7 @@ def my_oracle(z, t: float):
 def test_case_feasible():
     """[summary]"""
     x0 = np.array([0.0, 0.0])  # initial x0
-    E = ell(10.0, x0)
+    E = ell_stable(10.0, x0)
     P = my_oracle
     _, _, ell_info = cutting_plane_dc(P, E, float("-inf"))
     assert ell_info.feasible
@@ -68,7 +68,7 @@ def test_case_feasible():
 def test_case_infeasible1():
     """[summary]"""
     x0 = np.array([100.0, 100.0])  # wrong initial guess,
-    E = ell(10.0, x0)  # or ellipsoid is too small
+    E = ell_stable(10.0, x0)  # or ellipsoid is too small
     P = my_oracle
     _, _, ell_info = cutting_plane_dc(P, E, float("-inf"))
     assert not ell_info.feasible
@@ -78,7 +78,7 @@ def test_case_infeasible1():
 def test_case_infeasible2():
     """[summary]"""
     x0 = np.array([0.0, 0.0])  # initial x0
-    E = ell(10.0, x0)
+    E = ell_stable(10.0, x0)
     P = my_oracle
     _, _, ell_info = cutting_plane_dc(P, E, 100)  # wrong initial best-so-far
     assert not ell_info.feasible
