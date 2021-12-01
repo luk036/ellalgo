@@ -1,6 +1,6 @@
 # ellalgo-py
 
-Add a short description here!
+Ellipsoid Method Python Code
 
 
 ## Note
