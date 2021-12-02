@@ -1,4 +1,4 @@
-# ellalgo-py
+# ellalgo
 
 Ellipsoid Method Python Code
 

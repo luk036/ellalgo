@@ -1,4 +1,4 @@
-name: ellalgo-py
+name: ellalgo
 channels:
   - conda-forge
 dependencies:

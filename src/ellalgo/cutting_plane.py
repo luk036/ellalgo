@@ -186,7 +186,7 @@ def bsearch(
         else:
             lower = t
 
-    ret = CInfo(upper != u_orig, niter, status)
+    ret = CInfo(upper != u_orig, niter + 1, status)
     return upper, ret
 
 

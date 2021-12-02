@@ -1,15 +1,15 @@
-# ellalgo-py
+# ellalgo
 
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/luk036/ellalgo-py)
-![Python application](https://github.com/luk036/ellalgo-py/workflows/Python%20application/badge.svg)
-[![Build Status](https://travis-ci.org/luk036/ellalgo-py.svg?branch=master)](https://travis-ci.org/luk036/ellalgo-py)
-[![Build status](https://ci.appveyor.com/api/projects/status/0v1cf05tcueny7d9?svg=true)](https://ci.appveyor.com/project/luk036/ellalgo-py)
-[![Documentation Status](https://readthedocs.org/projects/ellalgo-py/badge/?version=latest)](https://ellalgo-py.readthedocs.io/en/latest/?badge=latest)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a2f75bd3cc1e4c34be4741bdd61168ba)](https://app.codacy.com/app/luk036/ellalgo-py?utm_source=github.com&utm_medium=referral&utm_content=luk036/ellalgo-py&utm_campaign=badger)
-[![codecov](https://codecov.io/gh/luk036/ellalgo-py/branch/master/graph/badge.svg)](https://codecov.io/gh/luk036/ellalgo-py)
-[![Maintainability](https://api.codeclimate.com/v1/badges/6ce78bab65047bfe53d6/maintainability)](https://codeclimate.com/github/luk036/ellalgo-py/maintainability)
-[![CodeFactor](https://www.codefactor.io/repository/github/luk036/ellalgo-py/badge)](https://www.codefactor.io/repository/github/luk036/ellalgo-py)
-[![BCH compliance](https://bettercodehub.com/edge/badge/luk036/ellalgo-py?branch=master)](https://bettercodehub.com/)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/luk036/ellalgo)
+![Python application](https://github.com/luk036/ellalgo/workflows/Python%20application/badge.svg)
+[![Build Status](https://travis-ci.org/luk036/ellalgo.svg?branch=master)](https://travis-ci.org/luk036/ellalgo)
+[![Build status](https://ci.appveyor.com/api/projects/status/0v1cf05tcueny7d9?svg=true)](https://ci.appveyor.com/project/luk036/ellalgo)
+[![Documentation Status](https://readthedocs.org/projects/ellalgo/badge/?version=latest)](https://ellalgo.readthedocs.io/en/latest/?badge=latest)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a2f75bd3cc1e4c34be4741bdd61168ba)](https://app.codacy.com/app/luk036/ellalgo?utm_source=github.com&utm_medium=referral&utm_content=luk036/ellalgo&utm_campaign=badger)
+[![codecov](https://codecov.io/gh/luk036/ellalgo/branch/master/graph/badge.svg)](https://codecov.io/gh/luk036/ellalgo)
+[![Maintainability](https://api.codeclimate.com/v1/badges/6ce78bab65047bfe53d6/maintainability)](https://codeclimate.com/github/luk036/ellalgo/maintainability)
+[![CodeFactor](https://www.codefactor.io/repository/github/luk036/ellalgo/badge)](https://www.codefactor.io/repository/github/luk036/ellalgo)
+[![BCH compliance](https://bettercodehub.com/edge/badge/luk036/ellalgo?branch=master)](https://bettercodehub.com/)
 
 ellipsoid method python code
 
@@ -18,6 +18,7 @@ ellipsoid method python code
 -   At most one square-root per iteration.
 -   Include oracles for Matrix Inequalities and Network problems.
 -   Suport Parallel-Cuts.
+-   Pure Python code.
 
 ## Installation
 

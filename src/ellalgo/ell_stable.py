@@ -16,6 +16,7 @@ class ell_stable:
 
     Returns:
         [type] -- [description]
+
     """
 
     # __slots__ = ('_n', '_c1', '_kappa', '_rho', '_sigma', '_delta', '_tsq',
@@ -102,6 +103,9 @@ class ell_stable:
     #     """
     #     self._use_parallel_cut = b
 
+
+    # Reference: Gill, Murray, and Wright, "Practical Optimization", p43.
+    # Author: Brian Borchers (borchers@nmt.edu)
     def update(self, cut) -> Tuple[int, float]:
         g, beta = cut
 
