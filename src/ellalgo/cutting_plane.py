@@ -132,9 +132,9 @@ def cutting_plane_q(Omega, S, t, options=Options()):
     t_orig = t  # const
     x_best = None
     status = CUTStatus.nosoln
-
+    retry = False
     for niter in range(options.max_it):
-        retry = status == CUTStatus.noeffect
+        # retry = status == CUTStatus.noeffect
         cut, x0, t1, more_alt = Omega(S.xc, t, retry)
         if t1 is not None:  # better t obtained
             t = t1
@@ -143,6 +143,8 @@ def cutting_plane_q(Omega, S, t, options=Options()):
         if status == CUTStatus.noeffect:
             if not more_alt:  # no more alternative cut
                 break
+            status = CUTStatus.noeffect
+            retry = True
         if status == CUTStatus.nosoln:
             break
         if tsq < options.tol:
