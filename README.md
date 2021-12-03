@@ -7,9 +7,6 @@
 [![Documentation Status](https://readthedocs.org/projects/ellalgo/badge/?version=latest)](https://ellalgo.readthedocs.io/en/latest/?badge=latest)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/a2f75bd3cc1e4c34be4741bdd61168ba)](https://app.codacy.com/app/luk036/ellalgo?utm_source=github.com&utm_medium=referral&utm_content=luk036/ellalgo&utm_campaign=badger)
 [![codecov](https://codecov.io/gh/luk036/ellalgo/branch/master/graph/badge.svg)](https://codecov.io/gh/luk036/ellalgo)
-[![Maintainability](https://api.codeclimate.com/v1/badges/6ce78bab65047bfe53d6/maintainability)](https://codeclimate.com/github/luk036/ellalgo/maintainability)
-[![CodeFactor](https://www.codefactor.io/repository/github/luk036/ellalgo/badge)](https://www.codefactor.io/repository/github/luk036/ellalgo)
-[![BCH compliance](https://bettercodehub.com/edge/badge/luk036/ellalgo?branch=master)](https://bettercodehub.com/)
 
 ellipsoid method python code
 
