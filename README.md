@@ -12,20 +12,19 @@ ellipsoid method python code
 
 ## Features
 
--   At most one square-root per iteration.
--   Include oracles for Matrix Inequalities and Network problems.
--   Suport Parallel-Cuts.
--   Pure Python code.
+- At most one square-root per iteration.
+- Include oracles for Matrix Inequalities and Network problems.
+- Suport Parallel-Cuts.
+- Pure Python code.
 
 ## Installation
 
--   The core ellipsoid method depends only on the `numpy` module.
+- The core ellipsoid method depends only on the `numpy` module.
 
 ## See also
 
--   [ellalgo-cpp](https://github.com/luk036/ellalgo-cpp)
--   [Presentation Slides](https://luk036.github.io/cvx)
-
+- [ellalgo-cpp](https://github.com/luk036/ellalgo-cpp)
+- [Presentation Slides](https://luk036.github.io/cvx)
 
 <!-- pyscaffold-notes -->
 
