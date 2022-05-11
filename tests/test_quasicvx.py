@@ -23,8 +23,7 @@ def my_quasicvx_oracle(z, t: float):
     sqrtx, ly = z
 
     # constraint 1: exp(x) <= y, or sqrtx**2 <= ly
-    fj = sqrtx * sqrtx - ly
-    if fj > 0:
+    if (fj := sqrtx * sqrtx - ly) > 0:
         return (np.array([2 * sqrtx, -1.0]), fj), None
 
     # constraint 3: x > 0
@@ -34,12 +33,10 @@ def my_quasicvx_oracle(z, t: float):
     # objective: minimize -sqrt(x) / y
     tmp2 = math.exp(ly)
     tmp3 = t * tmp2
-    fj = -sqrtx + tmp3
-    if fj < 0.0:  # feasible
-        t = sqrtx / tmp2
-        return (np.array([-1.0, sqrtx]), 0), t
-
-    return (np.array([-1.0, tmp3]), fj), None
+    if (fj := -sqrtx + tmp3) >= 0.0:  # feasible
+        return (np.array([-1.0, tmp3]), fj), None
+    t = sqrtx / tmp2
+    return (np.array([-1.0, sqrtx]), 0), t
 
 
 def test_case_feasible():

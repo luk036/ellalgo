@@ -19,13 +19,11 @@ def my_oracle2(z):
     x, y = z
 
     # constraint 1: x + y <= 3
-    fj = x + y - 3
-    if fj > 0:
+    if (fj := x + y - 3) > 0:
         return np.array([1.0, 1.0]), fj
 
     # constraint 2: x - y >= 1
-    fj = -x + y + 1
-    if fj > 0:
+    if (fj := -x + y + 1) > 0:
         return np.array([-1.0, 1.0]), fj
 
 
