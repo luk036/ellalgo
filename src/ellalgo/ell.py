@@ -316,7 +316,7 @@ class ell1d:
         g, beta = cut
         # TODO handle g == 0
         tau = abs(self._r * g)
-        tsq = tau ** 2
+        tsq = tau**2
         if beta == 0:
             self._r /= 2
             self._xc += -self._r if g > 0 else self._r
