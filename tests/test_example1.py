@@ -3,7 +3,7 @@ from __future__ import print_function
 
 import numpy as np
 
-from ellalgo.cutting_plane import CUTStatus, cutting_plane_dc
+from ellalgo.cutting_plane import CUTStatus, cutting_plane_optim
 from ellalgo.ell_stable import ell_stable
 
 
@@ -54,7 +54,7 @@ def test_case_feasible():
     x0 = np.array([0.0, 0.0])  # initial x0
     E = ell_stable(10.0, x0)
     P = my_oracle
-    _, _, ell_info = cutting_plane_dc(P, E, float("-inf"))
+    _, _, ell_info = cutting_plane_optim(P, E, float("-inf"))
     assert ell_info.feasible
 
     # fmt = '{:f} {} {} {}'
@@ -67,7 +67,7 @@ def test_case_infeasible1():
     x0 = np.array([100.0, 100.0])  # wrong initial guess,
     E = ell_stable(10.0, x0)  # or ellipsoid is too small
     P = my_oracle
-    _, _, ell_info = cutting_plane_dc(P, E, float("-inf"))
+    _, _, ell_info = cutting_plane_optim(P, E, float("-inf"))
     assert not ell_info.feasible
     assert ell_info.status == CUTStatus.nosoln  # no sol'n
 
@@ -77,5 +77,5 @@ def test_case_infeasible2():
     x0 = np.array([0.0, 0.0])  # initial x0
     E = ell_stable(10.0, x0)
     P = my_oracle
-    _, _, ell_info = cutting_plane_dc(P, E, 100)  # wrong initial best-so-far
+    _, _, ell_info = cutting_plane_optim(P, E, 100)  # wrong initial best-so-far
     assert not ell_info.feasible

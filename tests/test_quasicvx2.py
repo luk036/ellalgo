@@ -6,7 +6,7 @@ import math
 import numpy as np
 from pytest import approx
 
-from ellalgo.cutting_plane import CUTStatus, cutting_plane_dc
+from ellalgo.cutting_plane import CUTStatus, cutting_plane_optim
 from ellalgo.ell import ell
 
 
@@ -48,7 +48,7 @@ def test_case_feasible():
     x0 = np.array([1.0, 1.0])  # initial x0
     E = ell(10.0, x0)
     P = my_quasicvx_oracle
-    xb, fb, ell_info = cutting_plane_dc(P, E, 0.0)
+    xb, fb, ell_info = cutting_plane_optim(P, E, 0.0)
     assert ell_info.feasible
     assert fb == approx(-0.4288673396685956)
     assert xb[0] == approx(0.501315956)
@@ -60,7 +60,7 @@ def test_case_infeasible1():
     x0 = np.array([100.0, 100.0])  # wrong initial guess,
     E = ell(10.0, x0)  # or ellipsoid is too small
     P = my_quasicvx_oracle
-    _, _, ell_info = cutting_plane_dc(P, E, 0.0)
+    _, _, ell_info = cutting_plane_optim(P, E, 0.0)
     assert not ell_info.feasible
     assert ell_info.status == CUTStatus.nosoln  # no sol'n
 
@@ -70,5 +70,5 @@ def test_case_infeasible2():
     x0 = np.array([1.0, 1.0])  # initial x0
     E = ell(10.0, x0)
     P = my_quasicvx_oracle
-    _, _, ell_info = cutting_plane_dc(P, E, -100)  # wrong initial best-so-far
+    _, _, ell_info = cutting_plane_optim(P, E, -100)  # wrong initial best-so-far
     assert not ell_info.feasible

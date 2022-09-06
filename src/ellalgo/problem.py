@@ -1,4 +1,4 @@
-from .cutting_plane import CUTStatus, Options, cutting_plane_dc
+from .cutting_plane import CUTStatus, Options, cutting_plane_optim
 
 
 class Problem:
@@ -114,7 +114,7 @@ class Problem:
         ----------
         t : Best-so-far value
         solver : str, optional
-            The solver to use. Defaults to cutting_plane_dc
+            The solver to use. Defaults to cutting_plane_optim
         warm_start : bool, optional
             Should the previous solver result be used to warm start?
         verbose : bool, optional
@@ -130,7 +130,7 @@ class Problem:
             The optimal value for the problem, or a string indicating
             why the problem could not be solved.
         """
-        xb, fb, ell_info = cutting_plane_dc(self.oracle, self.S, t, self.options)
+        xb, fb, ell_info = cutting_plane_optim(self.oracle, self.S, t, self.options)
         num_iters = ell_info.num_iters
         status = ell_info.status
 

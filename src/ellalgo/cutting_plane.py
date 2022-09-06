@@ -29,7 +29,7 @@ class CInfo:
         self.status: CUTStatus = status
 
 
-def cutting_plane_feas(Omega: Callable[[Any], Any], S, options=Options()) -> CInfo:
+def cutting_plane_feas(omega: Callable[[Any], Any], S, options=Options()) -> CInfo:
     """Find a point in a convex set (defined through a cutting-plane oracle).
 
     Description:
@@ -47,7 +47,7 @@ def cutting_plane_feas(Omega: Callable[[Any], Any], S, options=Options()) -> CIn
         or provide a cut that separates the feasible region and x0.
 
     Arguments:
-        Omega ([type]): perform assessment on x0
+        omega ([type]): perform assessment on x0
         S ([type]): Initial search space known to contain x*
 
     Keyword Arguments:
@@ -57,30 +57,27 @@ def cutting_plane_feas(Omega: Callable[[Any], Any], S, options=Options()) -> CIn
         x: solution vector
         niter: number of iterations performed
     """
-    feasible = False
-    status = CUTStatus.success
-    for niter in range(options.max_it):
-        cut = Omega(S.xc)  # query the oracle at S.xc
+    for niter in range(1, options.max_it):
+        cut = omega.assess_feas(S.xc)  # query the oracle at S.xc
         if cut is None:  # feasible sol'n obtained
-            feasible = True
-            break
+            return CInfo(True, niter, CUTStatus.success)
+
         cutstatus, tsq = S.update(cut)  # update S
         if cutstatus != CUTStatus.success:
-            status = cutstatus
-            break
+            return CInfo(False, niter, cutstatus)
+
         if tsq < options.tol:
-            status = CUTStatus.smallenough
-            break
-    return CInfo(feasible, niter + 1, status)
+            return CInfo(False, niter, CUTStatus.smallenough)
+    return CInfo(False, options.max_iter, CUTStatus.nosoln)
 
 
-def cutting_plane_dc(
-    Omega: Callable[[Any, Any], Any], S, t, options=Options()
+def cutting_plane_optim(
+    omega: Callable[[Any, Any], Any], S, t, options=Options()
 ) -> Tuple[Any, Any, CInfo]:
     """Cutting-plane method for solving convex optimization problem
 
     Arguments:
-        Omega ([type]): perform assessment on x0
+        omega ([type]): perform assessment on x0
         S ([type]): Search Space containing x*
         t (float): initial best-so-far value
 
@@ -94,10 +91,10 @@ def cutting_plane_dc(
     """
     t_orig = t  # const
     x_best = None
-    status = CUTStatus.success
+    status = CUTStatus.nosoln
 
     for niter in range(options.max_it):
-        cut, t1 = Omega(S.xc, t)
+        cut, t1 = omega.assess_optim(S.xc, t)
         if t1 is not None:  # better t obtained
             t = t1
             x_best = S.xc
@@ -112,11 +109,11 @@ def cutting_plane_dc(
     return x_best, t, ret
 
 
-def cutting_plane_q(Omega, S, t, options=Options()):
+def cutting_plane_q(omega, S, t, options=Options()):
     """Cutting-plane method for solving convex discrete optimization problem
 
     Arguments:
-        Omega ([type]): perform assessment on x0
+        omega ([type]): perform assessment on x0
         S ([type]): Search Space containing x*
         t (float): initial best-so-far value
 
@@ -135,7 +132,7 @@ def cutting_plane_q(Omega, S, t, options=Options()):
     retry = False
     for niter in range(options.max_it):
         # retry = status == CUTStatus.noeffect
-        cut, x0, t1, more_alt = Omega(S.xc, t, retry)
+        cut, x0, t1, more_alt = omega.assess_q(S.xc, t, retry)
         if t1 is not None:  # better t obtained
             t = t1
             x_best = x0.copy()
@@ -156,12 +153,12 @@ def cutting_plane_q(Omega, S, t, options=Options()):
 
 
 def bsearch(
-    Omega: Callable[[Any], bool], Interval: Tuple, options=Options()
+    omega: Callable[[Any], bool], Interval: Tuple, options=Options()
 ) -> Tuple[Any, CInfo]:
     """[summary]
 
     Arguments:
-        Omega ([type]): [description]
+        omega ([type]): [description]
         I ([type]): interval (initial search space)
 
     Keyword Arguments:
@@ -183,7 +180,7 @@ def bsearch(
             status = CUTStatus.smallenough
             break
         t = T(lower + tau)
-        if Omega(t):  # feasible sol'n obtained
+        if omega.assess_bs(t):  # feasible sol'n obtained
             upper = t
         else:
             lower = t
@@ -216,7 +213,7 @@ class bsearch_adaptor:
         """
         return self.S.xc
 
-    def __call__(self, t):
+    def assess_bs(self, t):
         """[summary]
 
         Arguments:

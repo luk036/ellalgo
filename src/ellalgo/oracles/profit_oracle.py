@@ -40,8 +40,8 @@ class profit_oracle:
         self.v = v
         self.a = a
 
-    def __call__(self, y: Arr, t: float) -> Tuple[Cut, Optional[float]]:
-        """Make object callable for cutting_plane_dc()
+    def assess_optim(self, y: Arr, t: float) -> Tuple[Cut, Optional[float]]:
+        """Make object callable for cutting_plane_optim()
 
         Arguments:
             y (Arr): input quantity (in log scale)
@@ -51,7 +51,7 @@ class profit_oracle:
             Tuple[Cut, float]: Cut and the updated best-so-far value
 
         See also:
-            cutting_plane_dc
+            cutting_plane_optim
         """
         fj = y[0] - self.log_k  # constraint
         if fj > 0.0:
@@ -115,8 +115,8 @@ class profit_rb_oracle:
         params_rb = p - e3, A, k - e4
         self.P = profit_oracle(params_rb, a, v + e5)
 
-    def __call__(self, y: Arr, t: float) -> Tuple[Cut, Optional[float]]:
-        """Make object callable for cutting_plane_dc()
+    def assess_optim(self, y: Arr, t: float) -> Tuple[Cut, Optional[float]]:
+        """Make object callable for cutting_plane_optim()
 
         Arguments:
             y (Arr): input quantity (in log scale)
@@ -126,13 +126,13 @@ class profit_rb_oracle:
             Tuple[Cut, float]: Cut and the updated best-so-far value
 
         See also:
-            cutting_plane_dc
+            cutting_plane_optim
         """
         a_rb = self.a.copy()
         for i in [0, 1]:
             a_rb[i] += -self.e[i] if y[i] > 0.0 else self.e[i]
         self.P.a = a_rb
-        return self.P(y, t)
+        return self.P.assess_optim(y, t)
 
 
 class profit_q_oracle:
@@ -170,7 +170,7 @@ class profit_q_oracle:
         """
         self.P = profit_oracle(params, a, v)
 
-    def __call__(self, y, t, retry):
+    def assess_q(self, y, t, retry):
         """Make object callable for cutting_plane_q()
 
         Arguments:
@@ -195,6 +195,6 @@ class profit_q_oracle:
                 x[1] = 1
             self.yd = np.log(x)
 
-        (g, h), t = self.P(self.yd, t)
+        (g, h), t = self.P.assess_optim(self.yd, t)
         h += g @ (self.yd - y)
         return (g, h), self.yd, t, not retry

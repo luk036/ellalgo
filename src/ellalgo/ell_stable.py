@@ -135,7 +135,7 @@ class ell_stable:
         Qg = invDinvLg.copy()  # initially
         for i in range(self._n - 1, 0, -1):
             for j in range(i, self._n):
-                Qg[i - 1] -= self._Q[i, j] * Qg[j]  # ???
+                Qg[i - 1] -= self._Q[i, j] * Qg[j]  # TODO
 
         # calculate xc: n
         self._xc -= (self._rho / omega) * Qg
