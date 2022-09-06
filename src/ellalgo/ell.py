@@ -4,7 +4,7 @@ from typing import Tuple, Union
 
 import numpy as np
 
-from .cutting_plane import CUTStatus
+from .cutting_plane import CutStatus
 
 Arr = Union[np.ndarray]
 
@@ -133,7 +133,7 @@ class ell:
         omega = g @ Qg  # n multiplications
         self._tsq = self._kappa * omega
         status = calc_ell(beta)
-        if status != CUTStatus.success:
+        if status != CutStatus.Success:
             return status, self._tsq
 
         self._xc -= (self._rho / omega) * Qg  # n
@@ -146,7 +146,7 @@ class ell:
 
         return status, self._tsq
 
-    def _calc_ll(self, beta) -> CUTStatus:
+    def _calc_ll(self, beta) -> CutStatus:
         """parallel or deep cut
 
         Arguments:
@@ -161,7 +161,7 @@ class ell:
             return self._calc_dc(beta[0])
         return self._calc_ll_core(beta[0], beta[1])
 
-    def _calc_ll_core(self, b0: float, b1: float) -> CUTStatus:
+    def _calc_ll_core(self, b0: float, b1: float) -> CutStatus:
         """Calculate new ellipsoid under Parallel Cut
 
                 g' (x − xc​) + β0 ​≤ 0
@@ -177,14 +177,14 @@ class ell:
         if self._tsq < b1 * b1 or not self.use_parallel_cut:
             return self._calc_dc(b0)
         if b1 < b0:
-            return CUTStatus.nosoln  # no sol'n
+            return CutStatus.NoSoln  # no sol'n
         if b0 == 0:
             self._calc_ll_cc(b1)
-            return CUTStatus.success
+            return CutStatus.Success
 
         b0b1 = b0 * b1
         if self._n * b0b1 < -self._tsq:  # unlikely
-            return CUTStatus.noeffect  # no effect
+            return CutStatus.NoEffect  # no effect
 
         # parallel cut
         t1n = self._tsq - b1 * b1
@@ -197,7 +197,7 @@ class ell:
         self._sigma = self._c3 + (self._tsq - b0b1 - xi) / (bsum * bav * self._nPlus1)
         self._rho = self._sigma * bav
         self._delta = self._c1 * ((t0n + t1n) / 2 + xi / self._n) / self._tsq
-        return CUTStatus.success
+        return CutStatus.Success
 
     def _calc_ll_cc(self, b1: float):
         """Calculate new ellipsoid under Parallel Cut, one of them is central
@@ -215,7 +215,7 @@ class ell:
         self._rho = self._sigma * b1 / 2.0
         self._delta = self._c1 * (1.0 - b1sqn / 2.0 + xi / self._n)
 
-    def _calc_dc(self, beta: float) -> CUTStatus:
+    def _calc_dc(self, beta: float) -> CutStatus:
         """Calculate new ellipsoid under Deep Cut
 
                 g' (x − xc​) + β ​≤ 0
@@ -234,20 +234,20 @@ class ell:
             tau = 0.0
 
         if tau < beta:
-            return CUTStatus.nosoln  # no sol'n
+            return CutStatus.NoSoln  # no sol'n
         if beta == 0.0:
             self._calc_cc(tau)
-            return CUTStatus.success
+            return CutStatus.Success
         n = self._n
         gamma = tau + n * beta
         if gamma < 0.0:
-            return CUTStatus.noeffect  # no effect, unlikely
+            return CutStatus.NoEffect  # no effect, unlikely
 
         self._mu = (tau - beta) / gamma * self._halfNminus1
         self._rho = gamma / self._nPlus1
         self._sigma = 2.0 * self._rho / (tau + beta)
         self._delta = self._c1 * (1.0 - beta * (beta / self._tsq))
-        return CUTStatus.success
+        return CutStatus.Success
 
     def _calc_cc(self, tau: float):
         """Calculate new ellipsoid under Central Cut
@@ -320,15 +320,15 @@ class ell1d:
         if beta == 0:
             self._r /= 2
             self._xc += -self._r if g > 0 else self._r
-            return CUTStatus.success, tsq
+            return CutStatus.Success, tsq
         if beta > tau:
-            return CUTStatus.nosoln, tsq  # no sol'n
+            return CutStatus.NoSoln, tsq  # no sol'n
         if beta < -tau:  # unlikely
-            return CUTStatus.noeffect, tsq  # no effect
+            return CutStatus.NoEffect, tsq  # no effect
 
         bound = self._xc - beta / g
         upper = bound if g > 0 else self._xc + self._r
         lower = self._xc - self._r if g > 0 else bound
         self._r = (upper - lower) / 2
         self._xc = lower + self._r
-        return CUTStatus.success, tsq
+        return CutStatus.Success, tsq

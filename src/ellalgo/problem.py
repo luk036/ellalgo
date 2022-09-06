@@ -1,4 +1,4 @@
-from .cutting_plane import CUTStatus, Options, cutting_plane_optim
+from .cutting_plane import CutStatus, Options, cutting_plane_optim
 
 
 class Problem:
@@ -135,7 +135,7 @@ class Problem:
         status = ell_info.status
 
         if ell_info.feasible:
-            if status == CUTStatus.smallenough:
+            if status == CutStatus.SmallEnough:
                 self._status = "optimal"
             else:
                 self._status = "feasible"

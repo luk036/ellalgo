@@ -4,7 +4,7 @@ from typing import Tuple, Union
 
 import numpy as np
 
-from .cutting_plane import CUTStatus
+from .cutting_plane import CutStatus
 
 Arr = Union[np.ndarray]
 
@@ -128,7 +128,7 @@ class ell_stable:
         self._tsq = self._kappa * omega
 
         status = self._calc_ll(beta)
-        if status != CUTStatus.success:
+        if status != CutStatus.Success:
             return status, self._tsq
 
         # calculate Q*g = inv(L')*inv(D)*inv(L)*g : (n-1)*n/2
@@ -171,7 +171,7 @@ class ell_stable:
         # }
         return status, self._tsq
 
-    def _calc_ll(self, beta) -> CUTStatus:
+    def _calc_ll(self, beta) -> CutStatus:
         """parallel or deep cut
 
         Arguments:
@@ -186,7 +186,7 @@ class ell_stable:
             return self._calc_dc(beta[0])
         return self._calc_ll_core(beta[0], beta[1])
 
-    def _calc_ll_core(self, b0: float, b1: float) -> CUTStatus:
+    def _calc_ll_core(self, b0: float, b1: float) -> CutStatus:
         """Calculate new ellipsoid under Parallel Cut
 
                 g' (x − xc​) + β0 ​≤ 0
@@ -205,14 +205,14 @@ class ell_stable:
             return self._calc_dc(b0)
         bdiff = b1 - b0
         if bdiff < 0:
-            return CUTStatus.nosoln  # no sol'n
+            return CutStatus.NoSoln  # no sol'n
         if b0 == 0:
             self._calc_ll_cc(b1, b1sqn)
-            return CUTStatus.success
+            return CutStatus.Success
 
         b0b1n = b0 * (b1 / self._tsq)
         if self._n * b0b1n < -1:  # unlikely
-            return CUTStatus.noeffect  # no effect
+            return CutStatus.NoEffect  # no effect
 
         # parallel cut
         t0n = 1.0 - b0 * (b0 / self._tsq)
@@ -225,7 +225,7 @@ class ell_stable:
         self._sigma = self._c3 + (1.0 - b0b1n - xi) / (bsumn * bav * self._nPlus1)
         self._rho = self._sigma * bav
         self._delta = self._c1 * ((t0n + t1n) / 2 + xi / self._n)
-        return CUTStatus.success
+        return CutStatus.Success
 
     def _calc_ll_cc(self, b1: float, b1sqn: float):
         """Calculate new ellipsoid under Parallel Cut, one of them is central
@@ -243,7 +243,7 @@ class ell_stable:
         self._rho = self._sigma * b1 / 2.0
         self._delta = self._c1 * (1.0 - b1sqn / 2.0 + xi / n)
 
-    def _calc_dc(self, beta: float) -> CUTStatus:
+    def _calc_dc(self, beta: float) -> CutStatus:
         """Calculate new ellipsoid under Deep Cut
 
                 g' (x − xc​) + β ​≤ 0
@@ -263,20 +263,20 @@ class ell_stable:
 
         bdiff = tau - beta
         if bdiff < 0.0:
-            return CUTStatus.nosoln  # no sol'n
+            return CutStatus.NoSoln  # no sol'n
         if beta == 0.0:
             self._calc_cc(tau)
-            return CUTStatus.success
+            return CutStatus.Success
         n = self._n
         gamma = tau + n * beta
         if gamma < 0.0:
-            return CUTStatus.noeffect  # no effect, unlikely
+            return CutStatus.NoEffect  # no effect, unlikely
 
         self._mu = (bdiff / gamma) * self._halfNminus1
         self._rho = gamma / self._nPlus1
         self._sigma = 2.0 * self._rho / (tau + beta)
         self._delta = self._c1 * (1.0 - beta * (beta / self._tsq))
-        return CUTStatus.success
+        return CutStatus.Success
 
     def _calc_cc(self, tau: float):
         """Calculate new ellipsoid under Central Cut

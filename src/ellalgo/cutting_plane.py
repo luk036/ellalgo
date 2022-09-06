@@ -3,11 +3,11 @@ from enum import Enum
 from typing import Any, Callable, Tuple
 
 
-class CUTStatus(Enum):
-    success = 0
-    nosoln = 1
-    smallenough = 2
-    noeffect = 3
+class CutStatus(Enum):
+    Success = 0
+    NoSoln = 1
+    SmallEnough = 2
+    NoEffect = 3
 
 
 class Options:
@@ -16,7 +16,7 @@ class Options:
 
 
 class CInfo:
-    def __init__(self, feasible: bool, num_iters: int, status: CUTStatus):
+    def __init__(self, feasible: bool, num_iters: int, status: CutStatus):
         """Construct a new CInfo object
 
         Arguments:
@@ -26,7 +26,7 @@ class CInfo:
         """
         self.feasible: bool = feasible
         self.num_iters: int = num_iters
-        self.status: CUTStatus = status
+        self.status: CutStatus = status
 
 
 def cutting_plane_feas(omega: Callable[[Any], Any], S, options=Options()) -> CInfo:
@@ -60,15 +60,15 @@ def cutting_plane_feas(omega: Callable[[Any], Any], S, options=Options()) -> CIn
     for niter in range(1, options.max_it):
         cut = omega.assess_feas(S.xc)  # query the oracle at S.xc
         if cut is None:  # feasible sol'n obtained
-            return CInfo(True, niter, CUTStatus.success)
+            return CInfo(True, niter, CutStatus.Success)
 
         cutstatus, tsq = S.update(cut)  # update S
-        if cutstatus != CUTStatus.success:
+        if cutstatus != CutStatus.Success:
             return CInfo(False, niter, cutstatus)
 
         if tsq < options.tol:
-            return CInfo(False, niter, CUTStatus.smallenough)
-    return CInfo(False, options.max_iter, CUTStatus.nosoln)
+            return CInfo(False, niter, CutStatus.SmallEnough)
+    return CInfo(False, options.max_iter, CutStatus.NoSoln)
 
 
 def cutting_plane_optim(
@@ -91,7 +91,7 @@ def cutting_plane_optim(
     """
     t_orig = t  # const
     x_best = None
-    status = CUTStatus.nosoln
+    status = CutStatus.NoSoln
 
     for niter in range(options.max_it):
         cut, t1 = omega.assess_optim(S.xc, t)
@@ -99,11 +99,11 @@ def cutting_plane_optim(
             t = t1
             x_best = S.xc
         cutstatus, tsq = S.update(cut)
-        if cutstatus != CUTStatus.success:
+        if cutstatus != CutStatus.Success:
             status = cutstatus
             break
         if tsq < options.tol:
-            status = CUTStatus.smallenough
+            status = CutStatus.SmallEnough
             break
     ret = CInfo(t != t_orig, niter + 1, status)
     return x_best, t, ret
@@ -128,24 +128,24 @@ def cutting_plane_q(omega, S, t, options=Options()):
     # x_last = S.xc
     t_orig = t  # const
     x_best = None
-    status = CUTStatus.nosoln
+    status = CutStatus.NoSoln
     retry = False
     for niter in range(options.max_it):
-        # retry = status == CUTStatus.noeffect
+        # retry = status == CutStatus.NoEffect
         cut, x0, t1, more_alt = omega.assess_q(S.xc, t, retry)
         if t1 is not None:  # better t obtained
             t = t1
             x_best = x0.copy()
         status, tsq = S.update(cut)
-        if status == CUTStatus.noeffect:
+        if status == CutStatus.NoEffect:
             if not more_alt:  # no more alternative cut
                 break
-            status = CUTStatus.noeffect
+            status = CutStatus.NoEffect
             retry = True
-        if status == CUTStatus.nosoln:
+        if status == CutStatus.NoSoln:
             break
         if tsq < options.tol:
-            status = CUTStatus.smallenough
+            status = CutStatus.SmallEnough
             break
 
     ret = CInfo(t != t_orig, niter + 1, status)
@@ -172,12 +172,12 @@ def bsearch(
     lower, upper = Interval
     T = type(upper)  # T could be `int` or `Fraction`
     u_orig = upper
-    status = CUTStatus.success
+    status = CutStatus.Success
 
     for niter in range(options.max_it):
         tau = (upper - lower) / 2
         if tau < options.tol:
-            status = CUTStatus.smallenough
+            status = CutStatus.SmallEnough
             break
         t = T(lower + tau)
         if omega.assess_bs(t):  # feasible sol'n obtained
