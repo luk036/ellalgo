@@ -8,10 +8,11 @@ class CutStatus(Enum):
     NoSoln = 1
     SmallEnough = 2
     NoEffect = 3
+    Unknown = 4
 
 
 class Options:
-    max_it: int = 2000  # maximum number of iterations
+    max_iter: int = 2000  # maximum number of iterations
     tol: float = 1e-8  # error tolerance
 
 
@@ -29,7 +30,7 @@ class CInfo:
         self.status: CutStatus = status
 
 
-def cutting_plane_feas(omega: Callable[[Any], Any], S, options=Options()) -> CInfo:
+def cutting_plane_feas(omega, S, options=Options()) -> CInfo:
     """Find a point in a convex set (defined through a cutting-plane oracle).
 
     Description:
@@ -57,7 +58,7 @@ def cutting_plane_feas(omega: Callable[[Any], Any], S, options=Options()) -> CIn
         x: solution vector
         niter: number of iterations performed
     """
-    for niter in range(1, options.max_it):
+    for niter in range(1, options.max_iter):
         cut = omega.assess_feas(S.xc)  # query the oracle at S.xc
         if cut is None:  # feasible sol'n obtained
             return CInfo(True, niter, CutStatus.Success)
@@ -71,9 +72,8 @@ def cutting_plane_feas(omega: Callable[[Any], Any], S, options=Options()) -> CIn
     return CInfo(False, options.max_iter, CutStatus.NoSoln)
 
 
-def cutting_plane_optim(
-    omega: Callable[[Any, Any], Any], S, t, options=Options()
-) -> Tuple[Any, Any, CInfo]:
+def cutting_plane_optim(omega, S, t, options=Options()
+) -> Tuple[Any, Any, int, CutStatus]:
     """Cutting-plane method for solving convex optimization problem
 
     Arguments:
@@ -89,24 +89,21 @@ def cutting_plane_optim(
         t: final best-so-far value
         ret {CInfo}
     """
-    t_orig = t  # const
     x_best = None
-    status = CutStatus.NoSoln
+    status = CutStatus.Unknown
 
-    for niter in range(options.max_it):
+    for niter in range(1, options.max_iter):
         cut, t1 = omega.assess_optim(S.xc, t)
         if t1 is not None:  # better t obtained
             t = t1
-            x_best = S.xc
-        cutstatus, tsq = S.update(cut)
-        if cutstatus != CutStatus.Success:
-            status = cutstatus
-            break
+            x_best = S.xc.copy()
+        status, tsq = S.update(cut)
+        if status != CutStatus.Success:
+            return x_best, t, niter, status
         if tsq < options.tol:
-            status = CutStatus.SmallEnough
-            break
-    ret = CInfo(t != t_orig, niter + 1, status)
-    return x_best, t, ret
+            return x_best, t, niter, CutStatus.SmallEnough
+
+    return x_best, t, options.max_iter, status
 
 
 def cutting_plane_q(omega, S, t, options=Options()):
@@ -126,34 +123,29 @@ def cutting_plane_q(omega, S, t, options=Options()):
         niter ([type]): number of iterations performed
     """
     # x_last = S.xc
-    t_orig = t  # const
     x_best = None
-    status = CutStatus.NoSoln
+    status = CutStatus.Unknown
     retry = False
-    for niter in range(options.max_it):
+    for niter in range(1, options.max_iter):
         # retry = status == CutStatus.NoEffect
-        cut, x0, t1, more_alt = omega.assess_q(S.xc, t, retry)
+        cut, x0, t1, more_alt = omega.assess_optim_q(S.xc, t, retry)
         if t1 is not None:  # better t obtained
             t = t1
             x_best = x0.copy()
         status, tsq = S.update(cut)
         if status == CutStatus.NoEffect:
             if not more_alt:  # no more alternative cut
-                break
-            status = CutStatus.NoEffect
+                return x_best, t, niter, status
             retry = True
-        if status == CutStatus.NoSoln:
-            break
+        elif status == CutStatus.NoSoln:
+            return x_best, t, niter, status
         if tsq < options.tol:
-            status = CutStatus.SmallEnough
-            break
+            return x_best, t, niter, CutStatus.SmallEnough
 
-    ret = CInfo(t != t_orig, niter + 1, status)
-    return x_best, t, ret
+    return x_best, t, options.max_iter, status
 
 
-def bsearch(
-    omega: Callable[[Any], bool], Interval: Tuple, options=Options()
+def bsearch(omega, Interval: Tuple, options=Options()
 ) -> Tuple[Any, CInfo]:
     """[summary]
 
@@ -172,9 +164,9 @@ def bsearch(
     lower, upper = Interval
     T = type(upper)  # T could be `int` or `Fraction`
     u_orig = upper
-    status = CutStatus.Success
+    status = CutStatus.Unknown
 
-    for niter in range(options.max_it):
+    for niter in range(1, options.max_iter):
         tau = (upper - lower) / 2
         if tau < options.tol:
             status = CutStatus.SmallEnough

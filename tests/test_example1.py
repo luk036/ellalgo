@@ -41,14 +41,15 @@ class MyOracle:
         """
         # cut = my_oracle2(z)
         if cut := MyOracle2().assess_feas(z):
-            return cut, t
+            return cut, None
         x, y = z
         # objective: maximize x + y
         f0 = x + y
         if (fj := t - f0) < 0.0:
             fj = 0.0
             t = f0
-        return (-1.0 * np.array([1.0, 1.0]), fj), t
+            return (-1.0 * np.array([1.0, 1.0]), fj), t
+        return (-1.0 * np.array([1.0, 1.0]), fj), None
 
 
 def test_case_feasible():
@@ -56,8 +57,8 @@ def test_case_feasible():
     x0 = np.array([0.0, 0.0])  # initial x0
     E = ell_stable(10.0, x0)
     P = MyOracle()
-    _, _, ell_info = cutting_plane_optim(P, E, float("-inf"))
-    assert ell_info.feasible
+    x, _, _, _ = cutting_plane_optim(P, E, float("-inf"))
+    assert x is not None
     # fmt = '{:f} {} {} {}'
     # print(fmt.format(fb, niter, feasible, status))
     # print(xb)
@@ -68,9 +69,8 @@ def test_case_infeasible1():
     x0 = np.array([100.0, 100.0])  # wrong initial guess,
     E = ell_stable(10.0, x0)  # or ellipsoid is too small
     P = MyOracle()
-    _, _, ell_info = cutting_plane_optim(P, E, float("-inf"))
-    assert not ell_info.feasible
-    assert ell_info.status == CutStatus.NoSoln  # no sol'n
+    x, _, _, _ = cutting_plane_optim(P, E, float("-inf"))
+    assert x is None
 
 
 def test_case_infeasible2():
@@ -78,5 +78,5 @@ def test_case_infeasible2():
     x0 = np.array([0.0, 0.0])  # initial x0
     E = ell_stable(10.0, x0)
     P = MyOracle()
-    _, _, ell_info = cutting_plane_optim(P, E, 100)  # wrong init best-so-far
-    assert not ell_info.feasible
+    x, _, _, _ = cutting_plane_optim(P, E, 100)  # wrong init best-so-far
+    assert x is None

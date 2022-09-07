@@ -170,7 +170,7 @@ class profit_q_oracle:
         """
         self.P = profit_oracle(params, a, v)
 
-    def assess_q(self, y, t, retry):
+    def assess_optim_q(self, y, t, retry):
         """Make object callable for cutting_plane_q()
 
         Arguments:

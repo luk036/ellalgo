@@ -23,9 +23,9 @@ r = np.array([100.0, 100.0])  # initial ellipsoid (sphere)
 def test_profit():
     E = ell(r, np.array([0.0, 0.0]))
     P = profit_oracle(params, a, v)
-    _, _, ell_info = cutting_plane_optim(P, E, 0.0)
-    assert ell_info.feasible
-    assert ell_info.num_iters == 37
+    x, _, num_iters, _ = cutting_plane_optim(P, E, 0.0)
+    assert x is not None
+    assert num_iters == 37
 
 
 def test_profit_rb():
@@ -34,15 +34,14 @@ def test_profit_rb():
     e3 = e4 = e5 = 1.0
     E = ell(r, np.array([0.0, 0.0]))
     P = profit_rb_oracle(params, a, v, (e1, e2, e3, e4, e5))
-    _, _, ell_info = cutting_plane_optim(P, E, 0.0)
-    assert ell_info.feasible
-    assert ell_info.num_iters == 42
+    x, _, num_iters, _ = cutting_plane_optim(P, E, 0.0)
+    assert x is not None
+    assert num_iters == 42
 
 
 def test_profit_q():
     E = ell(r, np.array([0.0, 0.0]))
     P = profit_q_oracle(params, a, v)
-    _, _, ell_info = cutting_plane_q(P, E, 0.0)
-    assert ell_info.feasible
-    assert ell_info.num_iters == 28
-    return ell_info.num_iters
+    x, _, num_iters, _ = cutting_plane_q(P, E, 0.0)
+    assert x is not None
+    assert num_iters == 28

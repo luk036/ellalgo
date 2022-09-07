@@ -49,11 +49,11 @@ def test_case_feasible():
     x0 = np.array([1.0, 1.0])  # initial x0
     E = ell(10.0, x0)
     P = MyQuasicvxOracle()
-    xb, fb, ell_info = cutting_plane_optim(P, E, 0.0)
-    assert ell_info.feasible
+    xb, fb, _, _ = cutting_plane_optim(P, E, 0.0)
+    assert xb is not None
     assert fb == approx(-0.4288673396685956)
-    assert xb[0] == approx(0.501315956)
-    assert xb[1] == approx(1.650886769)
+    assert xb[0] == approx(0.5053830040042219)
+    assert xb[1] == approx(1.6576289475891712)
 
 
 def test_case_infeasible1():
@@ -61,9 +61,8 @@ def test_case_infeasible1():
     x0 = np.array([100.0, 100.0])  # wrong initial guess,
     E = ell(10.0, x0)  # or ellipsoid is too small
     P = MyQuasicvxOracle()
-    _, _, ell_info = cutting_plane_optim(P, E, 0.0)
-    assert not ell_info.feasible
-    assert ell_info.status == CutStatus.NoSoln  # no sol'n
+    xb, _, _,_ = cutting_plane_optim(P, E, 0.0)
+    assert xb is None
 
 
 def test_case_infeasible2():
@@ -71,5 +70,5 @@ def test_case_infeasible2():
     x0 = np.array([1.0, 1.0])  # initial x0
     E = ell(10.0, x0)
     P = MyQuasicvxOracle()
-    _, _, ell_info = cutting_plane_optim(P, E, -100)  # wrong init best-so-far
-    assert not ell_info.feasible
+    xb, _, _, _ = cutting_plane_optim(P, E, -100)  # wrong init best-so-far
+    assert xb is None

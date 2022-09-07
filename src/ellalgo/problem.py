@@ -130,9 +130,7 @@ class Problem:
             The optimal value for the problem, or a string indicating
             why the problem could not be solved.
         """
-        xb, fb, ell_info = cutting_plane_optim(self.oracle, self.S, t, self.options)
-        num_iters = ell_info.num_iters
-        status = ell_info.status
+        xb, fb, num_iters, status = cutting_plane_optim(self.oracle, self.S, t, self.options)
 
         if ell_info.feasible:
             if status == CutStatus.SmallEnough:
