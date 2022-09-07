@@ -6,7 +6,7 @@ import math
 import numpy as np
 from pytest import approx
 
-from ellalgo.cutting_plane import CutStatus, cutting_plane_optim
+from ellalgo.cutting_plane import cutting_plane_optim
 from ellalgo.ell import ell
 
 

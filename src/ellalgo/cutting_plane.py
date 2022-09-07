@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
-from typing import Any, Callable, Tuple
+from typing import Any, Tuple
 
 
 class CutStatus(Enum):

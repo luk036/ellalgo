@@ -3,7 +3,7 @@ from __future__ import print_function
 
 import numpy as np
 
-from ellalgo.cutting_plane import CutStatus, cutting_plane_optim
+from ellalgo.cutting_plane import cutting_plane_optim
 from ellalgo.ell_stable import ell_stable
 
 

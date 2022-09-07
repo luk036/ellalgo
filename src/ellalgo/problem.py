@@ -132,7 +132,7 @@ class Problem:
         """
         xb, fb, num_iters, status = cutting_plane_optim(self.oracle, self.S, t, self.options)
 
-        if ell_info.feasible:
+        if xb is not None:
             if status == CutStatus.SmallEnough:
                 self._status = "optimal"
             else:
