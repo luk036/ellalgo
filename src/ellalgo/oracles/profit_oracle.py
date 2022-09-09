@@ -3,11 +3,11 @@ from typing import Optional, Tuple, Union
 
 import numpy as np
 
-Arr = Union[np.ndarray]
+Arr = Union[np.ndarray, float]
 Cut = Tuple[Arr, float]
 
 
-class profit_oracle:
+class ProfitOracle:
     """Oracle for a profit maximization problem.
 
     This example is taken from [Aliabadi and Salahi, 2013]
@@ -53,27 +53,23 @@ class profit_oracle:
         See also:
             cutting_plane_optim
         """
-        fj = y[0] - self.log_k  # constraint
-        if fj > 0.0:
+        if (fj := y[0] - self.log_k) > 0.0:  # constraint
             g = np.array([1.0, 0.0])
             return (g, fj), None
 
         log_Cobb = self.log_pA + self.a @ y
         q = self.v * np.exp(y)
         vx = q[0] + q[1]
-        te = t + vx
-        fj = np.log(te) - log_Cobb
+        if (fj := np.log(t + vx) - log_Cobb) >= 0.0:
+            g = q / (t + vx) - self.a
+            return (g, fj), None
 
-        if fj < 0.0:  # feasible
-            te = np.exp(log_Cobb)
-            g = q / te - self.a
-            return (g, 0.0), te - vx
-
-        g = q / te - self.a
-        return (g, fj), None
+        t = np.exp(log_Cobb) - vx
+        g = q / (t + vx) - self.a
+        return (g, 0.0), t
 
 
-class profit_rb_oracle:
+class ProfitRbOracle:
     """Oracle for a robust profit maximization problem.
 
     This example is taken from [Aliabadi and Salahi, 2013]:
@@ -90,7 +86,7 @@ class profit_rb_oracle:
         v' = v ± e5
 
     See also:
-        profit_oracle
+        ProfitOracle
     """
 
     def __init__(
@@ -113,7 +109,7 @@ class profit_rb_oracle:
         self.e = [e1, e2]
         p, A, k = params
         params_rb = p - e3, A, k - e4
-        self.P = profit_oracle(params_rb, a, v + e5)
+        self.P = ProfitOracle(params_rb, a, v + e5)
 
     def assess_optim(self, y: Arr, t: float) -> Tuple[Cut, Optional[float]]:
         """Make object callable for cutting_plane_optim()
@@ -135,7 +131,7 @@ class profit_rb_oracle:
         return self.P.assess_optim(y, t)
 
 
-class profit_q_oracle:
+class ProfitQOracle:
     """Oracle for a decrete profit maximization problem.
 
         max     p(A x1^α x2^β) - v1*x1 - v2*x2
@@ -155,7 +151,7 @@ class profit_q_oracle:
         AssertionError: [description]
 
     See also:
-        profit_oracle
+        ProfitOracle
     """
 
     yd = None
@@ -168,7 +164,7 @@ class profit_q_oracle:
             a (Arr): the output elasticities
             v (Arr): output price
         """
-        self.P = profit_oracle(params, a, v)
+        self.P = ProfitOracle(params, a, v)
 
     def assess_optim_q(self, y, t, retry):
         """Make object callable for cutting_plane_q()

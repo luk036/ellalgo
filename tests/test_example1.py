@@ -4,7 +4,7 @@ from __future__ import print_function
 import numpy as np
 
 from ellalgo.cutting_plane import cutting_plane_optim
-from ellalgo.ell_stable import ell_stable
+from ellalgo.ell_stable import EllStable
 
 
 class MyOracle2:
@@ -55,7 +55,7 @@ class MyOracle:
 def test_case_feasible():
     """[summary]"""
     x0 = np.array([0.0, 0.0])  # initial x0
-    E = ell_stable(10.0, x0)
+    E = EllStable(10.0, x0)
     P = MyOracle()
     x, _, _, _ = cutting_plane_optim(P, E, float("-inf"))
     assert x is not None
@@ -67,7 +67,7 @@ def test_case_feasible():
 def test_case_infeasible1():
     """[summary]"""
     x0 = np.array([100.0, 100.0])  # wrong initial guess,
-    E = ell_stable(10.0, x0)  # or ellipsoid is too small
+    E = EllStable(10.0, x0)  # or ellipsoid is too small
     P = MyOracle()
     x, _, _, _ = cutting_plane_optim(P, E, float("-inf"))
     assert x is None
@@ -76,7 +76,7 @@ def test_case_infeasible1():
 def test_case_infeasible2():
     """[summary]"""
     x0 = np.array([0.0, 0.0])  # initial x0
-    E = ell_stable(10.0, x0)
+    E = EllStable(10.0, x0)
     P = MyOracle()
     x, _, _, _ = cutting_plane_optim(P, E, 100)  # wrong init best-so-far
     assert x is None

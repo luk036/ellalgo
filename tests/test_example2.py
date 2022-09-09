@@ -4,7 +4,7 @@ from __future__ import print_function
 import numpy as np
 
 from ellalgo.cutting_plane import CutStatus, cutting_plane_feas
-from ellalgo.ell import ell
+from ellalgo.ell import Ell
 
 
 class MyOracle:
@@ -31,7 +31,7 @@ class MyOracle:
 def test_case_feasible():
     """[summary]"""
     x0 = np.array([0.0, 0.0])  # initial guess
-    E = ell(10.0, x0)
+    E = Ell(10.0, x0)
     P = MyOracle()
     ell_info = cutting_plane_feas(P, E)
     assert ell_info.feasible
@@ -42,9 +42,9 @@ def test_case_feasible():
 def test_case_infeasible():
     """[summary]"""
     x0 = np.array([100.0, 100.0])  # wrong initial guess
-    E = ell(10.0, x0)
+    E = Ell(10.0, x0)
     P = MyOracle()
     ell_info = cutting_plane_feas(P, E)
     assert ell_info.status == CutStatus.NoSoln  # no sol'n
-    assert ell_info.num_iters == 1  # small
+    assert ell_info.num_iters == 0  # small
     assert not ell_info.feasible

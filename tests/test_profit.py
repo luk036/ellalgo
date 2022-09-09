@@ -4,11 +4,11 @@ from __future__ import print_function
 import numpy as np
 
 from ellalgo.cutting_plane import cutting_plane_optim, cutting_plane_q
-from ellalgo.ell import ell
+from ellalgo.ell import Ell
 from ellalgo.oracles.profit_oracle import (
-    profit_oracle,
-    profit_q_oracle,
-    profit_rb_oracle,
+    ProfitOracle,
+    ProfitQOracle,
+    ProfitRbOracle,
 )
 
 p, A, k = 20.0, 40.0, 30.5
@@ -21,27 +21,27 @@ r = np.array([100.0, 100.0])  # initial ellipsoid (sphere)
 
 
 def test_profit():
-    E = ell(r, np.array([0.0, 0.0]))
-    P = profit_oracle(params, a, v)
+    E = Ell(r, np.array([0.0, 0.0]))
+    P = ProfitOracle(params, a, v)
     x, _, num_iters, _ = cutting_plane_optim(P, E, 0.0)
     assert x is not None
-    assert num_iters == 37
+    assert num_iters == 36
 
 
 def test_profit_rb():
     e1 = 0.003
     e2 = 0.007
     e3 = e4 = e5 = 1.0
-    E = ell(r, np.array([0.0, 0.0]))
-    P = profit_rb_oracle(params, a, v, (e1, e2, e3, e4, e5))
+    E = Ell(r, np.array([0.0, 0.0]))
+    P = ProfitRbOracle(params, a, v, (e1, e2, e3, e4, e5))
     x, _, num_iters, _ = cutting_plane_optim(P, E, 0.0)
     assert x is not None
-    assert num_iters == 42
+    assert num_iters == 41
 
 
 def test_profit_q():
-    E = ell(r, np.array([0.0, 0.0]))
-    P = profit_q_oracle(params, a, v)
+    E = Ell(r, np.array([0.0, 0.0]))
+    P = ProfitQOracle(params, a, v)
     x, _, num_iters, _ = cutting_plane_q(P, E, 0.0)
     assert x is not None
-    assert num_iters == 28
+    assert num_iters == 27

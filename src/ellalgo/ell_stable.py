@@ -9,10 +9,10 @@ from .cutting_plane import CutStatus
 Arr = Union[np.ndarray]
 
 
-class ell_stable:
+class EllStable:
     """Ellipsoid Search Space
 
-            ell_stable = {x | (x − xc)' Q^−1 (x − xc) ​≤ κ}
+            EllStable = {x | (x − xc)' Q^−1 (x − xc) ​≤ κ}
 
     Returns:
         [type] -- [description]
@@ -23,7 +23,7 @@ class ell_stable:
     #              '_xc', '_Q', 'use_parallel_cut', 'no_defer_trick')
 
     def __init__(self, val: Union[Arr, float], x: Arr):
-        """Construct a new ell_stable object
+        """Construct a new EllStable object
 
         Arguments:
             val (Union[Arr, float]): [description]
@@ -58,9 +58,9 @@ class ell_stable:
         """[summary]
 
         Returns:
-            ell_stable: [description]
+            EllStable: [description]
         """
-        E = ell_stable(self._kappa, self.xc)
+        E = EllStable(self._kappa, self.xc)
         E._Q = self._Q.copy()
         # E._c1 = self._c1
         E.use_parallel_cut = self.use_parallel_cut

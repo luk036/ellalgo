@@ -58,15 +58,13 @@ def cutting_plane_feas(omega, S, options=Options()) -> CInfo:
         x: solution vector
         niter: number of iterations performed
     """
-    for niter in range(1, options.max_iter):
+    for niter in range(options.max_iter):
         cut = omega.assess_feas(S.xc)  # query the oracle at S.xc
         if cut is None:  # feasible sol'n obtained
             return CInfo(True, niter, CutStatus.Success)
-
         cutstatus, tsq = S.update(cut)  # update S
         if cutstatus != CutStatus.Success:
             return CInfo(False, niter, cutstatus)
-
         if tsq < options.tol:
             return CInfo(False, niter, CutStatus.SmallEnough)
     return CInfo(False, options.max_iter, CutStatus.NoSoln)
@@ -90,9 +88,7 @@ def cutting_plane_optim(omega, S, t, options=Options()
         ret {CInfo}
     """
     x_best = None
-    status = CutStatus.Unknown
-
-    for niter in range(1, options.max_iter):
+    for niter in range(options.max_iter):
         cut, t1 = omega.assess_optim(S.xc, t)
         if t1 is not None:  # better t obtained
             t = t1
@@ -102,8 +98,7 @@ def cutting_plane_optim(omega, S, t, options=Options()
             return x_best, t, niter, status
         if tsq < options.tol:
             return x_best, t, niter, CutStatus.SmallEnough
-
-    return x_best, t, options.max_iter, status
+    return x_best, t, options.max_iter, CutStatus.Success
 
 
 def cutting_plane_q(omega, S, t, options=Options()):
@@ -124,10 +119,8 @@ def cutting_plane_q(omega, S, t, options=Options()):
     """
     # x_last = S.xc
     x_best = None
-    status = CutStatus.Unknown
     retry = False
-    for niter in range(1, options.max_iter):
-        # retry = status == CutStatus.NoEffect
+    for niter in range(options.max_iter):
         cut, x0, t1, more_alt = omega.assess_optim_q(S.xc, t, retry)
         if t1 is not None:  # better t obtained
             t = t1
@@ -141,12 +134,10 @@ def cutting_plane_q(omega, S, t, options=Options()):
             return x_best, t, niter, status
         if tsq < options.tol:
             return x_best, t, niter, CutStatus.SmallEnough
+    return x_best, t, options.max_iter, CutStatus.Success
 
-    return x_best, t, options.max_iter, status
 
-
-def bsearch(omega, Interval: Tuple, options=Options()
-) -> Tuple[Any, CInfo]:
+def bsearch(omega, intrvl, options=Options()) -> Tuple[Any, int, CutStatus]:
     """[summary]
 
     Arguments:
@@ -160,25 +151,18 @@ def bsearch(omega, Interval: Tuple, options=Options()
         [type]: [description]
     """
     # assume monotone
-    # feasible = False
-    lower, upper = Interval
-    T = type(upper)  # T could be `int` or `Fraction`
-    u_orig = upper
-    status = CutStatus.Unknown
-
-    for niter in range(1, options.max_iter):
+    lower, upper = intrvl
+    T = type(upper)  # T could be `int`
+    for niter in range(options.max_iter):
         tau = (upper - lower) / 2
         if tau < options.tol:
-            status = CutStatus.SmallEnough
-            break
+            return upper, niter, CutStatus.SmallEnough
         t = T(lower + tau)
         if omega.assess_bs(t):  # feasible sol'n obtained
             upper = t
         else:
             lower = t
-
-    ret = CInfo(upper != u_orig, niter + 1, status)
-    return upper, ret
+    return upper, options.max_iter, CutStatus.Unknown
 
 
 class bsearch_adaptor:

@@ -7,7 +7,7 @@ import numpy as np
 from pytest import approx
 
 from ellalgo.cutting_plane import cutting_plane_optim
-from ellalgo.ell import ell
+from ellalgo.ell import Ell
 
 
 class MyQuasicvxOracle:
@@ -43,7 +43,7 @@ class MyQuasicvxOracle:
 def test_case_feasible():
     """[summary]"""
     x0 = np.array([0.0, 0.0])  # initial x0
-    E = ell(10.0, x0)
+    E = Ell(10.0, x0)
     P = MyQuasicvxOracle()
     xb, fb, _, _ = cutting_plane_optim(P, E, 0.0)
     assert xb is not None
@@ -55,7 +55,7 @@ def test_case_feasible():
 def test_case_infeasible1():
     """[summary]"""
     x0 = np.array([100.0, 100.0])  # wrong initial guess,
-    E = ell(10.0, x0)  # or ellipsoid is too small
+    E = Ell(10.0, x0)  # or ellipsoid is too small
     P = MyQuasicvxOracle()
     xb, _, _, _ = cutting_plane_optim(P, E, 0.0)
     assert xb is None
@@ -64,7 +64,7 @@ def test_case_infeasible1():
 def test_case_infeasible2():
     """[summary]"""
     x0 = np.array([0.0, 0.0])  # initial x0
-    E = ell(10.0, x0)
+    E = Ell(10.0, x0)
     P = MyQuasicvxOracle()
     xb, _, _, _ = cutting_plane_optim(P, E, 100)  # wrong init best-so-far
     assert xb is None
