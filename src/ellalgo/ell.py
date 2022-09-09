@@ -12,7 +12,7 @@ Arr = Union[np.ndarray]
 class Ell:
     """Ellipsoid Search Space
 
-            Ell = {x | (x − xc)' Q^−1 (x − xc) ​≤ κ}
+            Ell = {x | (x − xc)' Q^−1 (x − xc) ≤ κ}
 
     Returns:
         [type] -- [description]
@@ -116,7 +116,7 @@ class Ell:
     def update_core(self, calc_ell, cut):
         """Update ellipsoid core function using the cut(s)
 
-                g' * (x − xc) + beta <= 0
+                grad' (x − xc) + beta ≤ 0
 
             Note: At most one square-root per iteration.
 
@@ -128,22 +128,20 @@ class Ell:
             status: 0: success
             tau: "volumn" of ellipsoid
         """
-        g, beta = cut
-        Qg = self._Q @ g  # n^2 multiplications
-        omega = g @ Qg  # n multiplications
+        grad, beta = cut
+        grad_t = self._Q @ grad  # n^2 multiplications
+        omega = grad @ grad_t  # n multiplications
         self._tsq = self._kappa * omega
         status = calc_ell(beta)
         if status != CutStatus.Success:
             return status, self._tsq
-
-        self._xc -= (self._rho / omega) * Qg  # n
-        self._Q -= (self._sigma / omega) * np.outer(Qg, Qg)  # n*(n-1)/2
-
+        self._xc -= (self._rho / omega) * grad_t  # n
+        self._Q -= (self._sigma / omega) \
+            * np.outer(grad_t, grad_t)  # n*(n-1)/2
         if self.no_defer_trick:
             self._Q *= self._delta
         else:
             self._kappa *= self._delta
-
         return status, self._tsq
 
     def _calc_ll(self, beta) -> CutStatus:
@@ -194,7 +192,8 @@ class Ell:
         bav = bsum / 2.0
         temp = self._n * bav * (b1 - b0)
         xi = math.sqrt(t0n * t1n + temp * temp)
-        self._sigma = self._c3 + (self._tsq - b0b1 - xi) / (bsum * bav * self._nPlus1)
+        self._sigma = self._c3 + (self._tsq - b0b1 - xi) \
+            / (bsum * bav * self._nPlus1)
         self._rho = self._sigma * bav
         self._delta = self._c1 * ((t0n + t1n) / 2 + xi / self._n) / self._tsq
         return CutStatus.Success
@@ -218,7 +217,7 @@ class Ell:
     def _calc_dc(self, beta: float) -> CutStatus:
         """Calculate new ellipsoid under Deep Cut
 
-                g' (x − xc​) + β ​≤ 0
+                g' (x − xc) + β ≤ 0
 
         Arguments:
             beta (float): [description]
@@ -238,12 +237,11 @@ class Ell:
         if beta == 0.0:
             self._calc_cc(tau)
             return CutStatus.Success
-        n = self._n
-        gamma = tau + n * beta
+        gamma = tau + self._n * beta
         if gamma < 0.0:
             return CutStatus.NoEffect  # no effect, unlikely
 
-        self._mu = (tau - beta) / gamma * self._halfNminus1
+        # self._mu = (tau - beta) / gamma * self._halfNminus1
         self._rho = gamma / self._nPlus1
         self._sigma = 2.0 * self._rho / (tau + beta)
         self._delta = self._c1 * (1.0 - beta * (beta / self._tsq))
@@ -255,7 +253,7 @@ class Ell:
         Arguments:
             tau (float): [description]
         """
-        self._mu = self._halfNminus1
+        # self._mu = self._halfNminus1
         self._sigma = self._c2
         self._rho = tau / self._nPlus1
         self._delta = self._c1

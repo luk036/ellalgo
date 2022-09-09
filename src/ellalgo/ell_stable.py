@@ -12,7 +12,7 @@ Arr = Union[np.ndarray]
 class EllStable:
     """Ellipsoid Search Space
 
-            EllStable = {x | (x − xc)' Q^−1 (x − xc) ​≤ κ}
+        EllStable = {x | (x − xc)' Q^−1 (x − xc) ≤ κ}
 
     Returns:
         [type] -- [description]
@@ -189,8 +189,8 @@ class EllStable:
     def _calc_ll_core(self, b0: float, b1: float) -> CutStatus:
         """Calculate new ellipsoid under Parallel Cut
 
-                g' (x − xc​) + β0 ​≤ 0
-                g' (x − xc​) + β1 ​≥ 0
+                g' (x − xc) + β0 ≤ 0
+                g' (x − xc) + β1 ≥ 0
 
         Arguments:
             b0 (float): [description]
@@ -200,13 +200,12 @@ class EllStable:
             int: [description]
         """
         b1sqn = b1 * (b1 / self._tsq)
-        t1n = 1 - b1sqn
-        if t1n < 0 or not self.use_parallel_cut:
+        t1n = 1.0 - b1sqn
+        if t1n < 0.0 or not self.use_parallel_cut:
             return self._calc_dc(b0)
-        bdiff = b1 - b0
-        if bdiff < 0:
+        if b1 - b0 < 0.0:
             return CutStatus.NoSoln  # no sol'n
-        if b0 == 0:
+        if b0 == 0.0:
             self._calc_ll_cc(b1, b1sqn)
             return CutStatus.Success
 
@@ -220,18 +219,19 @@ class EllStable:
         bsum = b0 + b1
         bsumn = bsum / self._tsq
         bav = bsum / 2.0
-        tempn = self._halfN * bsumn * bdiff
+        tempn = self._halfN * bsumn * (b1 - b0)
         xi = math.sqrt(t0n * t1n + tempn * tempn)
-        self._sigma = self._c3 + (1.0 - b0b1n - xi) / (bsumn * bav * self._nPlus1)
+        self._sigma = self._c3 + (1.0 - b0b1n - xi) \
+            / (bsumn * bav * self._nPlus1)
         self._rho = self._sigma * bav
-        self._delta = self._c1 * ((t0n + t1n) / 2 + xi / self._n)
+        self._delta = self._c1 * ((t0n + t1n) / 2.0 + xi / self._n)
         return CutStatus.Success
 
     def _calc_ll_cc(self, b1: float, b1sqn: float):
         """Calculate new ellipsoid under Parallel Cut, one of them is central
 
-                g' (x − xc​) ​≤ 0
-                g' (x − xc​) + β1 ​≥ 0
+                g' (x − xc) ≤ 0
+                g' (x − xc) + β1 ≥ 0
 
         Arguments:
             b1 (float): [description]
