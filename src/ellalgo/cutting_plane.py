@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
+# from typing import TypeVar
+from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Any, Tuple
+from typing import Optional, Tuple, Union
+
+from numpy import ndarray
+
+ArrayType = Union[float, ndarray]  # one or multi dimensional
+CutChoice = Union[float, Tuple[float, Optional[float]]]  # single or parallel
+Cut = Tuple[ArrayType, CutChoice]
+FloatOrInt = Union[float, int]
 
 
 class CutStatus(Enum):
@@ -30,7 +39,35 @@ class CInfo:
         self.status: CutStatus = status
 
 
-def cutting_plane_feas(omega, S, options=Options()) -> CInfo:
+class OracleFeas(ABC):
+    @abstractmethod
+    def assess_feas(self, x: ArrayType) -> Optional[Cut]:
+        pass
+
+
+class OracleOptim(ABC):
+    @abstractmethod
+    def assess_optim(
+        self, x: ArrayType, t: float  # what?
+    ) -> Tuple[Cut, Optional[float]]:
+        pass
+
+
+class OracleOptimQ(ABC):
+    @abstractmethod
+    def assess_optim_q(
+        self, x: ndarray, t: float, retry: bool
+    ) -> Tuple[Cut, ndarray, Optional[float], bool]:
+        pass
+
+
+class OracleBS(ABC):
+    @abstractmethod
+    def assess_bs(self, t: FloatOrInt) -> bool:
+        pass
+
+
+def cutting_plane_feas(omega: OracleFeas, S, options=Options()) -> CInfo:
     """Find a point in a convex set (defined through a cutting-plane oracle).
 
     Description:
@@ -70,8 +107,9 @@ def cutting_plane_feas(omega, S, options=Options()) -> CInfo:
     return CInfo(False, options.max_iter, CutStatus.NoSoln)
 
 
-def cutting_plane_optim(omega, S, t, options=Options()
-) -> Tuple[Any, Any, int, CutStatus]:
+def cutting_plane_optim(
+    omega: OracleOptim, S, t: float, options=Options()
+) -> Tuple[Optional[ArrayType], float, int, CutStatus]:
     """Cutting-plane method for solving convex optimization problem
 
     Arguments:
@@ -101,11 +139,13 @@ def cutting_plane_optim(omega, S, t, options=Options()
     return x_best, t, options.max_iter, CutStatus.Success
 
 
-def cutting_plane_q(omega, S, t, options=Options()):
+def cutting_plane_q(
+    omega: OracleOptimQ, S, t: float, options=Options()
+) -> Tuple[Optional[ArrayType], float, int, CutStatus]:
     """Cutting-plane method for solving convex discrete optimization problem
 
     Arguments:
-        omega ([type]): perform assessment on x0
+        omega (OracleOptimQ): perform assessment on x0
         S ([type]): Search Space containing x*
         t (float): initial best-so-far value
 
@@ -137,7 +177,9 @@ def cutting_plane_q(omega, S, t, options=Options()):
     return x_best, t, options.max_iter, CutStatus.Success
 
 
-def bsearch(omega, intrvl, options=Options()) -> Tuple[Any, int, CutStatus]:
+def bsearch(
+    omega: OracleBS, intrvl: Tuple[FloatOrInt, FloatOrInt], options=Options()
+) -> Tuple[FloatOrInt, int, CutStatus]:
     """[summary]
 
     Arguments:
