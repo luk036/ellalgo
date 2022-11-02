@@ -5,8 +5,10 @@ import numpy as np
 from .cutting_plane import CutStatus
 from .ell_calc import EllCalc
 
-Arr = Union[np.ndarray, float]
-Mat = Union[np.ndarray, float]
+Arr = Union[np.ndarray]
+Mat = Union[np.ndarray]
+CutChoice = Union[float, Arr]  # single or parallel
+Cut = Tuple[Arr, CutChoice]
 
 
 class EllStable:
@@ -45,8 +47,8 @@ class EllStable:
         E.no_defer_trick = self.no_defer_trick
         return E
 
-    @property
-    def xc(self):
+    # @property
+    def xc(self) -> Arr:
         """copy the whole array anyway
 
         Returns:
@@ -54,8 +56,8 @@ class EllStable:
         """
         return self._xc
 
-    @xc.setter
-    def xc(self, x: Arr):
+    # @xc.setter
+    def set_xc(self, x: Arr):
         """Set the xc object
 
         arguments:
@@ -63,7 +65,7 @@ class EllStable:
         """
         self._xc = x
 
-    def update(self, cut) -> Tuple[CutStatus, float]:
+    def update(self, cut: Cut) -> Tuple[CutStatus, float]:
         """Update ellipsoid by cut
 
         Arguments:

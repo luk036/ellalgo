@@ -1,7 +1,9 @@
-from .cutting_plane import CutStatus
-from typing import List
 from math import sqrt
+from typing import List
+
 import numpy as np
+
+from .cutting_plane import CutStatus
 
 
 class EllCalc:
@@ -10,20 +12,20 @@ class EllCalc:
     sigma: float = 0.0
     delta: float = 0.0
     tsq: float = 0.0
-    n: float
+    n_f: float
     half_n: float
-    c0: float
-    c1: float
-    c2: float
-    c3: float
+    cst0: float
+    cst1: float
+    cst2: float
+    cst3: float
 
     def __init__(self, n: float):
-        self.n = n
+        self.n_f = n
         self.half_n = n / 2.0
-        self.c0 = 1.0 / (n + 1.0)
-        self.c1 = n**2 / (n**2 - 1.0)
-        self.c2 = 2.0 * self.c0
-        self.c3 = n * self.c0
+        self.cst0 = 1.0 / (n + 1.0)
+        self.cst1 = n**2 / (n**2 - 1.0)
+        self.cst2 = 2.0 * self.cst0
+        self.cst3 = n * self.cst0
 
     def copy(self):
         """[summary]
@@ -31,7 +33,7 @@ class EllCalc:
         Returns:
             EllCalc: [description]
         """
-        E = EllCalc(self.n)
+        E = EllCalc(self.n_f)
         E.use_parallel_cut = self.use_parallel_cut
         E.rho = self.rho
         E.sigma = self.sigma
@@ -51,7 +53,7 @@ class EllCalc:
         """
         if np.isscalar(beta):
             return self.calc_dc(beta, sqrt(self.tsq))
-        if len(beta) < 2:  # unlikely
+        elif len(beta) < 2:  # unlikely
             return self.calc_dc(beta[0], sqrt(self.tsq))
         return self.calc_ll_core(beta[0], beta[1])
 
@@ -63,7 +65,7 @@ class EllCalc:
         if b0 == 0.0:
             return self.calc_ll_cc(b1)
         b0b1 = b0 * b1
-        if self.n * b0b1 < -self.tsq:  # for discrete optimization
+        if self.n_f * b0b1 < -self.tsq:  # for discrete optimization
             return CutStatus.NoEffect  # no effect
 
         b0sq = b0**2
@@ -71,18 +73,19 @@ class EllCalc:
         t0 = self.tsq - b0sq
         t1 = self.tsq - b1sq
         bsum = b0 + b1
-        xi = sqrt(t0 * t1 + (self.half_n * (b1sq - b0sq))**2)
-        self.sigma = self.c3 + self.c2 * (self.tsq - b0b1 - xi) / (bsum**2)
+        xi = sqrt(t0 * t1 + (self.half_n * (b1sq - b0sq)) ** 2)
+        self.sigma = self.cst3 + self.cst2 * (self.tsq - b0b1 - xi) / (bsum**2)
         self.rho = self.sigma * bsum / 2
-        self.delta = self.c1 * ((t0 + t1) / 2 + xi / self.n) / self.tsq
+        self.delta = self.cst1 * ((t0 + t1) / 2 + xi / self.n_f) / self.tsq
         return CutStatus.Success
 
     def calc_ll_cc(self, b1: float):
         b1sq = b1**2
-        xi = sqrt((self.tsq - b1sq) * self.tsq + (self.half_n * b1sq)**2)
-        self.sigma = self.c3 + self.c2 * (self.tsq - xi) / b1sq
+        xi = sqrt((self.tsq - b1sq) * self.tsq + (self.half_n * b1sq) ** 2)
+        self.sigma = self.cst3 + self.cst2 * (self.tsq - xi) / b1sq
         self.rho = self.sigma * b1 / 2
-        self.delta = self.c1 * (self.tsq - b1sq / 2 + xi / self.n) / self.tsq
+        temp = self.tsq - b1sq / 2 + xi / self.n_f
+        self.delta = self.cst1 * temp / self.tsq
         return CutStatus.Success
 
     def calc_dc(self, beta: float, tau: float) -> CutStatus:
@@ -90,19 +93,19 @@ class EllCalc:
             return CutStatus.NoSoln  # no sol'n
         if beta == 0.0:
             return self.calc_cc(tau)
-        gamma = tau + self.n * beta
+        gamma = tau + self.n_f * beta
         if gamma < 0.0:
             return CutStatus.NoEffect  # no effect
 
-        self.rho = self.c0 * gamma
-        self.sigma = self.c2 * gamma / (tau + beta)
-        self.delta = self.c1 * (self.tsq - beta**2) / self.tsq
+        self.rho = self.cst0 * gamma
+        self.sigma = self.cst2 * gamma / (tau + beta)
+        self.delta = self.cst1 * (self.tsq - beta**2) / self.tsq
         return CutStatus.Success
 
     def calc_cc(self, tau: float):
-        self.sigma = self.c2
-        self.rho = self.c0 * tau
-        self.delta = self.c1
+        self.sigma = self.cst2
+        self.rho = self.cst0 * tau
+        self.delta = self.cst1
         return CutStatus.Success
 
     def get_results(self) -> List[float]:

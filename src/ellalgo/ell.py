@@ -2,14 +2,16 @@ from typing import Tuple, Union
 
 import numpy as np
 
-from .cutting_plane import CutStatus
+from .cutting_plane import CutStatus, SearchSpace
 from .ell_calc import EllCalc
 
-Arr = Union[np.ndarray, float]
-Mat = Union[np.ndarray, float]
+Arr = Union[np.ndarray]
+Mat = Union[np.ndarray]
+CutChoice = Union[float, Arr]  # single or parallel
+Cut = Tuple[Arr, CutChoice]
 
 
-class Ell:
+class Ell(SearchSpace):
     no_defer_trick: bool = False
 
     _mq: Mat
@@ -42,8 +44,8 @@ class Ell:
         E.no_defer_trick = self.no_defer_trick
         return E
 
-    @property
-    def xc(self):
+    # @property
+    def xc(self) -> Arr:
         """copy the whole array anyway
 
         Returns:
@@ -51,8 +53,8 @@ class Ell:
         """
         return self._xc
 
-    @xc.setter
-    def xc(self, x: Arr):
+    # @xc.setter
+    def set_xc(self, x: Arr):
         """Set the xc object
 
         Arguments:
@@ -60,7 +62,7 @@ class Ell:
         """
         self._xc = x
 
-    def update(self, cut) -> Tuple[CutStatus, float]:
+    def update(self, cut: Cut) -> Tuple[CutStatus, float]:
         grad, beta = cut
         grad_t = self._mq @ grad  # n^2 multiplications
         omega = grad @ grad_t  # n multiplications

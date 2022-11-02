@@ -1,13 +1,14 @@
-# -*- coding: utf-8 -*-
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, TypeVar
 
 import numpy as np
 
-Arr = Union[np.ndarray, float]
+from ellalgo.cutting_plane import OracleOptim
+
+Arr = TypeVar("Arr", bound="np.ndarray")
 Cut = Tuple[Arr, float]
 
 
-class ProfitOracle:
+class ProfitOracle(OracleOptim):
     """Oracle for a profit maximization problem.
 
     This example is taken from [Aliabadi and Salahi, 2013]
@@ -69,13 +70,13 @@ class ProfitOracle:
         return (g, 0.0), t
 
 
-class ProfitRbOracle:
+class ProfitRbOracle(OracleOptim):
     """Oracle for a robust profit maximization problem.
 
     This example is taken from [Aliabadi and Salahi, 2013]:
 
-        max     p'(A x1^α' x2^β') - v1'*x1 - v2'*x2
-        s.t.    x1 ≤ k'
+        max  p'(A x1^α' x2^β') - v1'*x1 - v2'*x2
+        s.t. x1 ≤ k'
 
     where:
 
@@ -166,7 +167,9 @@ class ProfitQOracle:
         """
         self.P = ProfitOracle(params, a, v)
 
-    def assess_optim_q(self, y, t, retry):
+    def assess_optim_q(
+        self, y: Arr, t: float, retry: bool
+    ) -> Tuple[Cut, Arr, Optional[float], bool]:
         """Make object callable for cutting_plane_q()
 
         Arguments:
