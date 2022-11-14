@@ -19,7 +19,7 @@ class LMIOldOracle:
 
     """
 
-    def __init__(self, F, B):
+    def __init__(self, F, B) -> None:
         """[summary]
 
         Arguments:

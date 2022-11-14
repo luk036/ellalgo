@@ -24,7 +24,7 @@ class Options:
 
 
 class CInfo:
-    def __init__(self, feasible: bool, num_iters: int, status: CutStatus):
+    def __init__(self, feasible: bool, num_iters: int, status: CutStatus) -> None:
         """Construct a new CInfo object
 
         Arguments:
@@ -91,7 +91,7 @@ class SearchSpace2(SearchSpace):
         pass
 
     @abstractmethod
-    def set_xc(self, xc: ndarray):
+    def set_xc(self, xc: ndarray) -> None:
         pass
 
 
@@ -239,7 +239,7 @@ def bsearch(
 
 
 class bsearch_adaptor:
-    def __init__(self, P: OracleFeas2, S: SearchSpace2, options=Options()):
+    def __init__(self, P: OracleFeas2, S: SearchSpace2, options=Options()) -> None:
         """[summary]
 
         Arguments:

@@ -19,14 +19,14 @@ class Ell(SearchSpace):
     _kappa: float
     _helper: EllCalc
 
-    def _new_with_matrix(self, kappa: float, mq: Mat, xc: Arr):
+    def _new_with_matrix(self, kappa: float, mq: Mat, xc: Arr) -> None:
         n = len(xc)
         self._helper = EllCalc(float(n))
         self._kappa = kappa
         self._mq = mq
         self._xc = xc
 
-    def __init__(self, val, xc: Arr):
+    def __init__(self, val, xc: Arr) -> None:
         if np.isscalar(val):
             self._new_with_matrix(val, np.eye(len(xc)), xc)
         else:
@@ -54,7 +54,7 @@ class Ell(SearchSpace):
         return self._xc
 
     # @xc.setter
-    def set_xc(self, x: Arr):
+    def set_xc(self, x: Arr) -> None:
         """Set the xc object
 
         Arguments:

@@ -17,7 +17,7 @@ class LMI0Oracle:
 
     """
 
-    def __init__(self, F):
+    def __init__(self, F) -> None:
         """[summary]
 
         Arguments:

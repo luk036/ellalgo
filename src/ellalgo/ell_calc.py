@@ -19,7 +19,7 @@ class EllCalc:
     cst2: float
     cst3: float
 
-    def __init__(self, n: float):
+    def __init__(self, n: float) -> None:
         self.n_f = n
         self.half_n = n / 2.0
         self.cst0 = 1.0 / (n + 1.0)
@@ -79,7 +79,7 @@ class EllCalc:
         self.delta = self.cst1 * ((t0 + t1) / 2 + xi / self.n_f) / self.tsq
         return CutStatus.Success
 
-    def calc_ll_cc(self, b1: float):
+    def calc_ll_cc(self, b1: float) -> CutStatus:
         b1sq = b1**2
         xi = sqrt((self.tsq - b1sq) * self.tsq + (self.half_n * b1sq) ** 2)
         self.sigma = self.cst3 + self.cst2 * (self.tsq - xi) / b1sq
@@ -102,7 +102,7 @@ class EllCalc:
         self.delta = self.cst1 * (self.tsq - beta**2) / self.tsq
         return CutStatus.Success
 
-    def calc_cc(self, tau: float):
+    def calc_cc(self, tau: float) -> CutStatus:
         self.sigma = self.cst2
         self.rho = self.cst0 * tau
         self.delta = self.cst1

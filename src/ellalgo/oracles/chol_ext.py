@@ -21,7 +21,7 @@ class LDLTMgr:
 
     __slots__ = ("p", "v", "_n", "_T", "allow_semidefinite")
 
-    def __init__(self, N: int):
+    def __init__(self, N: int) -> None:
         """Construct a new chol ext object
 
         Arguments:
@@ -74,7 +74,7 @@ class LDLTMgr:
             start = i + 1  # T[i, i] == 0 (very unlikely), restart at i+1
         return self.is_spd()
 
-    def is_spd(self):
+    def is_spd(self) -> bool:
         """Is $A$ symmetric positive definite (spd)
 
         Returns:
@@ -82,7 +82,7 @@ class LDLTMgr:
         """
         return self.p[1] == 0
 
-    def witness(self):
+    def witness(self) -> float:
         """witness that certifies $A$ is not symmetric positive definite (spd)
             (square-root-free version)
 
@@ -104,7 +104,7 @@ class LDLTMgr:
             self.v[i - 1] = -(self._T[i:n, i - 1] @ self.v[i:n])
         return -self._T[m, m]
 
-    def sym_quad(self, A: Arr):
+    def sym_quad(self, A: Arr) -> float:
         """[summary]
 
         Arguments:

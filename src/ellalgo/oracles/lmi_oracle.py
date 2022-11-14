@@ -19,7 +19,7 @@ class LMIOracle:
 
     """
 
-    def __init__(self, F, B):
+    def __init__(self, F, B) -> None:
         """Construct a new lmi oracle object
 
         Arguments:

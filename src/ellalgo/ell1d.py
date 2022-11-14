@@ -11,7 +11,7 @@ Arr = Union[np.ndarray]
 class ell1d(SearchSpace):
     __slots__ = ("_rd", "_xc")
 
-    def __init__(self, interval: Tuple[float, float]):
+    def __init__(self, interval: Tuple[float, float]) -> None:
         """[summary]
 
         Arguments:
@@ -40,7 +40,7 @@ class ell1d(SearchSpace):
         return self._xc
 
     # @xc.setter
-    def set_xc(self, x: float):
+    def set_xc(self, x: float) -> None:
         """[summary]
 
         Arguments:

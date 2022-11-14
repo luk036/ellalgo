@@ -27,7 +27,7 @@ class ProfitOracle(OracleOptim):
         k: a given constant that restricts the quantity of x1
     """
 
-    def __init__(self, params: Tuple[float, float, float], a: Arr, v: Arr):
+    def __init__(self, params: Tuple[float, float, float], a: Arr, v: Arr) -> None:
         """[summary]
 
         Arguments:
@@ -96,7 +96,7 @@ class ProfitRbOracle(OracleOptim):
         a: Arr,
         v: Arr,
         vparams: Tuple[float, float, float, float, float],
-    ):
+    ) -> None:
         """[summary]
 
         Arguments:
@@ -155,9 +155,9 @@ class ProfitQOracle:
         ProfitOracle
     """
 
-    yd = None
+    yd: np.array
 
-    def __init__(self, params, a, v):
+    def __init__(self, params, a, v) -> None:
         """[summary]
 
         Arguments:
@@ -194,6 +194,6 @@ class ProfitQOracle:
                 x[1] = 1
             self.yd = np.log(x)
 
-        (g, h), t = self.P.assess_optim(self.yd, t)
+        (g, h), tnew = self.P.assess_optim(self.yd, t)
         h += g @ (self.yd - y)
-        return (g, h), self.yd, t, not retry
+        return (g, h), self.yd, tnew, not retry
