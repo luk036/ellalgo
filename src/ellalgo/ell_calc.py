@@ -47,37 +47,8 @@ class EllCalc:
         return E
 
     # def update_cut(self, beta: float) -> CutStatus { self.calc_dc(beta)
-    def calc_ll(self, beta1) -> CutStatus:
+    def calc_ll(self, beta) -> CutStatus:
         """parallel or deep cut
-
-                       __________________________
-                      ╱                         2
-                     ╱                  ⎛     2⎞
-                    ╱                   ⎜n ⋅ β ⎟
-                   ╱   ⎛ 2    2⎞    2   ⎜     1⎟
-            ξ =   ╱    ⎜τ  - β ⎟ ⋅ τ  + ⎜──────⎟
-                ╲╱     ⎝      1⎠        ⎝   2  ⎠
-
-                            ⎛ 2    ⎞
-                  n     2 ⋅ ⎝τ  - ξ⎠
-            σ = ───── + ────────────
-                n + 1              2
-                        (n + 1) ⋅ β
-                                   1
-
-                σ ⋅ β
-                     1
-            ϱ = ──────
-                   2
-
-                     ⎛      2    ⎞
-                     ⎜     β     ⎟
-                 2   ⎜ 2    1   ξ⎟
-                n  ⋅ ⎜τ  - ── + ─⎟
-                     ⎝      2   n⎠
-            δ = ──────────────────
-                   ⎛ 2    ⎞    2
-                   ⎝n  - 1⎠ ⋅ τ
 
         Arguments:
             beta ([type]): [description]
@@ -85,11 +56,11 @@ class EllCalc:
         Returns:
             int: [description]
         """
-        if np.isscalar(beta1):
-            return self.calc_dc(beta1, sqrt(self.tsq))
-        elif len(beta1) < 2:  # unlikely
-            return self.calc_dc(beta1[0], sqrt(self.tsq))
-        return self.calc_ll_core(beta1[0], beta1[1])
+        if np.isscalar(beta):
+            return self.calc_dc(beta, sqrt(self.tsq))
+        elif len(beta) < 2:  # unlikely
+            return self.calc_dc(beta[0], sqrt(self.tsq))
+        return self.calc_ll_core(beta[0], beta[1])
 
     def calc_ll_core(self, b0: float, b1: float) -> CutStatus:
         """Parallel Cut
@@ -153,13 +124,42 @@ class EllCalc:
         t1 = self.tsq - b1sq
         bsum = b0 + b1
         xi = sqrt(t0 * t1 + (self.half_n * (b1sq - b0sq)) ** 2)
-        self.sigma = self.cst3 + self.cst2 * (self.tsq - b0b1 - xi) / (bsum**2)
+        bsumsq = b0sq + 2 * b0b1 + b1sq
+        self.sigma = self.cst3 + self.cst2 * (self.tsq - b0b1 - xi) / bsumsq
         self.rho = self.sigma * bsum / 2
         self.delta = self.cst1 * ((t0 + t1) / 2 + xi / self.n_f) / self.tsq
         return CutStatus.Success
 
     def calc_ll_cc(self, b1: float) -> CutStatus:
-        """_summary_
+        """Parallel Cut with beta0 = 0
+                       __________________________
+                      ╱                         2
+                     ╱                  ⎛     2⎞
+                    ╱                   ⎜n ⋅ β ⎟
+                   ╱   ⎛ 2    2⎞    2   ⎜     1⎟
+            ξ =   ╱    ⎜τ  - β ⎟ ⋅ τ  + ⎜──────⎟
+                ╲╱     ⎝      1⎠        ⎝   2  ⎠
+
+                            ⎛ 2    ⎞
+                  n     2 ⋅ ⎝τ  - ξ⎠
+            σ = ───── + ────────────
+                n + 1              2
+                        (n + 1) ⋅ β
+                                   1
+
+                σ ⋅ β
+                     1
+            ϱ = ──────
+                   2
+
+                     ⎛      2    ⎞
+                     ⎜     β     ⎟
+                 2   ⎜ 2    1   ξ⎟
+                n  ⋅ ⎜τ  - ── + ─⎟
+                     ⎝      2   n⎠
+            δ = ──────────────────
+                   ⎛ 2    ⎞    2
+                   ⎝n  - 1⎠ ⋅ τ
 
         Args:
             b1 (float): _description_
@@ -167,12 +167,13 @@ class EllCalc:
         Returns:
             CutStatus: _description_
         """
-        b1sq = b1**2
-        xi = sqrt((self.tsq - b1sq) * self.tsq + (self.half_n * b1sq) ** 2)
-        self.sigma = self.cst3 + self.cst2 * (self.tsq - xi) / b1sq
+        # b1sq = b1**2
+        a1sq = b1**2 / self.tsq
+        xi = sqrt(1 - a1sq + (self.half_n * a1sq) ** 2)
+        self.sigma = self.cst3 + self.cst2 * (1.0 - xi) / a1sq
         self.rho = self.sigma * b1 / 2
-        temp = self.tsq - b1sq / 2 + xi / self.n_f
-        self.delta = self.cst1 * temp / self.tsq
+        # temp = 1.0 - a1sq / 2 + xi / self.n_f
+        self.delta = self.cst1 * (1 - a1sq / 2 + xi / self.n_f)
         return CutStatus.Success
 
     def calc_dc(self, beta: float, tau: float) -> CutStatus:

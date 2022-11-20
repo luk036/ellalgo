@@ -85,6 +85,15 @@ class SearchSpace(ABC):
         pass
 
 
+"""
+CuttingPlane -> SearchSpace: request xc
+SearchSpace -> CuttingPlane: return xc
+CuttingPlane -> OracleFeas: assess_feas(xc)
+OracleFeas -> CuttingPlane: return cut
+CuttingPlane -> SearchSpace: update by the cut
+"""
+
+
 class SearchSpace2(SearchSpace):
     @abstractmethod
     def copy(self) -> SearchSpace:
@@ -113,6 +122,28 @@ def cutting_plane_feas(
 
         A *separation oracle* asserts that an evalution point x0 is feasible,
         or provide a cut that separates the feasible region and x0.
+
+         ┌────────────┐    ┌───────────┐┌──────────┐
+         │CuttingPlane│    │SearchSpace││OracleFeas│
+         └─────┬──────┘    └─────┬─────┘└────┬─────┘
+               │                 │           │
+               │   request xc    │           │
+               │────────────────>│           │
+               │                 │           │
+               │    return xc    │           │
+               │<────────────────│           │
+               │                 │           │
+               │       assess_feas(xc)       │
+               │────────────────────────────>│
+               │                 │           │
+               │         return cut          │
+               │<────────────────────────────│
+               │                 │           │
+               │update by the cut│           │
+               │────────────────>│           │
+         ┌─────┴──────┐    ┌─────┴─────┐┌────┴─────┐
+         │CuttingPlane│    │SearchSpace││OracleFeas│
+         └────────────┘    └───────────┘└──────────┘
 
     Arguments:
         omega (OracleFeas): perform assessment on x0
