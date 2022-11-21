@@ -61,6 +61,14 @@ class OracleOptim(ABC):
         pass
 
 
+class OracleFeasQ(ABC):
+    @abstractmethod
+    def assess_feas_q(
+        self, x: ndarray, retry: bool
+    ) -> Tuple[Optional[Cut], Optional[ndarray], bool]:
+        pass
+
+
 class OracleOptimQ(ABC):
     @abstractmethod
     def assess_optim_q(
@@ -77,7 +85,7 @@ class OracleBS(ABC):
 
 class SearchSpace(ABC):
     @abstractmethod
-    def update(self, cut: Cut) -> Tuple[CutStatus, float]:
+    def update(self, cut: Cut, cc: bool = False) -> Tuple[CutStatus, float]:
         pass
 
     @abstractmethod
@@ -204,12 +212,12 @@ def cutting_plane_optim(
 
 
 def cutting_plane_feas_q(
-    omega: OracleOptimQ, S, t: float, options=Options()
-) -> Tuple[Optional[ArrayType], float, int, CutStatus]:
+    omega: OracleFeasQ, S, options=Options()
+) -> Tuple[Optional[ArrayType], CInfo]:
     """Cutting-plane method for solving convex discrete optimization problem
 
     Arguments:
-        omega (OracleOptimQ): perform assessment on x0
+        omega (OracleFeasQ): perform assessment on x0
         S ([type]): Search Space containing x*
         t (float): initial best-so-far value
 
@@ -227,7 +235,7 @@ def cutting_plane_feas_q(
         cut, x0, more_alt = omega.assess_feas_q(S.xc(), retry)
         if cut is None:  # better t obtained
             return x0, CInfo(True, niter, CutStatus.Success)
-        cutstatus, tsq = space.update(cut)
+        cutstatus, tsq = S.update(cut)
         if cutstatus == CutStatus.NoEffect:
             if not more_alt:  # no more alternative cut
                 return None, CInfo(False, niter, CutStatus.NoEffect)

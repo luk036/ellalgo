@@ -101,7 +101,7 @@ class EllCalc:
         b0b1 = b0 * b1
         if self.n_f * b0b1 < -self.tsq:  # for discrete optimization
             return CutStatus.NoEffect  # no effect
-        calc_ll_core(b0, b1, b1sq, b0b1)
+        self.calc_ll_core(b0, b1, b1sq, b0b1)
         return CutStatus.Success
 
     def calc_ll_core(self, b0: float, b1: float, b1sq: float, b0b1: float) -> None:
@@ -239,7 +239,8 @@ class EllCalc:
         if beta == 0.0:
             return self.calc_cc(tau)
         gamma = tau + self.n_f * beta
-        if gamma < 0.0:
+
+        if gamma < 0.0:  # discrete optimization only
             return CutStatus.NoEffect  # no effect
 
         self.rho = self.cst0 * gamma
