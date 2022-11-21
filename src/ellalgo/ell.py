@@ -62,13 +62,17 @@ class Ell(SearchSpace):
         """
         self._xc = x
 
-    def update(self, cut: Cut) -> Tuple[CutStatus, float]:
+    def update(self, cut: Cut, cc=False) -> Tuple[CutStatus, float]:
         grad, beta = cut
         grad_t = self._mq @ grad  # n^2 multiplications
         omega = grad @ grad_t  # n multiplications
         self._helper.tsq = self._kappa * omega
 
-        status = self._helper.calc_ll(beta)
+        if cc:
+            status = self._helper.calc_single_or_ll_cc(beta)
+        else:
+            status = self._helper.calc_single_or_ll(beta)
+
         if status != CutStatus.Success:
             return (status, self._helper.tsq)
 

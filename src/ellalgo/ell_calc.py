@@ -47,10 +47,10 @@ class EllCalc:
         return E
 
     # def update_cut(self, beta: float) -> CutStatus { self.calc_dc(beta)
-    def calc_ll(self, beta) -> CutStatus:
-        """parallel or deep cut
+    def calc_single_or_ll(self, beta) -> CutStatus:
+        """single or parallel cut
 
-        Arguments:
+        Args:
             beta ([type]): [description]
 
         Returns:
@@ -60,10 +60,52 @@ class EllCalc:
             return self.calc_dc(beta, sqrt(self.tsq))
         elif len(beta) < 2:  # unlikely
             return self.calc_dc(beta[0], sqrt(self.tsq))
-        return self.calc_ll_core(beta[0], beta[1])
+        return self.calc_ll(beta[0], beta[1])
 
-    def calc_ll_core(self, b0: float, b1: float) -> CutStatus:
+    def calc_single_or_ll_cc(self, beta) -> CutStatus:
+        """single or parallel cut
+
+        Args:
+            beta ([type]): [description]
+
+        Returns:
+            int: [description]
+        """
+        if np.isscalar(beta) or len(beta) < 2:
+            return self.calc_cc(sqrt(self.tsq))
+        if beta[1] < 0.0:
+            return CutStatus.NoSoln  # no sol'n
+        return self.calc_ll_cc(beta[1])
+
+    def calc_ll(self, b0: float, b1: float) -> CutStatus:
         """Parallel Cut
+
+             ⎛                      ╱     ╱    ⎞
+            -τ                0    β0    β1    +τ
+             ⎝                    ╱     ╱      ⎠
+
+        Args:
+            b0 (float): _description_
+            b1 (float): _description_
+
+        Returns:
+            CutStatus: _description_
+        """
+        if b1 < b0:
+            return CutStatus.NoSoln  # no sol'n
+        if b0 == 0.0:
+            return self.calc_ll_cc(b1)
+        b1sq = b1 * b1
+        if self.tsq < b1sq or not self.use_parallel_cut:
+            return self.calc_dc(b0, sqrt(self.tsq))
+        b0b1 = b0 * b1
+        if self.n_f * b0b1 < -self.tsq:  # for discrete optimization
+            return CutStatus.NoEffect  # no effect
+        calc_ll_core(b0, b1, b1sq, b0b1)
+        return CutStatus.Success
+
+    def calc_ll_core(self, b0: float, b1: float, b1sq: float, b0b1: float) -> None:
+        """Parallel Cut Core
 
                   2    2
             ζ  = τ  - β
@@ -104,22 +146,12 @@ class EllCalc:
         Args:
             b0 (float): _description_
             b1 (float): _description_
+            b0b1 (float): _description_
 
         Returns:
             CutStatus: _description_
         """
-        if b1 < b0:
-            return CutStatus.NoSoln  # no sol'n
-        if (tau := sqrt(self.tsq)) < b1 or not self.use_parallel_cut:
-            return self.calc_dc(b0, tau)
-        if b0 == 0.0:
-            return self.calc_ll_cc(b1)
-        b0b1 = b0 * b1
-        if self.n_f * b0b1 < -self.tsq:  # for discrete optimization
-            return CutStatus.NoEffect  # no effect
-
-        b0sq = b0**2
-        b1sq = b1**2
+        b0sq = b0 * b0
         t0 = self.tsq - b0sq
         t1 = self.tsq - b1sq
         xi = sqrt(t0 * t1 + (self.half_n * (b1sq - b0sq)) ** 2)
@@ -127,7 +159,6 @@ class EllCalc:
         self.sigma = self.cst3 + self.cst2 * (self.tsq - b0b1 - xi) / bsumsq
         self.rho = self.sigma * (b0 + b1) / 2.0
         self.delta = self.cst1 * ((t0 + t1) / 2.0 + xi / self.n_f) / self.tsq
-        return CutStatus.Success
 
     def calc_ll_cc(self, b1: float) -> CutStatus:
         """Parallel Cut with beta0 = 0
@@ -166,8 +197,10 @@ class EllCalc:
         Returns:
             CutStatus: _description_
         """
-        # b1sq = b1**2
-        a1sq = b1**2 / self.tsq
+        b1sq = b1**2
+        if self.tsq < b1sq or not self.use_parallel_cut:
+            return self.calc_cc(sqrt(self.tsq))
+        a1sq = b1sq / self.tsq
         xi = sqrt(1.0 - a1sq + (self.half_n * a1sq) ** 2)
         self.sigma = self.cst3 + self.cst2 * (1.0 - xi) / a1sq
         self.rho = self.sigma * b1 / 2.0
