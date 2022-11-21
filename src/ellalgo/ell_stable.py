@@ -22,7 +22,7 @@ class EllStable:
 
     def _new_with_matrix(self, kappa: float, mq: Mat, xc: Arr) -> None:
         n = len(xc)
-        self._helper = EllCalc(float(n))
+        self._helper = EllCalc(n)
         self._kappa = kappa
         self._mq = mq
         self._xc = xc

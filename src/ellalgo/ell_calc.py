@@ -19,18 +19,18 @@ class EllCalc:
     cst2: float
     cst3: float
 
-    def __init__(self, n: float) -> None:
+    def __init__(self, n: int) -> None:
         """_summary_
 
         Args:
             n (float): _description_
         """
-        self.n_f = n
-        self.half_n = n / 2.0
-        self.cst0 = 1.0 / (n + 1.0)
-        self.cst1 = n**2 / (n**2 - 1.0)
+        self.n_f = float(n)
+        self.half_n = self.n_f / 2.0
+        self.cst0 = 1.0 / (self.n_f + 1.0)
+        self.cst1 = self.n_f**2 / (self.n_f**2 - 1.0)
         self.cst2 = 2.0 * self.cst0
-        self.cst3 = n * self.cst0
+        self.cst3 = self.n_f * self.cst0
 
     def copy(self):
         """[summary]
@@ -122,12 +122,11 @@ class EllCalc:
         b1sq = b1**2
         t0 = self.tsq - b0sq
         t1 = self.tsq - b1sq
-        bsum = b0 + b1
         xi = sqrt(t0 * t1 + (self.half_n * (b1sq - b0sq)) ** 2)
-        bsumsq = b0sq + 2 * b0b1 + b1sq
+        bsumsq = b0sq + 2.0 * b0b1 + b1sq
         self.sigma = self.cst3 + self.cst2 * (self.tsq - b0b1 - xi) / bsumsq
-        self.rho = self.sigma * bsum / 2
-        self.delta = self.cst1 * ((t0 + t1) / 2 + xi / self.n_f) / self.tsq
+        self.rho = self.sigma * (b0 + b1) / 2.0
+        self.delta = self.cst1 * ((t0 + t1) / 2.0 + xi / self.n_f) / self.tsq
         return CutStatus.Success
 
     def calc_ll_cc(self, b1: float) -> CutStatus:
@@ -169,11 +168,11 @@ class EllCalc:
         """
         # b1sq = b1**2
         a1sq = b1**2 / self.tsq
-        xi = sqrt(1 - a1sq + (self.half_n * a1sq) ** 2)
+        xi = sqrt(1.0 - a1sq + (self.half_n * a1sq) ** 2)
         self.sigma = self.cst3 + self.cst2 * (1.0 - xi) / a1sq
-        self.rho = self.sigma * b1 / 2
+        self.rho = self.sigma * b1 / 2.0
         # temp = 1.0 - a1sq / 2 + xi / self.n_f
-        self.delta = self.cst1 * (1 - a1sq / 2 + xi / self.n_f)
+        self.delta = self.cst1 * (1.0 - a1sq / 2.0 + xi / self.n_f)
         return CutStatus.Success
 
     def calc_dc(self, beta: float, tau: float) -> CutStatus:
