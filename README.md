@@ -1,4 +1,4 @@
-# ellalgo
+# ellalgo 🍉
 
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/luk036/ellalgo)
 ![Python application](https://github.com/luk036/ellalgo/workflows/Python%20application/badge.svg)
