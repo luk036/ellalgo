@@ -65,7 +65,7 @@ class EllStable:
         """
         self._xc = x
 
-    def update(self, cut: Cut, cc=False) -> Tuple[CutStatus, float]:
+    def update(self, cut: Cut, central_cut=False) -> Tuple[CutStatus, float]:
         """Update ellipsoid by cut
 
         Arguments:
@@ -98,7 +98,7 @@ class EllStable:
 
         self._helper.tsq = self._kappa * omega
 
-        if cc:
+        if central_cut:
             status = self._helper.calc_single_or_ll_cc(beta)
         else:
             status = self._helper.calc_single_or_ll(beta)
