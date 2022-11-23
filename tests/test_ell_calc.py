@@ -25,15 +25,16 @@ def test_calc_cc():
 
 def test_calc_dc():
     ell_calc = EllCalc(4)
-    status = ell_calc.calc_dc(0.11, 0.1)
+    ell_calc.tsq = 0.01
+    status = ell_calc.calc_dc(0.11)
     assert status == CutStatus.NoSoln
-    status = ell_calc.calc_dc(0.0, 0.1)
+    status = ell_calc.calc_dc(0.01)
     assert status == CutStatus.Success
-    status = ell_calc.calc_dc(-0.05, 0.1)
+    status = ell_calc.calc_dc(-0.05)
     assert status == CutStatus.NoEffect
 
     ell_calc.tsq = 0.01
-    status = ell_calc.calc_dc(0.05, 0.1)
+    status = ell_calc.calc_dc(0.05)
     assert status == CutStatus.Success
     assert ell_calc.sigma == approx(0.8)
     assert ell_calc.rho == approx(0.06)

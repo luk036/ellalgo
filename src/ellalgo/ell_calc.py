@@ -57,9 +57,9 @@ class EllCalc:
             int: [description]
         """
         if np.isscalar(beta):
-            return self.calc_dc(beta, sqrt(self.tsq))
+            return self.calc_dc(beta)
         elif len(beta) < 2:  # unlikely
-            return self.calc_dc(beta[0], sqrt(self.tsq))
+            return self.calc_dc(beta[0])
         return self.calc_ll(beta[0], beta[1])
 
     def calc_single_or_ll_cc(self, beta) -> CutStatus:
@@ -97,7 +97,7 @@ class EllCalc:
             return self.calc_ll_cc(b1)
         b1sq = b1 * b1
         if self.tsq < b1sq or not self.use_parallel_cut:
-            return self.calc_dc(b0, sqrt(self.tsq))
+            return self.calc_dc(b0)
         b0b1 = b0 * b1
         if self.n_f * b0b1 < -self.tsq:  # for discrete optimization
             return CutStatus.NoEffect  # no effect
@@ -208,7 +208,7 @@ class EllCalc:
         self.delta = self.cst1 * (1.0 - a1sq / 2.0 + xi / self.n_f)
         return CutStatus.Success
 
-    def calc_dc(self, beta: float, tau: float) -> CutStatus:
+    def calc_dc(self, beta: float) -> CutStatus:
         """Deep Cut
 
             γ = τ + n ⋅ β
@@ -234,6 +234,7 @@ class EllCalc:
         Returns:
             CutStatus: _description_
         """
+        tau = sqrt(self.tsq)
         if tau < beta:
             return CutStatus.NoSoln  # no sol'n
         if beta == 0.0:
