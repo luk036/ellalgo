@@ -1,4 +1,4 @@
-# ellalgo 🍉
+# 🏉 ellalgo
 
 [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/luk036/ellalgo)
 ![Python application](https://github.com/luk036/ellalgo/workflows/Python%20application/badge.svg)
@@ -10,7 +10,7 @@
 
 ellipsoid method python code
 
-## Features
+## ✨ Features
 
 - At most one square-root per iteration.
 - Include oracles for Matrix Inequalities and Network problems.
@@ -21,14 +21,14 @@ ellipsoid method python code
 
 - The core ellipsoid method depends only on the `numpy` module.
 
-## See also
+## 👀 See also
 
 - [ellalgo-cpp](https://github.com/luk036/ellalgo-cpp)
 - [Presentation Slides](https://luk036.github.io/cvx)
 
 <!-- pyscaffold-notes -->
 
-## Note
+## 👉 Note
 
 This project has been set up using PyScaffold 4.0.2. For details and usage
 information on PyScaffold see https://pyscaffold.org/.
