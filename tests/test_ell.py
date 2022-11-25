@@ -1,0 +1,90 @@
+import numpy as np
+from pytest import approx
+
+from ellalgo.cutting_plane import CutStatus
+from ellalgo.ell import Ell
+
+
+def test_construct():
+    ell = Ell(0.01, np.zeros(4))
+    assert ell.no_defer_trick is False
+    assert ell._kappa == 0.01
+    assert ell._mq == approx(np.eye(4))
+    assert ell._xc == approx(np.zeros(4))
+
+
+def test_update_cc():
+    ell = Ell(0.01, np.zeros(4))
+    cut = 0.5 * np.ones(4), 0.0
+    ell.update(cut, central_cut=True)
+    # omega = 1.0
+    # assert ell.sigma == approx(0.4)
+    # assert ell.rho == approx(0.02)
+    # assert ell.delta == approx(16.0 / 15.0)
+    assert ell._xc == approx(-0.01 * np.ones(4))
+    assert ell._mq == approx(np.eye(4) - 0.1 * np.ones((4, 4)))
+    assert ell._kappa == approx(0.16 / 15.0)
+
+
+def test_calc_dc():
+    ell = Ell(0.01, np.zeros(4))
+    cut = 0.5 * np.ones(4), 0.05
+    ell.update(cut)
+
+    # assert ell.sigma == approx(0.8)
+    # assert ell.rho == approx(0.06)
+    # assert ell.delta == approx(0.8)
+    assert ell._xc == approx(-0.03 * np.ones(4))
+    assert ell._mq == approx(np.eye(4) - 0.2 * np.ones((4, 4)))
+    assert ell._kappa == approx(0.008)
+
+
+# def test_calc_ll_cc():
+#     ell = Ell(4)
+#     ell.tsq = 0.01
+#     status = ell.calc_ll_cc(0.11)
+#     assert status == CutStatus.Success
+#     # Central cut
+#     assert ell.sigma == approx(0.4)
+#     assert ell.rho == approx(0.02)
+#     assert ell.delta == approx(16.0 / 15.0)
+#
+#     status = ell.calc_ll_cc(0.05)
+#     assert status == CutStatus.Success
+#     assert ell.sigma == approx(0.8)
+#     assert ell.rho == approx(0.02)
+#     assert ell.delta == approx(1.2)
+#
+#
+# def test_calc_ll():
+#     ell = Ell(4)
+#     ell.tsq = 0.01
+#     status = ell.calc_ll(0.07, 0.03)
+#     assert status == CutStatus.NoSoln
+#
+#     status = ell.calc_ll(0.0, 0.05)
+#     assert status == CutStatus.Success
+#     assert ell.sigma == approx(0.8)
+#     assert ell.rho == approx(0.02)
+#     assert ell.delta == approx(1.2)
+#
+#     status = ell.calc_ll(0.05, 0.11)
+#     assert status == CutStatus.Success
+#     assert ell.sigma == approx(0.8)
+#     assert ell.rho == approx(0.06)
+#     assert ell.delta == approx(0.8)
+#
+#     status = ell.calc_ll(-0.07, 0.07)
+#     assert status == CutStatus.NoEffect
+#
+#     status = ell.calc_ll(0.01, 0.04)
+#     assert status == CutStatus.Success
+#     assert ell.sigma == approx(0.928)
+#     assert ell.rho == approx(0.0232)
+#     assert ell.delta == approx(1.232)
+#
+#     status = ell.calc_ll(-0.04, 0.0625)
+#     assert status == CutStatus.Success
+#     assert ell.sigma == approx(0.0)
+#     assert ell.rho == approx(0.0)
+#     assert ell.delta == approx(1.0)

@@ -201,9 +201,9 @@ def cutting_plane_optim(
         if t1 is not None:  # better t obtained
             t = t1
             x_best = space.xc().copy()
-            status, tsq = space.update(cut, cc=True)
+            status, tsq = space.update(cut, central_cut=True)
         else:
-            status, tsq = space.update(cut, cc=False)
+            status, tsq = space.update(cut, central_cut=False)
         if status != CutStatus.Success:
             return x_best, t, niter, status
         if tsq < options.tol:

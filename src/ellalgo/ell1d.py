@@ -48,8 +48,11 @@ class ell1d(SearchSpace):
         """
         self._xc = x
 
-    def update(self, cut: Tuple[float, float], cc=False) -> Tuple[CutStatus, float]:
+    def update(
+        self, cut: Tuple[float, float], central_cut=False
+    ) -> Tuple[CutStatus, float]:
         """Update ellipsoid core function using the cut
+
                 grad' * (x - xc) + beta <= 0
 
         Note: Support single cut only
@@ -67,7 +70,7 @@ class ell1d(SearchSpace):
         tau = abs(self._rd * grad)
         tsq = tau**2
         # TODO: Support parallel cut
-        if cc or beta == 0:
+        if central_cut or beta == 0:
             self._rd /= 2
             self._xc += -self._rd if grad > 0 else self._rd
             return CutStatus.Success, tsq
