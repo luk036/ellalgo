@@ -85,6 +85,11 @@ def test_calc_ll():
     assert ell_calc.rho == approx(0.0232)
     assert ell_calc.delta == approx(1.232)
 
+
+def test_calc_ll_noeffect():
+    ell_calc = EllCalc(4)
+    ell_calc.tsq = 0.01
+
     status = ell_calc.calc_ll(-0.04, 0.0625)
     assert status == CutStatus.Success
     assert ell_calc.sigma == approx(0.0)

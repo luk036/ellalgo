@@ -86,12 +86,14 @@ class EllStable:
                 self._mq[i, j] = self._mq[j, i] * invLg[j]
                 # keep for rank-one update
                 invLg[i] -= self._mq[i, j]
+        print(invLg)
 
         # calculate inv(D)*inv(L)*g: n
         invDinvLg = invLg.copy()  # initially
         for i in range(self._n):
             invDinvLg[i] *= self._mq[i, i]
 
+        print(invDinvLg)
         # calculate omega: n
         gg_t = invDinvLg * invLg
         omega = sum(gg_t)
@@ -108,10 +110,13 @@ class EllStable:
 
         # calculate Q*g = inv(L')*inv(D)*inv(L)*g : (n-1)*n/2
         g_t = invDinvLg.copy()  # initially
+        print(g_t)
+        print(self._mq)
         for i in range(self._n - 1, 0, -1):
             for j in range(i, self._n):
-                g_t[i - 1] -= self._mq[i, j] * g_t[j]  # TODO
+                g_t[i - 1] -= self._mq[i - 1, j] * g_t[j]  # TODO
 
+        print(g_t)
         # calculate xc: n
         self._xc -= (self._helper.rho / omega) * g_t
 
@@ -137,6 +142,7 @@ class EllStable:
         # mup = mu * p
         t = oldt + gg_t[m]
         self._mq[m, m] *= oldt / t  # update invD
+        print(self._mq)
         self._kappa *= self._helper.delta
 
         if self.no_defer_trick:
