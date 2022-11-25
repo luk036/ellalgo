@@ -123,7 +123,7 @@ class EllCalc:
                 ╲╱      0    1   ⎝      2      ⎠
 
                             ⎛ 2              ⎞
-                        2 ⋅ ⎜τ  - β  ⋅ β  - ξ⎟
+                        2 ⋅ ⎜τ  + β  ⋅ β  - ξ⎟
                   n         ⎝      0    1    ⎠
             σ = ───── + ──────────────────────
                 n + 1                       2
@@ -156,7 +156,7 @@ class EllCalc:
         t1 = self.tsq - b1sq
         xi = sqrt(t0 * t1 + (self.half_n * (b1sq - b0sq)) ** 2)
         bsumsq = b0sq + 2.0 * b0b1 + b1sq
-        self.sigma = self.cst3 + self.cst2 * (self.tsq - b0b1 - xi) / bsumsq
+        self.sigma = self.cst3 + self.cst2 * (self.tsq + b0b1 - xi) / bsumsq
         self.rho = self.sigma * (b0 + b1) / 2.0
         self.delta = self.cst1 * ((t0 + t1) / 2.0 + xi / self.n_f) / self.tsq
 
@@ -229,7 +229,6 @@ class EllCalc:
 
         Args:
             beta (float): _description_
-            tau (float): _description_
 
         Returns:
             CutStatus: _description_
