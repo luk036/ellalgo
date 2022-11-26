@@ -32,7 +32,7 @@ def ldlt_solve1(low: Mat, vec: Arr):
     ndim = len(vec)
     for i in range(ndim):
         for j in range(i + 1, ndim):
-            vec[j] -= vec[i] * low[i, j]
+            vec[j] -= vec[i] * low[j, i]
 
 
 def ldlt_solve2(low: Mat, vec: Arr):

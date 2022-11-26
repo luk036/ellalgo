@@ -81,12 +81,18 @@ class EllStable:
 
         # calculate inv(L)*g: (n-1)*n/2 multiplications
         invLg = g.copy()  # initially
-        for i in range(1, self._n):
-            for j in range(i):
+        # for i in range(1, self._n):
+        #     for j in range(i):
+        #         # self._mq[j, i] = self._mq[i, j] * invLg[j]
+        #         # keep for rank-one update
+        #         invLg[i] -= self._mq[i, j] * invLg[j]
+        # print(invLg)
+
+        for j in range(self._n - 1):
+            for i in range(j + 1, self._n):
                 self._mq[j, i] = self._mq[i, j] * invLg[j]
                 # keep for rank-one update
                 invLg[i] -= self._mq[j, i]
-        # print(invLg)
 
         # calculate inv(D)*inv(L)*g: n
         invDinvLg = invLg.copy()  # initially
@@ -124,29 +130,18 @@ class EllStable:
         # r = self._sigma / omega
         mu = self._helper.sigma / (1.0 - self._helper.sigma)
         oldt = omega / mu  # initially
-        m = self._n - 1
         v = g.copy()
-        for j in range(m):
-            # p=sqrt(k)*vv(j)
+        for j in range(self._n):
             p = v[j]
-            # mup = mu * p
             temp = p * self._mq[j, j]
-            t = oldt + p * temp
-            # self._mq[j, j] /= t # update invD
-            beta2 = temp / t
-            self._mq[j, j] *= oldt / t  # update invD
+            newt = oldt + p * temp
+            beta2 = temp / newt
+            self._mq[j, j] *= oldt / newt  # update invD
             for k in range(j + 1, self._n):
-                v[k] -= p * self._mq[k, j]
+                # v[k] -= p * self._mq[k, j]
+                v[k] -= self._mq[j, k]
                 self._mq[k, j] += beta2 * v[k]
-            oldt = t
-
-        # p = invLg(n1)
-        # mup = mu * p
-        p = v[m]
-        temp = p * self._mq[m, m]
-        t = oldt + p * temp
-        self._mq[m, m] *= oldt / t  # update invD
-        # print(self._mq)
+            oldt = newt
 
         self._kappa *= self._helper.delta
 
