@@ -14,7 +14,7 @@ ellipsoid method python code
 
 - At most one square-root per iteration.
 - Include oracles for Matrix Inequalities and Network problems.
-- Suport Parallel-Cuts.
+- Support Parallel-Cuts.
 - Pure Python code.
 
 ## Installation

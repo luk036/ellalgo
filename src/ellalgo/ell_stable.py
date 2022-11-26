@@ -83,19 +83,19 @@ class EllStable:
         invLg = g.copy()  # initially
         for i in range(1, self._n):
             for j in range(i):
-                self._mq[i, j] = self._mq[j, i] * invLg[j]
+                self._mq[j, i] = self._mq[i, j] * invLg[j]
                 # keep for rank-one update
-                invLg[i] -= self._mq[i, j]
-        print(invLg)
+                invLg[i] -= self._mq[j, i]
+        # print(invLg)
 
         # calculate inv(D)*inv(L)*g: n
         invDinvLg = invLg.copy()  # initially
         for i in range(self._n):
             invDinvLg[i] *= self._mq[i, i]
 
-        print(invDinvLg)
+        # print(invDinvLg)
         # calculate omega: n
-        gg_t = invDinvLg * invLg
+        gg_t = invLg * invDinvLg
         omega = sum(gg_t)
 
         self._helper.tsq = self._kappa * omega
@@ -110,13 +110,13 @@ class EllStable:
 
         # calculate Q*g = inv(L')*inv(D)*inv(L)*g : (n-1)*n/2
         g_t = invDinvLg.copy()  # initially
-        print(g_t)
-        print(self._mq)
+        # print(g_t)
+        # print(self._mq)
         for i in range(self._n - 1, 0, -1):
             for j in range(i, self._n):
-                g_t[i - 1] -= self._mq[i - 1, j] * g_t[j]  # TODO
+                g_t[i - 1] -= self._mq[j, i - 1] * g_t[j]  # TODO
 
-        print(g_t)
+        # print(g_t)
         # calculate xc: n
         self._xc -= (self._helper.rho / omega) * g_t
 
@@ -125,24 +125,29 @@ class EllStable:
         mu = self._helper.sigma / (1.0 - self._helper.sigma)
         oldt = omega / mu  # initially
         m = self._n - 1
+        v = g.copy()
         for j in range(m):
             # p=sqrt(k)*vv(j)
-            # p = invLg[j]
+            p = v[j]
             # mup = mu * p
-            t = oldt + gg_t[j]
+            temp = p * self._mq[j, j]
+            t = oldt + p * temp
             # self._mq[j, j] /= t # update invD
-            beta2 = invDinvLg[j] / t
+            beta2 = temp / t
             self._mq[j, j] *= oldt / t  # update invD
             for k in range(j + 1, self._n):
-                # v(k) -= p * self._mq[j, k]
-                self._mq[j, k] += beta2 * self._mq[k, j]
+                v[k] -= p * self._mq[k, j]
+                self._mq[k, j] += beta2 * v[k]
             oldt = t
 
         # p = invLg(n1)
         # mup = mu * p
-        t = oldt + gg_t[m]
+        p = v[m]
+        temp = p * self._mq[m, m]
+        t = oldt + p * temp
         self._mq[m, m] *= oldt / t  # update invD
-        print(self._mq)
+        # print(self._mq)
+
         self._kappa *= self._helper.delta
 
         if self.no_defer_trick:
