@@ -81,12 +81,6 @@ class EllStable:
 
         # calculate inv(L)*g: (n-1)*n/2 multiplications
         invLg = g.copy()  # initially
-        # for i in range(1, self._n):
-        #     for j in range(i):
-        #         # self._mq[j, i] = self._mq[i, j] * invLg[j]
-        #         # keep for rank-one update
-        #         invLg[i] -= self._mq[i, j] * invLg[j]
-        # print(invLg)
 
         for j in range(self._n - 1):
             for i in range(j + 1, self._n):
@@ -104,7 +98,7 @@ class EllStable:
         gg_t = invLg * invDinvLg
         omega = sum(gg_t)
 
-        self._helper.tsq = self._kappa * omega
+        self._helper.tsq = self._kappa * omega  # need for helper
 
         if central_cut:
             status = self._helper.calc_single_or_ll_cc(beta)
@@ -133,7 +127,8 @@ class EllStable:
         v = g.copy()
         for j in range(self._n):
             p = v[j]
-            temp = p * self._mq[j, j]
+            # temp = p * self._mq[j, j]
+            temp = invDinvLg[j]
             newt = oldt + p * temp
             beta2 = temp / newt
             self._mq[j, j] *= oldt / newt  # update invD
