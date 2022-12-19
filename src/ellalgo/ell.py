@@ -38,7 +38,7 @@ class Ell(SearchSpace):
         Returns:
             Ell: [description]
         """
-        E = Ell(self._kappa, self.xc)
+        E = Ell(self._kappa, self._xc)
         E._mq = self._mq.copy()
         E._helper = self._helper.copy()
         E.no_defer_trick = self.no_defer_trick

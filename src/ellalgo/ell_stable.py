@@ -40,7 +40,7 @@ class EllStable:
         Returns:
             EllStable: [description]
         """
-        E = EllStable(self._kappa, self.xc)
+        E = EllStable(self._kappa, self._xc)
         E._mq = self._mq.copy()
         E._helper = self._helper.copy()
         E._n = self._n
