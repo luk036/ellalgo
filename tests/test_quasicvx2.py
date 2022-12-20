@@ -61,7 +61,7 @@ def test_case_infeasible1():
     x0 = np.array([100.0, 100.0])  # wrong initial guess,
     E = Ell(10.0, x0)  # or ellipsoid is too small
     P = MyQuasicvxOracle()
-    xb, _, _,_ = cutting_plane_optim(P, E, 0.0)
+    xb, _, _, _ = cutting_plane_optim(P, E, 0.0)
     assert xb is None
 
 

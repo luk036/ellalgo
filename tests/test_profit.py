@@ -5,11 +5,7 @@ import numpy as np
 
 from ellalgo.cutting_plane import cutting_plane_optim, cutting_plane_q
 from ellalgo.ell import Ell
-from ellalgo.oracles.profit_oracle import (
-    ProfitOracle,
-    ProfitQOracle,
-    ProfitRbOracle,
-)
+from ellalgo.oracles.profit_oracle import ProfitOracle, ProfitQOracle, ProfitRbOracle
 
 p, A, k = 20.0, 40.0, 30.5
 params = p, A, k

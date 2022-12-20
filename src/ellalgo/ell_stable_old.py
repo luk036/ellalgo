@@ -221,8 +221,7 @@ class EllStable:
         bav = bsum / 2.0
         tempn = self._halfN * bsumn * (b1 - b0)
         xi = math.sqrt(t0n * t1n + tempn * tempn)
-        self._sigma = self._c3 + (1.0 - b0b1n - xi) \
-            / (bsumn * bav * self._nPlus1)
+        self._sigma = self._c3 + (1.0 - b0b1n - xi) / (bsumn * bav * self._nPlus1)
         self._rho = self._sigma * bav
         self._delta = self._c1 * ((t0n + t1n) / 2.0 + xi / self._n)
         return CutStatus.Success

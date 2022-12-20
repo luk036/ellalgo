@@ -136,8 +136,7 @@ class Ell:
         if status != CutStatus.Success:
             return status, self._tsq
         self._xc -= (self._rho / omega) * grad_t  # n
-        self._Q -= (self._sigma / omega) \
-            * np.outer(grad_t, grad_t)  # n*(n-1)/2
+        self._Q -= (self._sigma / omega) * np.outer(grad_t, grad_t)  # n*(n-1)/2
         if self.no_defer_trick:
             self._Q *= self._delta
         else:
@@ -192,8 +191,7 @@ class Ell:
         bav = bsum / 2.0
         temp = self._n * bav * (b1 - b0)
         xi = math.sqrt(t0n * t1n + temp * temp)
-        self._sigma = self._c3 + (self._tsq - b0b1 - xi) \
-            / (bsum * bav * self._nPlus1)
+        self._sigma = self._c3 + (self._tsq - b0b1 - xi) / (bsum * bav * self._nPlus1)
         self._rho = self._sigma * bav
         self._delta = self._c1 * ((t0n + t1n) / 2 + xi / self._n) / self._tsq
         return CutStatus.Success
