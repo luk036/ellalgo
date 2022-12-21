@@ -1,34 +1,27 @@
-# 🏉 ellalgo
+<!-- These are examples of badges you might want to add to your README:
+     please update the URLs accordingly
 
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/luk036/ellalgo)
-![Python application](https://github.com/luk036/ellalgo/workflows/Python%20application/badge.svg)
-[![Build Status](https://travis-ci.org/luk036/ellalgo.svg?branch=master)](https://travis-ci.org/luk036/ellalgo)
-[![Build status](https://ci.appveyor.com/api/projects/status/0v1cf05tcueny7d9?svg=true)](https://ci.appveyor.com/project/luk036/ellalgo)
-[![Documentation Status](https://readthedocs.org/projects/ellalgo/badge/?version=latest)](https://ellalgo.readthedocs.io/en/latest/?badge=latest)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a2f75bd3cc1e4c34be4741bdd61168ba)](https://app.codacy.com/app/luk036/ellalgo?utm_source=github.com&utm_medium=referral&utm_content=luk036/ellalgo&utm_campaign=badger)
-[![codecov](https://codecov.io/gh/luk036/ellalgo/branch/master/graph/badge.svg)](https://codecov.io/gh/luk036/ellalgo)
+[![Built Status](https://api.cirrus-ci.com/github/<USER>/ellalgo.svg?branch=main)](https://cirrus-ci.com/github/<USER>/ellalgo)
+[![ReadTheDocs](https://readthedocs.org/projects/ellalgo/badge/?version=latest)](https://ellalgo.readthedocs.io/en/stable/)
+[![Coveralls](https://img.shields.io/coveralls/github/<USER>/ellalgo/main.svg)](https://coveralls.io/r/<USER>/ellalgo)
+[![PyPI-Server](https://img.shields.io/pypi/v/ellalgo.svg)](https://pypi.org/project/ellalgo/)
+[![Conda-Forge](https://img.shields.io/conda/vn/conda-forge/ellalgo.svg)](https://anaconda.org/conda-forge/ellalgo)
+[![Monthly Downloads](https://pepy.tech/badge/ellalgo/month)](https://pepy.tech/project/ellalgo)
+[![Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Twitter)](https://twitter.com/ellalgo)
+-->
 
-ellipsoid method python code
+[![Project generated with PyScaffold](https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold)](https://pyscaffold.org/)
 
-## ✨ Features
+# ellalgo
 
-- At most one square-root per iteration.
-- Include oracles for Matrix Inequalities and Network problems.
-- Support Parallel-Cuts.
-- Pure Python code.
+> Ellipsoid Method Python Code
 
-## Installation
+A longer description of your project goes here...
 
-- The core ellipsoid method depends only on the `numpy` module.
-
-## 👀 See also
-
-- [ellalgo-cpp](https://github.com/luk036/ellalgo-cpp)
-- [Presentation Slides](https://luk036.github.io/cvx)
 
 <!-- pyscaffold-notes -->
 
-## 👉 Note
+## Note
 
-This project has been set up using PyScaffold 4.0.2. For details and usage
+This project has been set up using PyScaffold 4.3.1. For details and usage
 information on PyScaffold see https://pyscaffold.org/.

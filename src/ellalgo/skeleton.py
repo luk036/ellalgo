@@ -12,11 +12,11 @@ which will install the command ``fibonacci`` inside your current environment.
 Besides console scripts, the header (i.e. until ``_logger``...) of this file can
 also be used as template for Python modules.
 
-👉 Note:
-    This skeleton file can be safely removed if not needed!
+Note:
+    This file can be renamed depending on your needs or safely removed if not needed.
 
 References:
-    - https://setuptools.readthedocs.io/en/latest/userguide/entry_point.html
+    - https://setuptools.pypa.io/en/latest/userguide/entry_point.html
     - https://pip.pypa.io/en/stable/reference/pip_install
 """
 
@@ -51,7 +51,7 @@ def fib(n):
     """
     assert n > 0
     a, b = 1, 1
-    for i in range(n - 1):
+    for _i in range(n - 1):
         a, b = b, a + b
     return a
 
