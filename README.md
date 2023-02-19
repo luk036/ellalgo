@@ -11,6 +11,8 @@
 -->
 
 [![Project generated with PyScaffold](https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold)](https://pyscaffold.org/)
+[![Documentation Status](https://readthedocs.org/projects/ellalgo/badge/?version=latest)](https://ellalgo.readthedocs.io/en/latest/?badge=latest)
+[![codecov](https://codecov.io/gh/luk036/ellalgo/branch/main/graph/badge.svg?token=6lpjUzPavX)](https://codecov.io/gh/luk036/ellalgo)
 
 # 🏉 ellalgo
 
