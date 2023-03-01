@@ -20,6 +20,12 @@
 
 A longer description of your project goes here...
 
+## Used In
+
+- [netoptim](https://github.com/luk036/netoptim)
+- [lmi-solver](https://github.com/luk036/lmi-solver)
+- [multiplierless](https://github.com/luk036/multiplierless)
+
 <!-- pyscaffold-notes -->
 
 ## 👉 Note
