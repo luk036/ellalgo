@@ -62,7 +62,16 @@ class Ell(SearchSpace):
         """
         self._xc = x
 
-    def update(self, cut: Cut, central_cut=False) -> Tuple[CutStatus, float]:
+    # @property
+    def tsq(self) -> float:
+        """Measure the distance square between xc and x*
+
+        Returns:
+            [type]: [description]
+        """
+        return self._helper.tsq
+
+    def update(self, cut: Cut, central_cut: bool = False) -> CutStatus:
         grad, beta = cut
         grad_t = self._mq @ grad  # n^2 multiplications
         omega = grad @ grad_t  # n multiplications
@@ -74,7 +83,7 @@ class Ell(SearchSpace):
             status = self._helper.calc_single_or_ll(beta)
 
         if status != CutStatus.Success:
-            return (status, self._helper.tsq)
+            return status
 
         self._xc -= (self._helper.rho / omega) * grad_t
         self._mq -= (self._helper.sigma / omega) * np.outer(grad_t, grad_t)
@@ -83,4 +92,4 @@ class Ell(SearchSpace):
         if self.no_defer_trick:
             self._mq *= self._kappa
             self._kappa = 1.0
-        return (status, self._helper.tsq)
+        return status

@@ -1,8 +1,13 @@
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, TYPE_CHECKING
 
-from numpy import ndarray
+
+if TYPE_CHECKING:
+    from numpy import ndarray
+else:
+    from typing import Any
+    ndarray = Any
 
 ArrayType = Union[float, ndarray]  # one or multi dimensional
 CutChoice = Union[float, ndarray]  # single or parallel
@@ -45,10 +50,6 @@ class OracleFeas(ABC):
 
 class OracleFeas2(OracleFeas):
     @abstractmethod
-    def assess_feas(self, x: ArrayType) -> Optional[Cut]:
-        pass
-
-    @abstractmethod
     def update(self, t: FloatOrInt):
         pass
 
@@ -85,11 +86,15 @@ class OracleBS(ABC):
 
 class SearchSpace(ABC):
     @abstractmethod
-    def update(self, cut: Cut, cc: bool = False) -> Tuple[CutStatus, float]:
+    def update(self, cut: Cut, central_cut: bool = False) -> CutStatus:
         pass
 
     @abstractmethod
     def xc(self) -> ndarray:
+        pass
+
+    @abstractmethod
+    def tsq(self) -> float:
         pass
 
 
@@ -169,10 +174,10 @@ def cutting_plane_feas(
         cut = omega.assess_feas(space.xc())  # query the oracle at S.xc()
         if cut is None:  # feasible sol'n obtained
             return CInfo(True, niter, CutStatus.Success)
-        cutstatus, tsq = space.update(cut)  # update S
+        cutstatus = space.update(cut)  # update S
         if cutstatus != CutStatus.Success:
             return CInfo(False, niter, cutstatus)
-        if tsq < options.tol:
+        if space.tsq() < options.tol:
             return CInfo(False, niter, CutStatus.SmallEnough)
     return CInfo(False, options.max_iter, CutStatus.NoSoln)
 
@@ -201,18 +206,18 @@ def cutting_plane_optim(
         if t1 is not None:  # better t obtained
             t = t1
             x_best = space.xc().copy()
-            status, tsq = space.update(cut, central_cut=True)
+            status = space.update(cut, central_cut=True)
         else:
-            status, tsq = space.update(cut, central_cut=False)
+            status = space.update(cut, central_cut=False)
         if status != CutStatus.Success:
             return x_best, t, niter, status
-        if tsq < options.tol:
+        if space.tsq() < options.tol:
             return x_best, t, niter, CutStatus.SmallEnough
     return x_best, t, options.max_iter, CutStatus.Success
 
 
 def cutting_plane_feas_q(
-    omega: OracleFeasQ, S, options=Options()
+        omega: OracleFeasQ, S: SearchSpace, options=Options()
 ) -> Tuple[Optional[ArrayType], CInfo]:
     """Cutting-plane method for solving convex discrete optimization problem
 
@@ -235,20 +240,20 @@ def cutting_plane_feas_q(
         cut, x0, more_alt = omega.assess_feas_q(S.xc(), retry)
         if cut is None:  # better t obtained
             return x0, CInfo(True, niter, CutStatus.Success)
-        cutstatus, tsq = S.update(cut)
+        cutstatus = S.update(cut)
         if cutstatus == CutStatus.NoEffect:
             if not more_alt:  # no more alternative cut
                 return None, CInfo(False, niter, CutStatus.NoEffect)
             retry = True
         elif cutstatus == CutStatus.NoSoln:
             return None, CInfo(False, niter, CutStatus.NoSoln)
-        if tsq < options.tol:
+        if S.tsq() < options.tol:
             return None, CInfo(False, niter, CutStatus.SmallEnough)
     return None, CInfo(False, options.max_iter, CutStatus.NoSoln)
 
 
 def cutting_plane_q(
-    omega: OracleOptimQ, S, t: float, options=Options()
+        omega: OracleOptimQ, S: SearchSpace, t: float, options=Options()
 ) -> Tuple[Optional[ArrayType], float, int, CutStatus]:
     """Cutting-plane method for solving convex discrete optimization problem
 
@@ -273,14 +278,14 @@ def cutting_plane_q(
         if t1 is not None:  # better t obtained
             t = t1
             x_best = x0.copy()
-        status, tsq = S.update(cut)
+        status = S.update(cut)
         if status == CutStatus.NoEffect:
             if not more_alt:  # no more alternative cut
                 return x_best, t, niter, status
             retry = True
         elif status == CutStatus.NoSoln:
             return x_best, t, niter, status
-        if tsq < options.tol:
+        if S.tsq() < options.tol:
             return x_best, t, niter, CutStatus.SmallEnough
     return x_best, t, options.max_iter, CutStatus.Success
 

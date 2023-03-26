@@ -20,6 +20,7 @@ class ell1d(SearchSpace):
         l, u = interval
         self._rd: float = (u - l) / 2
         self._xc: float = l + self._rd
+        self._tsq: float = 0
 
     def copy(self):
         """[summary]
@@ -48,9 +49,18 @@ class ell1d(SearchSpace):
         """
         self._xc = x
 
+    # @property
+    def tsq(self) -> float:
+        """[summary]
+
+        Returns:
+            float: [description]
+        """
+        return self._tsq
+
     def update(
         self, cut: Tuple[float, float], central_cut=False
-    ) -> Tuple[CutStatus, float]:
+    ) -> CutStatus:
         """Update ellipsoid core function using the cut
 
                 grad' * (x - xc) + beta <= 0
@@ -68,20 +78,20 @@ class ell1d(SearchSpace):
         grad, beta = cut
         # TODO handle grad == 0
         tau = abs(self._rd * grad)
-        tsq = tau**2
+        self._tsq = tau**2
         # TODO: Support parallel cut
         if central_cut or beta == 0:
             self._rd /= 2
             self._xc += -self._rd if grad > 0 else self._rd
-            return CutStatus.Success, tsq
+            return CutStatus.Success
         if beta > tau:
-            return CutStatus.NoSoln, tsq  # no sol'n
+            return CutStatus.NoSoln  # no sol'n
         if beta < -tau:  # unlikely
-            return CutStatus.NoEffect, tsq  # no effect
+            return CutStatus.NoEffect  # no effect
 
         bound = self._xc - beta / grad
         upper = bound if grad > 0 else self._xc + self._rd
         lower = self._xc - self._rd if grad > 0 else bound
         self._rd = (upper - lower) / 2
         self._xc = lower + self._rd
-        return CutStatus.Success, tsq
+        return CutStatus.Success

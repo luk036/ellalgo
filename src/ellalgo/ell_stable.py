@@ -65,7 +65,16 @@ class EllStable:
         """
         self._xc = x
 
-    def update(self, cut: Cut, central_cut=False) -> Tuple[CutStatus, float]:
+    # @property
+    def tsq(self) -> float:
+        """Measure the distance square between xc and x*
+
+        Returns:
+            [type]: [description]
+        """
+        return self._helper.tsq
+
+    def update(self, cut: Cut, central_cut: bool = False) -> CutStatus:
         """Update ellipsoid by cut
 
         Arguments:
@@ -106,7 +115,7 @@ class EllStable:
             status = self._helper.calc_single_or_ll(beta)
 
         if status != CutStatus.Success:
-            return (status, self._helper.tsq)
+            return status
 
         # calculate Q*g = inv(L')*inv(D)*inv(L)*g : (n-1)*n/2
         g_t = invDinvLg.copy()  # initially
@@ -143,4 +152,4 @@ class EllStable:
         if self.no_defer_trick:
             self._mq *= self._kappa
             self._kappa = 1.0
-        return (status, self._helper.tsq)
+        return status
