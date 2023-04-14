@@ -1,7 +1,6 @@
 import numpy as np
 from pytest import approx
 
-from ellalgo.cutting_plane import CutStatus
 from ellalgo.ell import Ell
 
 

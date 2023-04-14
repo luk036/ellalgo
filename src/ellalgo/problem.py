@@ -130,7 +130,7 @@ class Problem:
             The optimal value for the problem, or a string indicating
             why the problem could not be solved.
         """
-        xb, fb, num_iters, status = cutting_plane_optim(
+        xb, fb, num_iters = cutting_plane_optim(
             self.oracle, self.S, t, self.options
         )
 

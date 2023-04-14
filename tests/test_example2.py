@@ -3,7 +3,7 @@ from __future__ import print_function
 
 import numpy as np
 
-from ellalgo.cutting_plane import CutStatus, cutting_plane_feas
+from ellalgo.cutting_plane import cutting_plane_feas
 from ellalgo.ell import Ell
 
 
@@ -35,8 +35,7 @@ def test_case_feasible():
     P = MyOracle()
     ell_info = cutting_plane_feas(P, E)
     assert ell_info.feasible
-    assert ell_info.status == CutStatus.Success
-    print(ell_info.num_iters, ell_info.status)
+    print(ell_info.num_iters)
 
 
 def test_case_infeasible():
@@ -45,6 +44,5 @@ def test_case_infeasible():
     E = Ell(10.0, x0)
     P = MyOracle()
     ell_info = cutting_plane_feas(P, E)
-    assert ell_info.status == CutStatus.NoSoln  # no sol'n
     assert ell_info.num_iters == 0  # small
     assert not ell_info.feasible

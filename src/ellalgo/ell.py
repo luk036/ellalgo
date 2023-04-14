@@ -1,12 +1,12 @@
-from typing import Tuple, Union
+from typing import Tuple, Union, Any
 
 import numpy as np
 
 from .cutting_plane import CutStatus, SearchSpace
 from .ell_calc import EllCalc
 
-Arr = Union[np.ndarray]
-Mat = Union[np.ndarray]
+Arr = np.ndarray
+Mat = np.ndarray
 CutChoice = Union[float, Arr]  # single or parallel
 Cut = Tuple[Arr, CutChoice]
 
@@ -19,7 +19,7 @@ class Ell(SearchSpace):
     _kappa: float
     _helper: EllCalc
 
-    def _new_with_matrix(self, kappa: float, mq: Mat, xc: Arr) -> None:
+    def _new_with_matrix(self, kappa, mq: Mat, xc: Arr) -> None:
         n = len(xc)
         self._helper = EllCalc(n)
         self._kappa = kappa

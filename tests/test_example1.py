@@ -57,7 +57,7 @@ def test_case_feasible():
     x0 = np.array([0.0, 0.0])  # initial x0
     E = EllStable(10.0, x0)
     P = MyOracle()
-    x, _, _, _ = cutting_plane_optim(P, E, float("-inf"))
+    x, _, _ = cutting_plane_optim(P, E, float("-inf"))
     assert x is not None
     # fmt = '{:f} {} {} {}'
     # print(fmt.format(fb, niter, feasible, status))
@@ -69,7 +69,7 @@ def test_case_infeasible1():
     x0 = np.array([100.0, 100.0])  # wrong initial guess,
     E = EllStable(10.0, x0)  # or ellipsoid is too small
     P = MyOracle()
-    x, _, _, _ = cutting_plane_optim(P, E, float("-inf"))
+    x, _, _ = cutting_plane_optim(P, E, float("-inf"))
     assert x is None
 
 
@@ -78,5 +78,5 @@ def test_case_infeasible2():
     x0 = np.array([0.0, 0.0])  # initial x0
     E = EllStable(10.0, x0)
     P = MyOracle()
-    x, _, _, _ = cutting_plane_optim(P, E, 100)  # wrong init best-so-far
+    x, _, _ = cutting_plane_optim(P, E, 100)  # wrong init best-so-far
     assert x is None
