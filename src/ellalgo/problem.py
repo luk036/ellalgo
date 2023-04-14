@@ -1,4 +1,4 @@
-from .cutting_plane import CutStatus, Options, cutting_plane_optim
+from .cutting_plane import Options, cutting_plane_optim
 
 
 class Problem:
@@ -135,7 +135,7 @@ class Problem:
         )
 
         if xb is not None:
-            if status == CutStatus.SmallEnough:
+            if self.S.tsq < self.options.tol:
                 self._status = "optimal"
             else:
                 self._status = "feasible"
@@ -189,4 +189,4 @@ class SolverStats:
             solver_name ([type]): [description]
         """
         self.solver_name = solver_name
-        self.num_iters = None
+        self.num_iters = -1
