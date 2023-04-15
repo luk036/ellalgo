@@ -30,19 +30,19 @@ class MyOracle:
 
 def test_case_feasible():
     """[summary]"""
-    x0 = np.array([0.0, 0.0])  # initial guess
-    E = Ell(10.0, x0)
-    P = MyOracle()
-    ell_info = cutting_plane_feas(P, E)
+    xinit = np.array([0.0, 0.0])  # initial guess
+    ellip = Ell(10.0, xinit)
+    omega = MyOracle()
+    ell_info = cutting_plane_feas(omega, ellip)
     assert ell_info.feasible
     print(ell_info.num_iters)
 
 
 def test_case_infeasible():
     """[summary]"""
-    x0 = np.array([100.0, 100.0])  # wrong initial guess
-    E = Ell(10.0, x0)
-    P = MyOracle()
-    ell_info = cutting_plane_feas(P, E)
+    xinit = np.array([100.0, 100.0])  # wrong initial guess
+    ellip = Ell(10.0, xinit)
+    omega = MyOracle()
+    ell_info = cutting_plane_feas(omega, ellip)
     assert ell_info.num_iters == 0  # small
     assert not ell_info.feasible

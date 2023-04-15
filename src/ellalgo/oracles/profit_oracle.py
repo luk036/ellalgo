@@ -41,7 +41,7 @@ class ProfitOracle(OracleOptim):
         self.v = v
         self.a = a
 
-    def assess_optim(self, y: Arr, t: float) -> Tuple[Cut, Optional[float]]:
+    def assess_optim(self, y: Arr, target: float) -> Tuple[Cut, Optional[float]]:
         """Make object callable for cutting_plane_optim()
 
         Arguments:
@@ -61,13 +61,13 @@ class ProfitOracle(OracleOptim):
         log_Cobb = self.log_pA + self.a @ y
         q = self.v * np.exp(y)
         vx = q[0] + q[1]
-        if (fj := np.log(t + vx) - log_Cobb) >= 0.0:
-            g = q / (t + vx) - self.a
+        if (fj := np.log(target + vx) - log_Cobb) >= 0.0:
+            g = q / (target + vx) - self.a
             return (g, fj), None
 
-        t = np.exp(log_Cobb) - vx
-        g = q / (t + vx) - self.a
-        return (g, 0.0), t
+        target = np.exp(log_Cobb) - vx
+        g = q / (target + vx) - self.a
+        return (g, 0.0), target
 
 
 class ProfitRbOracle(OracleOptim):
@@ -110,9 +110,9 @@ class ProfitRbOracle(OracleOptim):
         self.e = [e1, e2]
         p, A, k = params
         params_rb = p - e3, A, k - e4
-        self.P = ProfitOracle(params_rb, a, v + e5)
+        self.omega = ProfitOracle(params_rb, a, v + e5)
 
-    def assess_optim(self, y: Arr, t: float) -> Tuple[Cut, Optional[float]]:
+    def assess_optim(self, y: Arr, target: float) -> Tuple[Cut, Optional[float]]:
         """Make object callable for cutting_plane_optim()
 
         Arguments:
@@ -128,8 +128,8 @@ class ProfitRbOracle(OracleOptim):
         a_rb = self.a.copy()
         for i in [0, 1]:
             a_rb[i] += -self.e[i] if y[i] > 0.0 else self.e[i]
-        self.P.a = a_rb
-        return self.P.assess_optim(y, t)
+        self.omega.a = a_rb
+        return self.omega.assess_optim(y, target)
 
 
 class ProfitQOracle:
@@ -165,10 +165,10 @@ class ProfitQOracle:
             a (Arr): the output elasticities
             v (Arr): output price
         """
-        self.P = ProfitOracle(params, a, v)
+        self.omega = ProfitOracle(params, a, v)
 
     def assess_optim_q(
-        self, y: Arr, t: float, retry: bool
+        self, y: Arr, target: float, retry: bool
     ) -> Tuple[Cut, Arr, Optional[float], bool]:
         """Make object callable for cutting_plane_q()
 
@@ -181,7 +181,7 @@ class ProfitQOracle:
             AssertionError: [description]
 
         Returns:
-            Tuple: Cut, t, and the actual evaluation point
+            Tuple: Cut, target, and the actual evaluation point
 
         See also:
             cutting_plane_q
@@ -194,6 +194,6 @@ class ProfitQOracle:
                 x[1] = 1
             self.yd = np.log(x)
 
-        (g, h), tnew = self.P.assess_optim(self.yd, t)
+        (g, h), tnew = self.omega.assess_optim(self.yd, target)
         h += g @ (self.yd - y)
         return (g, h), self.yd, tnew, not retry

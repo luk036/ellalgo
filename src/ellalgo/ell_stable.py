@@ -40,12 +40,12 @@ class EllStable:
         Returns:
             EllStable: [description]
         """
-        E = EllStable(self._kappa, self._xc)
-        E._mq = self._mq.copy()
-        E._helper = self._helper.copy()
-        E._n = self._n
-        E.no_defer_trick = self.no_defer_trick
-        return E
+        ellip = EllStable(self._kappa, self._xc)
+        ellip._mq = self._mq.copy()
+        ellip._helper = self._helper.copy()
+        ellip._n = self._n
+        ellip.no_defer_trick = self.no_defer_trick
+        return ellip
 
     # @property
     def xc(self) -> Arr:

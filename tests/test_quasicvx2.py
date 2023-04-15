@@ -11,7 +11,7 @@ from ellalgo.ell import Ell
 
 
 class MyQuasicvxOracle:
-    def assess_optim(self, z, t: float):
+    def assess_optim(self, z, target: float):
         """[summary]
 
         Arguments:
@@ -38,37 +38,37 @@ class MyQuasicvxOracle:
 
         # objective: minimize -sqrt(x) / y
         tmp2 = math.sqrt(x)
-        if (fj := -tmp2 - t * y) >= 0.0:  # infeasible
-            return (np.array([-0.5 / tmp2, -t]), fj), None
-        t = -tmp2 / y
-        return (np.array([-0.5 / tmp2, -t]), 0), t
+        if (fj := -tmp2 - target * y) >= 0.0:  # infeasible
+            return (np.array([-0.5 / tmp2, -target]), fj), None
+        target = -tmp2 / y
+        return (np.array([-0.5 / tmp2, -target]), 0), target
 
 
 def test_case_feasible():
     """[summary]"""
-    x0 = np.array([1.0, 1.0])  # initial x0
-    E = Ell(10.0, x0)
-    P = MyQuasicvxOracle()
-    xb, fb, _ = cutting_plane_optim(P, E, 0.0)
-    assert xb is not None
-    assert fb == approx(-0.4288673396685956)
-    assert xb[0] == approx(0.5053830040042219)
-    assert xb[1] == approx(1.6576289475891712)
+    xinit = np.array([1.0, 1.0])  # initial xinit
+    ellip = Ell(10.0, xinit)
+    omega = MyQuasicvxOracle()
+    xbest, fbest, _ = cutting_plane_optim(omega, ellip, 0.0)
+    assert xbest is not None
+    assert fbest == approx(-0.4288673396685956)
+    assert xbest[0] == approx(0.5053830040042219)
+    assert xbest[1] == approx(1.6576289475891712)
 
 
 def test_case_infeasible1():
     """[summary]"""
-    x0 = np.array([100.0, 100.0])  # wrong initial guess,
-    E = Ell(10.0, x0)  # or ellipsoid is too small
-    P = MyQuasicvxOracle()
-    xb, _, _ = cutting_plane_optim(P, E, 0.0)
-    assert xb is None
+    xinit = np.array([100.0, 100.0])  # wrong initial guess,
+    ellip = Ell(10.0, xinit)  # or ellipsoid is too small
+    omega = MyQuasicvxOracle()
+    xbest, _, _ = cutting_plane_optim(omega, ellip, 0.0)
+    assert xbest is None
 
 
 def test_case_infeasible2():
     """[summary]"""
-    x0 = np.array([1.0, 1.0])  # initial x0
-    E = Ell(10.0, x0)
-    P = MyQuasicvxOracle()
-    xb, _, _ = cutting_plane_optim(P, E, -100)  # wrong init best-so-far
-    assert xb is None
+    xinit = np.array([1.0, 1.0])  # initial xinit
+    ellip = Ell(10.0, xinit)
+    omega = MyQuasicvxOracle()
+    xbest, _, _ = cutting_plane_optim(omega, ellip, -100)  # wrong init best-so-far
+    assert xbest is None

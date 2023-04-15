@@ -29,12 +29,12 @@ class MyOracle2:
 
 
 class MyOracle:
-    def assess_optim(self, z, t: float):
+    def assess_optim(self, z, target: float):
         """[summary]
 
         Arguments:
             z ([type]): [description]
-            t (float): the best-so-far optimal value
+            target (float): the best-so-far optimal value
 
         Returns:
             [type]: [description]
@@ -45,38 +45,38 @@ class MyOracle:
         x, y = z
         # objective: maximize x + y
         f0 = x + y
-        if (fj := t - f0) < 0.0:
+        if (fj := target - f0) < 0.0:
             fj = 0.0
-            t = f0
-            return (-1.0 * np.array([1.0, 1.0]), fj), t
+            target = f0
+            return (-1.0 * np.array([1.0, 1.0]), fj), target
         return (-1.0 * np.array([1.0, 1.0]), fj), None
 
 
 def test_case_feasible():
     """[summary]"""
-    x0 = np.array([0.0, 0.0])  # initial x0
-    E = EllStable(10.0, x0)
-    P = MyOracle()
-    x, _, _ = cutting_plane_optim(P, E, float("-inf"))
-    assert x is not None
+    xinit = np.array([0.0, 0.0])  # initial xinit
+    ellip = EllStable(10.0, xinit)
+    omega = MyOracle()
+    xbest, _, _ = cutting_plane_optim(omega, ellip, float("-inf"))
+    assert xbest is not None
     # fmt = '{:f} {} {} {}'
-    # print(fmt.format(fb, niter, feasible, status))
-    # print(xb)
+    # print(fmt.format(fbest, niter, feasible, status))
+    # print(xbest)
 
 
 def test_case_infeasible1():
     """[summary]"""
-    x0 = np.array([100.0, 100.0])  # wrong initial guess,
-    E = EllStable(10.0, x0)  # or ellipsoid is too small
-    P = MyOracle()
-    x, _, _ = cutting_plane_optim(P, E, float("-inf"))
-    assert x is None
+    xinit = np.array([100.0, 100.0])  # wrong initial guess,
+    ellip = EllStable(10.0, xinit)  # or ellipsoid is too small
+    omega = MyOracle()
+    xbest, _, _ = cutting_plane_optim(omega, ellip, float("-inf"))
+    assert xbest is None
 
 
 def test_case_infeasible2():
     """[summary]"""
-    x0 = np.array([0.0, 0.0])  # initial x0
-    E = EllStable(10.0, x0)
-    P = MyOracle()
-    x, _, _ = cutting_plane_optim(P, E, 100)  # wrong init best-so-far
-    assert x is None
+    xinit = np.array([0.0, 0.0])  # initial xinit
+    ellip = EllStable(10.0, xinit)
+    omega = MyOracle()
+    xbest, _, _ = cutting_plane_optim(omega, ellip, 100)  # wrong init best-so-far
+    assert xbest is None

@@ -38,13 +38,13 @@ class EllCalc:
         Returns:
             EllCalc: [description]
         """
-        E = EllCalc(self.n_f)
-        E.use_parallel_cut = self.use_parallel_cut
-        E.rho = self.rho
-        E.sigma = self.sigma
-        E.delta = self.delta
-        E.tsq = self.tsq
-        return E
+        ellip = EllCalc(self.n_f)
+        ellip.use_parallel_cut = self.use_parallel_cut
+        ellip.rho = self.rho
+        ellip.sigma = self.sigma
+        ellip.delta = self.delta
+        ellip.tsq = self.tsq
+        return ellip
 
     # def update_cut(self, beta: float) -> CutStatus { self.calc_dc(beta)
     def calc_single_or_ll(self, beta) -> CutStatus:

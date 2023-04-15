@@ -17,10 +17,10 @@ r = np.array([100.0, 100.0])  # initial ellipsoid (sphere)
 
 
 def test_profit():
-    E = Ell(r, np.array([0.0, 0.0]))
-    P = ProfitOracle(params, a, v)
-    x, _, num_iters = cutting_plane_optim(P, E, 0.0)
-    assert x is not None
+    ellip = Ell(r, np.array([0.0, 0.0]))
+    omega = ProfitOracle(params, a, v)
+    xbest, _, num_iters = cutting_plane_optim(omega, ellip, 0.0)
+    assert xbest is not None
     assert num_iters == 36
 
 
@@ -28,16 +28,16 @@ def test_profit_rb():
     e1 = 0.003
     e2 = 0.007
     e3 = e4 = e5 = 1.0
-    E = Ell(r, np.array([0.0, 0.0]))
-    P = ProfitRbOracle(params, a, v, (e1, e2, e3, e4, e5))
-    x, _, num_iters = cutting_plane_optim(P, E, 0.0)
-    assert x is not None
+    ellip = Ell(r, np.array([0.0, 0.0]))
+    omega = ProfitRbOracle(params, a, v, (e1, e2, e3, e4, e5))
+    xbest, _, num_iters = cutting_plane_optim(omega, ellip, 0.0)
+    assert xbest is not None
     assert num_iters == 41
 
 
 def test_profit_q():
-    E = Ell(r, np.array([0.0, 0.0]))
-    P = ProfitQOracle(params, a, v)
-    x, _, num_iters = cutting_plane_q(P, E, 0.0)
-    assert x is not None
+    ellip = Ell(r, np.array([0.0, 0.0]))
+    omega = ProfitQOracle(params, a, v)
+    xbest, _, num_iters = cutting_plane_q(omega, ellip, 0.0)
+    assert xbest is not None
     assert num_iters == 27

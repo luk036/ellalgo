@@ -28,8 +28,8 @@ class ell1d(SearchSpace):
         Returns:
             [type]: [description]
         """
-        E = ell1d([self._xc - self._rd, self._xc + self._rd])
-        return E
+        ellip = ell1d([self._xc - self._rd, self._xc + self._rd])
+        return ellip
 
     # @property
     def xc(self) -> float:

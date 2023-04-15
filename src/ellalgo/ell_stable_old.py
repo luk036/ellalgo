@@ -60,12 +60,12 @@ class EllStable:
         Returns:
             EllStable: [description]
         """
-        E = EllStable(self._kappa, self.xc)
-        E._Q = self._Q.copy()
-        # E._c1 = self._c1
-        E.use_parallel_cut = self.use_parallel_cut
-        E.no_defer_trick = self.no_defer_trick
-        return E
+        ellip = EllStable(self._kappa, self.xc)
+        ellip._Q = self._Q.copy()
+        # ellip._c1 = self._c1
+        ellip.use_parallel_cut = self.use_parallel_cut
+        ellip.no_defer_trick = self.no_defer_trick
+        return ellip
 
     @property
     def xc(self):

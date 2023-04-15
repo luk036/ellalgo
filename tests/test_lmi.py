@@ -15,7 +15,7 @@ Arr = Union[np.ndarray, float]
 Cut = Tuple[Arr, float]
 
 
-class my_oracle:
+class MyOracle:
     def __init__(self, oracle):
         """[summary]
 
@@ -42,12 +42,12 @@ class my_oracle:
         self.lmi1 = oracle(F1, B1)
         self.lmi2 = oracle(F2, B2)
 
-    def assess_optim(self, x: Arr, t: float) -> Tuple[Cut, Optional[float]]:
+    def assess_optim(self, x: Arr, target: float) -> Tuple[Cut, Optional[float]]:
         """[summary]
 
         Arguments:
             x (Arr): [description]
-            t (float): the best-so-far optimal value
+            target (float): the best-so-far optimal value
 
         Returns:
             Tuple[Cut, float]: [description]
@@ -59,7 +59,7 @@ class my_oracle:
             return cut, None
 
         f0 = self.c @ x
-        if (fj := f0 - t) > 0.0:
+        if (fj := f0 - target) > 0.0:
             return (self.c, fj), None
         return (self.c, 0.0), f0
 
@@ -76,16 +76,16 @@ def run_lmi(oracle):
     Returns:
         [type]: [description]
     """
-    x0 = np.array([0.0, 0.0, 0.0])  # initial x0
-    E = Ell(10.0, x0)
-    P = my_oracle(oracle)
-    x, _, num_iters = cutting_plane_optim(P, E, float("inf"))
+    xinit = np.array([0.0, 0.0, 0.0])  # initial xinit
+    ellip = Ell(10.0, xinit)
+    omega = MyOracle(oracle)
+    xbest, _, num_iters = cutting_plane_optim(omega, ellip, float("inf"))
     # time.sleep(duration)
 
     # fmt = '{:f} {} {} {}'
-    # print(fmt.format(fb, niter, feasible, status))
-    # print(xb)
-    assert x is not None
+    # print(fmt.format(fbest, niter, feasible, status))
+    # print(xbest)
+    assert xbest is not None
     return num_iters
 
 

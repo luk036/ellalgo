@@ -59,12 +59,12 @@ class Ell:
         Returns:
             Ell: [description]
         """
-        E = Ell(self._kappa, self.xc)
-        E._Q = self._Q.copy()
-        # E._c1 = self._c1
-        E.use_parallel_cut = self.use_parallel_cut
-        E.no_defer_trick = self.no_defer_trick
-        return E
+        ellip = Ell(self._kappa, self.xc)
+        ellip._Q = self._Q.copy()
+        # ellip._c1 = self._c1
+        ellip.use_parallel_cut = self.use_parallel_cut
+        ellip.no_defer_trick = self.no_defer_trick
+        return ellip
 
     @property
     def xc(self):
@@ -276,8 +276,8 @@ class ell1d:
         Returns:
             [type]: [description]
         """
-        E = ell1d([self._xc - self._r, self._xc + self._r])
-        return E
+        ellip = ell1d([self._xc - self._r, self._xc + self._r])
+        return ellip
 
     @property
     def xc(self):

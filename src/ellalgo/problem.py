@@ -100,7 +100,7 @@ class Problem:
 
     def _solve(
         self,
-        t
+        target
         # solver=None,
         # warm_start=False,
         # verbose=False, **kwargs
@@ -130,17 +130,17 @@ class Problem:
             The optimal value for the problem, or a string indicating
             why the problem could not be solved.
         """
-        xb, fb, num_iters = cutting_plane_optim(
-            self.oracle, self.S, t, self.options
+        xbest, fbest, num_iters = cutting_plane_optim(
+            self.oracle, self.S, target, self.options
         )
 
-        if xb is not None:
+        if xbest is not None:
             if self.S.tsq < self.options.tol:
                 self._status = "optimal"
             else:
                 self._status = "feasible"
-            self._optim_value = fb
-            self._optim_var = xb
+            self._optim_value = fbest
+            self._optim_var = xbest
         else:
             self._status = "infeasible"
 

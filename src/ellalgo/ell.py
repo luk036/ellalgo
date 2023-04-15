@@ -38,11 +38,11 @@ class Ell(SearchSpace):
         Returns:
             Ell: [description]
         """
-        E = Ell(self._kappa, self._xc)
-        E._mq = self._mq.copy()
-        E._helper = self._helper.copy()
-        E.no_defer_trick = self.no_defer_trick
-        return E
+        ellip = Ell(self._kappa, self._xc)
+        ellip._mq = self._mq.copy()
+        ellip._helper = self._helper.copy()
+        ellip.no_defer_trick = self.no_defer_trick
+        return ellip
 
     # @property
     def xc(self) -> Arr:
