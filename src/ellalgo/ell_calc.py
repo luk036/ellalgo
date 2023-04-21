@@ -12,6 +12,7 @@ class EllCalc:
     sigma: float = 0.0
     delta: float = 0.0
     tsq: float = 0.0
+    ndim: int
     n_f: float
     half_n: float
     cst0: float
@@ -25,6 +26,7 @@ class EllCalc:
         Args:
             n (float): _description_
         """
+        self.ndim = n
         self.n_f = float(n)
         self.half_n = self.n_f / 2.0
         self.cst0 = 1.0 / (self.n_f + 1.0)
@@ -38,7 +40,7 @@ class EllCalc:
         Returns:
             EllCalc: [description]
         """
-        ellip = EllCalc(self.n_f)
+        ellip = EllCalc(self.ndim)
         ellip.use_parallel_cut = self.use_parallel_cut
         ellip.rho = self.rho
         ellip.sigma = self.sigma
@@ -208,7 +210,7 @@ class EllCalc:
         self.delta = self.cst1 * (1.0 - a1sq / 2.0 + xi / self.n_f)
         return CutStatus.Success
 
-    def calc_dc(self, beta: float) -> CutStatus:
+    def calc_dc(self, beta) -> CutStatus:
         """Deep Cut
 
             γ = τ + n ⋅ β

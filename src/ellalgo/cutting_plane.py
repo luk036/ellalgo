@@ -49,14 +49,14 @@ class OracleFeas(ABC):
 
 class OracleFeas2(OracleFeas):
     @abstractmethod
-    def update(self, target: Num):
+    def update(self, tea: Num):
         pass
 
 
 class OracleOptim(ABC):
     @abstractmethod
     def assess_optim(
-        self, x: ndarray, target: float  # what?
+        self, x: ndarray, tea: float  # what?
     ) -> Tuple[Cut, Optional[float]]:
         pass
 
@@ -72,14 +72,14 @@ class OracleFeasQ(ABC):
 class OracleOptimQ(ABC):
     @abstractmethod
     def assess_optim_q(
-        self, x: ndarray, target: float, retry: bool
+        self, x: ndarray, tea: float, retry: bool
     ) -> Tuple[Cut, ndarray, Optional[float], bool]:
         pass
 
 
 class OracleBS(ABC):
     @abstractmethod
-    def assess_bs(self, target: Num) -> bool:
+    def assess_bs(self, tea: Num) -> bool:
         pass
 
 
@@ -118,7 +118,7 @@ class SearchSpace2(SearchSpace):
 
 def cutting_plane_feas(
     omega: OracleFeas, space: SearchSpace, options=Options()
-) -> CInfo:
+) -> Tuple[Optional[ndarray], int]:
     """Find a point in a convex set (defined through a cutting-plane oracle).
 
     Description:
@@ -132,8 +132,8 @@ def cutting_plane_feas(
                 find x
                 s.t. f(x) <= 0,
 
-        A *separation oracle* asserts that an evalution point xinit is feasible,
-        or provide a cut that separates the feasible region and xinit.
+        A *separation oracle* asserts that an evalution point x0 is feasible,
+        or provide a cut that separates the feasible region and x0.
 
          ┌────────────┐    ┌───────────┐┌──────────┐
          │CuttingPlane│    │SearchSpace││OracleFeas│
@@ -172,48 +172,48 @@ def cutting_plane_feas(
     for niter in range(options.max_iter):
         cut = omega.assess_feas(space.xc())  # query the oracle at space.xc()
         if cut is None:  # feasible sol'n obtained
-            return CInfo(True, niter)
+            return space.xc(), niter
         cutstatus = space.update(cut)  # update space
         if cutstatus != CutStatus.Success or space.tsq() < options.tol:
-            return CInfo(False, niter)
-    return CInfo(False, options.max_iter)
+            return None, niter
+    return None, options.max_iter
 
 
 def cutting_plane_optim(
-    omega: OracleOptim, space: SearchSpace, target: float, options=Options()
+    omega: OracleOptim, space: SearchSpace, tea: float, options=Options()
 ) -> Tuple[Optional[ndarray], float, int]:
     """Cutting-plane method for solving convex optimization problem
 
     Arguments:
         omega (OracleOptim): perform assessment on xinit
         space (SearchSpace): Search Space containing x*
-        target (float): initial best-so-far value
+        tea (float): initial best-so-far value
 
     Keyword Arguments:
         options ([type]): [description] (default: {Options()})
 
     Returns:
         x_best (Any): solution vector
-        target: final best-so-far value
+        tea: final best-so-far value
         ret {CInfo}
     """
     x_best = None
     for niter in range(options.max_iter):
-        cut, target1 = omega.assess_optim(space.xc(), target)
-        if target1 is not None:  # better t obtained
-            target = target1
+        cut, tea1 = omega.assess_optim(space.xc(), tea)
+        if tea1 is not None:  # better t obtained
+            tea = tea1
             x_best = space.xc().copy()
             status = space.update(cut, central_cut=True)
         else:
             status = space.update(cut, central_cut=False)
         if status != CutStatus.Success or space.tsq() < options.tol:
-            return x_best, target, niter
-    return x_best, target, options.max_iter
+            return x_best, tea, niter
+    return x_best, tea, options.max_iter
 
 
 def cutting_plane_feas_q(
         omega: OracleFeasQ, space: SearchSpace, options=Options()
-) -> Tuple[Optional[ArrayType], CInfo]:
+) -> Tuple[Optional[ArrayType], int]:
     """Cutting-plane method for solving convex discrete optimization problem
 
     Arguments:
@@ -230,57 +230,57 @@ def cutting_plane_feas_q(
     # x_last = space.xc()
     retry = False
     for niter in range(options.max_iter):
-        cut, xinit, more_alt = omega.assess_feas_q(space.xc(), retry)
+        cut, x_q, more_alt = omega.assess_feas_q(space.xc(), retry)
         if cut is None:  # better t obtained
-            return xinit, CInfo(True, niter)
+            return x_q, niter
         cutstatus = space.update(cut)
         if cutstatus == CutStatus.NoEffect:
             if not more_alt:  # no more alternative cut
-                return None, CInfo(False, niter)
+                return None, niter
             retry = True
         elif cutstatus == CutStatus.NoSoln:
-            return None, CInfo(False, niter)
+            return None, niter
         if space.tsq() < options.tol:
-            return None, CInfo(False, niter)
-    return None, CInfo(False, options.max_iter)
+            return None, niter
+    return None, options.max_iter
 
 
 def cutting_plane_q(
-        omega: OracleOptimQ, space: SearchSpace, target: float, options=Options()
+        omega: OracleOptimQ, space: SearchSpace, tea: float, options=Options()
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for solving convex discrete optimization problem
 
     Arguments:
         omega (OracleOptimQ): perform assessment on xinit
         space ([type]): Search Space containing x*
-        target (float): initial best-so-far value
+        tea (float): initial best-so-far value
 
     Keyword Arguments:
         options ([type]): [description] (default: {Options()})
 
     Returns:
         x_best (float): solution vector
-        target (float): best-so-far optimal value
+        tea (float): best-so-far optimal value
         niter ([type]): number of iterations performed
     """
     # x_last = space.xc()
     x_best = None
     retry = False
     for niter in range(options.max_iter):
-        cut, xinit, t1, more_alt = omega.assess_optim_q(space.xc(), target, retry)
+        cut, x_q, t1, more_alt = omega.assess_optim_q(space.xc(), tea, retry)
         if t1 is not None:  # better t obtained
-            target = t1
-            x_best = xinit.copy()
+            tea = t1
+            x_best = x_q.copy()
         status = space.update(cut)
         if status == CutStatus.NoEffect:
             if not more_alt:  # no more alternative cut
-                return x_best, target, niter
+                return x_best, tea, niter
             retry = True
         elif status == CutStatus.NoSoln:
-            return x_best, target, niter
+            return x_best, tea, niter
         if space.tsq() < options.tol:
-            return x_best, target, niter
-    return x_best, target, options.max_iter
+            return x_best, tea, niter
+    return x_best, tea, options.max_iter
 
 
 def bsearch(
@@ -305,11 +305,11 @@ def bsearch(
         tau = (upper - lower) / 2
         if tau < options.tol:
             return upper, niter
-        target = T(lower + tau)
-        if omega.assess_bs(target):  # feasible sol'n obtained
-            upper = target
+        tea = T(lower + tau)
+        if omega.assess_bs(tea):  # feasible sol'n obtained
+            upper = tea
         else:
-            lower = target
+            lower = tea
     return upper, options.max_iter
 
 
@@ -339,7 +339,7 @@ class bsearch_adaptor:
         """
         return self.space.xc()
 
-    def assess_bs(self, target: Num) -> bool:
+    def assess_bs(self, tea: Num) -> bool:
         """[summary]
 
         Arguments:
@@ -349,8 +349,9 @@ class bsearch_adaptor:
             [type]: [description]
         """
         space = self.space.copy()
-        self.omega.update(target)
-        ell_info = cutting_plane_feas(self.omega, space, self.options)
-        if ell_info.feasible:
-            self.space.set_xc(space.xc())
-        return ell_info.feasible
+        self.omega.update(tea)
+        x_feas, _ = cutting_plane_feas(self.omega, space, self.options)
+        if x_feas is not None:
+            self.space.set_xc(x_feas)
+            return True
+        return False
