@@ -56,7 +56,7 @@ class OracleFeas2(OracleFeas):
 class OracleOptim(ABC):
     @abstractmethod
     def assess_optim(
-        self, x: ndarray, tea: float  # what?
+        self, xc: ndarray, tea: float  # what?
     ) -> Tuple[Cut, Optional[float]]:
         pass
 
@@ -64,7 +64,7 @@ class OracleOptim(ABC):
 class OracleFeasQ(ABC):
     @abstractmethod
     def assess_feas_q(
-        self, x: ndarray, retry: bool
+        self, xc: ndarray, retry: bool
     ) -> Tuple[Optional[Cut], Optional[ndarray], bool]:
         pass
 
@@ -72,7 +72,7 @@ class OracleFeasQ(ABC):
 class OracleOptimQ(ABC):
     @abstractmethod
     def assess_optim_q(
-        self, x: ndarray, tea: float, retry: bool
+        self, xc: ndarray, tea: float, retry: bool
     ) -> Tuple[Cut, ndarray, Optional[float], bool]:
         pass
 
@@ -95,15 +95,6 @@ class SearchSpace(ABC):
     @abstractmethod
     def tsq(self) -> float:
         pass
-
-
-"""
-CuttingPlane -> SearchSpace: request xc
-SearchSpace -> CuttingPlane: return xc
-CuttingPlane -> OracleFeas: assess_feas(xc)
-OracleFeas -> CuttingPlane: return cut
-CuttingPlane -> SearchSpace: update by the cut
-"""
 
 
 class SearchSpace2(SearchSpace):
