@@ -1,32 +1,30 @@
+import numpy as np
+from .cutting_plane import CutStatus
+from .ell_calc import EllCalc
 from typing import Tuple, Union
 
-import numpy as np
-
-from .cutting_plane import CutStatus, SearchSpace
-from .ell_calc import EllCalc
-
-Arr = np.ndarray
 Mat = np.ndarray
-CutChoice = Union[float, Arr]  # single or parallel
-Cut = Tuple[Arr, CutChoice]
+ArrayType = np.ndarray
+CutChoice = Union[float, ArrayType]  # single or parallel
+Cut = Tuple[ArrayType, CutChoice]
 
 
-class Ell(SearchSpace):
+class Ell:
     no_defer_trick: bool = False
 
     _mq: Mat
-    _xc: Arr
+    _xc: ArrayType
     _kappa: float
     _helper: EllCalc
 
-    def _new_with_matrix(self, kappa, mq: Mat, xc: Arr) -> None:
+    def _new_with_matrix(self, kappa, mq: Mat, xc: ArrayType) -> None:
         n = len(xc)
         self._helper = EllCalc(n)
         self._kappa = kappa
         self._mq = mq
         self._xc = xc
 
-    def __init__(self, val, xc: Arr) -> None:
+    def __init__(self, val, xc: ArrayType) -> None:
         if np.isscalar(val):
             self._new_with_matrix(val, np.eye(len(xc)), xc)
         else:
@@ -45,7 +43,7 @@ class Ell(SearchSpace):
         return ellip
 
     # @property
-    def xc(self) -> Arr:
+    def xc(self) -> ArrayType:
         """copy the whole array anyway
 
         Returns:
@@ -54,7 +52,7 @@ class Ell(SearchSpace):
         return self._xc
 
     # @xc.setter
-    def set_xc(self, x: Arr) -> None:
+    def set_xc(self, x: ArrayType) -> None:
         """Set the xc object
 
         Arguments:
@@ -74,7 +72,7 @@ class Ell(SearchSpace):
     def update(self, cut: Cut, central_cut: bool = False) -> CutStatus:
         grad, beta = cut
         grad_t = self._mq @ grad  # n^2 multiplications
-        omega = grad @ grad_t  # n multiplications
+        omega = grad.dot(grad_t)  # n multiplications
         self._helper.tsq = self._kappa * omega
 
         if central_cut:

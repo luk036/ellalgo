@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 import numpy as np
 
 from .chol_ext import LDLTMgr
 
-Arr = Union[np.ndarray]
+Arr = np.ndarray
 Cut = Tuple[Arr, float]
 
 

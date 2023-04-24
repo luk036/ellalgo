@@ -1,16 +1,19 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from enum import Enum
-from typing import Optional, Tuple, Union, TYPE_CHECKING
+from typing import Optional, Tuple, Union
+from typing import Generic, TypeVar
+from collections.abc import MutableSequence
+import copy
 
+T = TypeVar('T', bound='Copyable')
+class Copyable(Generic[T]):
+    @abstractmethod
+    def copy(self: T) -> T:
+        # return a copy of self
+        pass
 
-if TYPE_CHECKING:
-    from numpy import ndarray
-else:
-    from typing import Any
-    ndarray = Any
-
-ArrayType = Union[float, ndarray]  # one or multi dimensional
-CutChoice = Union[float, ndarray]  # single or parallel
+CutChoice = Union[float, MutableSequence]  # single or parallel
+ArrayType = TypeVar("ArrayType", bound="Copyable")
 Cut = Tuple[ArrayType, CutChoice]
 Num = Union[float, int]
 
@@ -41,55 +44,55 @@ class CInfo:
         self.num_iters: int = num_iters
 
 
-class OracleFeas(ABC):
+class OracleFeas(Generic[ArrayType]):
     @abstractmethod
-    def assess_feas(self, x: ArrayType) -> Optional[Cut]:
+    def assess_feas(self, xc: ArrayType) -> Optional[Cut]:
         pass
 
 
-class OracleFeas2(OracleFeas):
+class OracleFeas2(OracleFeas[ArrayType]):
     @abstractmethod
-    def update(self, tea: Num):
+    def update(self, tea: Num) -> None:
         pass
 
 
-class OracleOptim(ABC):
+class OracleOptim(Generic[ArrayType]):
     @abstractmethod
     def assess_optim(
-        self, xc: ndarray, tea: float  # what?
+        self, xc: ArrayType, tea: float  # what?
     ) -> Tuple[Cut, Optional[float]]:
         pass
 
 
-class OracleFeasQ(ABC):
+class OracleFeasQ(Generic[ArrayType]):
     @abstractmethod
     def assess_feas_q(
-        self, xc: ndarray, retry: bool
-    ) -> Tuple[Optional[Cut], Optional[ndarray], bool]:
+        self, xc: ArrayType, retry: bool
+    ) -> Tuple[Optional[Cut], Optional[ArrayType], bool]:
         pass
 
 
-class OracleOptimQ(ABC):
+class OracleOptimQ(Generic[ArrayType]):
     @abstractmethod
     def assess_optim_q(
-        self, xc: ndarray, tea: float, retry: bool
-    ) -> Tuple[Cut, ndarray, Optional[float], bool]:
+        self, xc: ArrayType, tea: float, retry: bool
+    ) -> Tuple[Cut, ArrayType, Optional[float], bool]:
         pass
 
 
-class OracleBS(ABC):
+class OracleBS(Generic[ArrayType]):
     @abstractmethod
     def assess_bs(self, tea: Num) -> bool:
         pass
 
 
-class SearchSpace(ABC):
+class SearchSpace(Generic[ArrayType]):
     @abstractmethod
     def update(self, cut: Cut, central_cut: bool = False) -> CutStatus:
         pass
 
     @abstractmethod
-    def xc(self) -> ndarray:
+    def xc(self) -> ArrayType:
         pass
 
     @abstractmethod
@@ -97,19 +100,14 @@ class SearchSpace(ABC):
         pass
 
 
-class SearchSpace2(SearchSpace):
+class SearchSpace2(SearchSpace[ArrayType]):
     @abstractmethod
-    def copy(self) -> SearchSpace:
+    def set_xc(self, xc: ArrayType) -> None:
         pass
-
-    @abstractmethod
-    def set_xc(self, xc: ndarray) -> None:
-        pass
-
 
 def cutting_plane_feas(
-    omega: OracleFeas, space: SearchSpace, options=Options()
-) -> Tuple[Optional[ndarray], int]:
+    omega: OracleFeas[ArrayType], space: SearchSpace[ArrayType], options=Options()
+) -> Tuple[Optional[ArrayType], int]:
     """Find a point in a convex set (defined through a cutting-plane oracle).
 
     Description:
@@ -158,21 +156,21 @@ def cutting_plane_feas(
     Returns:
         feasible (bool): whether it is feasible
         niter (int): number of iterations performed
-        cutStatus (CutStatus): cut status
+        status (CutStatus): cut status
     """
     for niter in range(options.max_iter):
         cut = omega.assess_feas(space.xc())  # query the oracle at space.xc()
         if cut is None:  # feasible sol'n obtained
             return space.xc(), niter
-        cutstatus = space.update(cut)  # update space
-        if cutstatus != CutStatus.Success or space.tsq() < options.tol:
+        status = space.update(cut)  # update space
+        if status != CutStatus.Success or space.tsq() < options.tol:
             return None, niter
     return None, options.max_iter
 
 
 def cutting_plane_optim(
-    omega: OracleOptim, space: SearchSpace, tea: float, options=Options()
-) -> Tuple[Optional[ndarray], float, int]:
+    omega: OracleOptim[ArrayType], space: SearchSpace[ArrayType], tea: float, options=Options()
+) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for solving convex optimization problem
 
     Arguments:
@@ -193,7 +191,7 @@ def cutting_plane_optim(
         cut, tea1 = omega.assess_optim(space.xc(), tea)
         if tea1 is not None:  # better t obtained
             tea = tea1
-            x_best = space.xc().copy()
+            x_best = copy.copy(space.xc())
             status = space.update(cut, central_cut=True)
         else:
             status = space.update(cut, central_cut=False)
@@ -203,7 +201,7 @@ def cutting_plane_optim(
 
 
 def cutting_plane_feas_q(
-        omega: OracleFeasQ, space: SearchSpace, options=Options()
+        omega: OracleFeasQ[ArrayType], space: SearchSpace[ArrayType], options=Options()
 ) -> Tuple[Optional[ArrayType], int]:
     """Cutting-plane method for solving convex discrete optimization problem
 
@@ -224,12 +222,12 @@ def cutting_plane_feas_q(
         cut, x_q, more_alt = omega.assess_feas_q(space.xc(), retry)
         if cut is None:  # better t obtained
             return x_q, niter
-        cutstatus = space.update(cut)
-        if cutstatus == CutStatus.NoEffect:
+        status = space.update(cut)
+        if status == CutStatus.NoEffect:
             if not more_alt:  # no more alternative cut
                 return None, niter
             retry = True
-        elif cutstatus == CutStatus.NoSoln:
+        elif status == CutStatus.NoSoln:
             return None, niter
         if space.tsq() < options.tol:
             return None, niter
@@ -237,7 +235,7 @@ def cutting_plane_feas_q(
 
 
 def cutting_plane_q(
-        omega: OracleOptimQ, space: SearchSpace, tea: float, options=Options()
+        omega: OracleOptimQ[ArrayType], space: SearchSpace[ArrayType], tea: float, options=Options()
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for solving convex discrete optimization problem
 
@@ -261,7 +259,7 @@ def cutting_plane_q(
         cut, x_q, t1, more_alt = omega.assess_optim_q(space.xc(), tea, retry)
         if t1 is not None:  # better t obtained
             tea = t1
-            x_best = x_q.copy()
+            x_best = x_q
         status = space.update(cut)
         if status == CutStatus.NoEffect:
             if not more_alt:  # no more alternative cut
@@ -304,9 +302,9 @@ def bsearch(
     return upper, options.max_iter
 
 
-class bsearch_adaptor:
+class bsearch_adaptor(Generic[ArrayType]):
     def __init__(
-        self, omega: OracleFeas2, space: SearchSpace2, options=Options()
+        self, omega: OracleFeas2[ArrayType], space: SearchSpace2[ArrayType], options=Options()
     ) -> None:
         """[summary]
 
@@ -322,7 +320,7 @@ class bsearch_adaptor:
         self.options = options
 
     @property
-    def x_best(self) -> ndarray:
+    def x_best(self) -> ArrayType:
         """[summary]
 
         Returns:
@@ -339,7 +337,7 @@ class bsearch_adaptor:
         Returns:
             [type]: [description]
         """
-        space = self.space.copy()
+        space = copy.deepcopy(self.space)
         self.omega.update(tea)
         x_feas, _ = cutting_plane_feas(self.omega, space, self.options)
         if x_feas is not None:

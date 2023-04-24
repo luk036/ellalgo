@@ -1,14 +1,12 @@
-from typing import Optional, Tuple, TypeVar
+from typing import Optional, Tuple
 
 import numpy as np
 
-from ellalgo.cutting_plane import OracleOptim
-
-Arr = TypeVar("Arr", bound="np.ndarray")
+Arr = np.ndarray
 Cut = Tuple[Arr, float]
 
 
-class ProfitOracle(OracleOptim):
+class ProfitOracle:
     """Oracle for a profit maximization problem.
 
     This example is taken from [Aliabadi and Salahi, 2013]
@@ -70,7 +68,7 @@ class ProfitOracle(OracleOptim):
         return (g, 0.0), target
 
 
-class ProfitRbOracle(OracleOptim):
+class ProfitRbOracle:
     """Oracle for a robust profit maximization problem.
 
     This example is taken from [Aliabadi and Salahi, 2013]:
@@ -155,7 +153,7 @@ class ProfitQOracle:
         ProfitOracle
     """
 
-    yd: np.array
+    yd: np.ndarray
 
     def __init__(self, params, a, v) -> None:
         """[summary]
@@ -195,5 +193,5 @@ class ProfitQOracle:
             self.yd = np.log(x)
 
         (g, h), tnew = self.omega.assess_optim(self.yd, target)
-        h += g @ (self.yd - y)
+        h += g.dot(self.yd - y)
         return (g, h), self.yd, tnew, not retry

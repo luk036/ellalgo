@@ -1,11 +1,5 @@
-# -*- coding: utf-8 -*-
-from typing import Tuple, Union
-
-import numpy as np
-
+from typing import Tuple
 from .cutting_plane import CutStatus, SearchSpace
-
-Arr = Union[np.ndarray]
 
 
 class ell1d(SearchSpace):
@@ -22,14 +16,14 @@ class ell1d(SearchSpace):
         self._xc: float = l + self._rd
         self._tsq: float = 0
 
-    def copy(self):
-        """[summary]
+    # def copy(self):
+    #     """[summary]
 
-        Returns:
-            [type]: [description]
-        """
-        ellip = ell1d([self._xc - self._rd, self._xc + self._rd])
-        return ellip
+    #     Returns:
+    #         [type]: [description]
+    #     """
+    #     ellip = ell1d([self._xc - self._rd, self._xc + self._rd])
+    #     return ellip
 
     # @property
     def xc(self) -> float:

@@ -1,12 +1,10 @@
-from typing import Union
-
 import numpy as np
 
-Arr = Union[np.ndarray]
-Mat = Union[np.ndarray]
+Arr = np.ndarray
+Mat = np.ndarray
 
 
-def ldlt_rank1update(low: Mat, inv_diag: Arr, alpha: int, vec: Arr):
+def ldlt_rank1update(tri_lower: Mat, inv_diag: Arr, alpha: int, vec: Arr):
     told = 1 / alpha  # initially
     ndim = len(vec)
     m = ndim - 1
@@ -17,8 +15,8 @@ def ldlt_rank1update(low: Mat, inv_diag: Arr, alpha: int, vec: Arr):
         beta = temp / tnew
         inv_diag[j] *= told / tnew  # update invD
         for k in range(j + 1, ndim):
-            vec[k] -= p * low[k, j]
-            low[k, j] += beta * vec[k]
+            vec[k] -= p * tri_lower[k, j]
+            tri_lower[k, j] += beta * vec[k]
         told = tnew
 
     p = vec[m]
@@ -27,19 +25,19 @@ def ldlt_rank1update(low: Mat, inv_diag: Arr, alpha: int, vec: Arr):
     inv_diag[m] *= told / tnew  # update invD
 
 
-def ldlt_solve1(low: Mat, vec: Arr):
+def ldlt_solve1(tri_lower: Mat, vec: Arr):
     "perform L^-1 * v"
     ndim = len(vec)
     for i in range(ndim):
         for j in range(i + 1, ndim):
-            vec[j] -= vec[i] * low[j, i]
+            vec[j] -= vec[i] * tri_lower[j, i]
 
 
-def ldlt_solve2(low: Mat, vec: Arr):
+def ldlt_solve2(tri_lower: Mat, vec: Arr):
     "perform L^-1 * v"
     ndim = len(vec)
     for i in range(1, ndim):
         for j in range(i):
-            low[j, i] = low[i, j] * vec[j]
+            tri_lower[j, i] = tri_lower[i, j] * vec[j]
             # keep for rank-one update
-            vec[i] -= low[j, i]
+            vec[i] -= tri_lower[j, i]

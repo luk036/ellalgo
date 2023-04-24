@@ -1,26 +1,24 @@
-from typing import Tuple, Union
-
 import numpy as np
-
 from .cutting_plane import CutStatus
 from .ell_calc import EllCalc
+from typing import Tuple, Union
 
-Arr = Union[np.ndarray]
-Mat = Union[np.ndarray]
-CutChoice = Union[float, Arr]  # single or parallel
-Cut = Tuple[Arr, CutChoice]
+Mat = np.ndarray
+ArrayType = np.ndarray
+CutChoice = Union[float, ArrayType]  # single or parallel
+Cut = Tuple[ArrayType, CutChoice]
 
 
 class EllStable:
     no_defer_trick: bool = False
 
     _mq: Mat
-    _xc: Arr
+    _xc: ArrayType
     _kappa: float
     _helper: EllCalc
     _n: int
 
-    def _new_with_matrix(self, kappa: float, mq: Mat, xc: Arr) -> None:
+    def _new_with_matrix(self, kappa, mq: Mat, xc: ArrayType) -> None:
         n = len(xc)
         self._helper = EllCalc(n)
         self._kappa = kappa
@@ -28,7 +26,7 @@ class EllStable:
         self._xc = xc
         self._n = n
 
-    def __init__(self, val, xc: Arr) -> None:
+    def __init__(self, val, xc: ArrayType) -> None:
         if np.isscalar(val):
             self._new_with_matrix(val, np.eye(len(xc)), xc)
         else:
@@ -48,7 +46,7 @@ class EllStable:
         return ellip
 
     # @property
-    def xc(self) -> Arr:
+    def xc(self) -> ArrayType:
         """copy the whole array anyway
 
         Returns:
@@ -57,7 +55,7 @@ class EllStable:
         return self._xc
 
     # @xc.setter
-    def set_xc(self, x: Arr) -> None:
+    def set_xc(self, x: ArrayType) -> None:
         """Set the xc object
 
         arguments:

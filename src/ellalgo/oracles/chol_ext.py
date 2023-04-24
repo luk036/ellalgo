@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 import math
-from typing import Callable, Union
-
+from typing import Callable
 import numpy as np
 
-Arr = Union[np.ndarray]
+Arr = np.ndarray
 
 
 class LDLTMgr:
@@ -51,7 +50,7 @@ class LDLTMgr:
         """Perform Cholesky Factorization (square-root free version)
 
         Arguments:
-            get_elem (callable): function to access symmetric matrix
+            get_elem (Callable): function to access symmetric matrix
 
          Construct $A(i, j)$ on demand, lazy evalution
         """
@@ -101,7 +100,7 @@ class LDLTMgr:
         m = n - 1
         self.v[m] = 1.0
         for i in range(m, start, -1):
-            self.v[i - 1] = -(self._T[i:n, i - 1] @ self.v[i:n])
+            self.v[i - 1] = -self._T[i:n, i - 1].dot(self.v[i:n])
         return -self._T[m, m]
 
     def sym_quad(self, A: Arr) -> float:
@@ -116,7 +115,7 @@ class LDLTMgr:
         """
         s, n = self.p
         v = self.v[s:n]
-        return v @ A[s:n, s:n] @ v
+        return v.dot(A[s:n, s:n] @ v)
 
     def sqrt(self) -> Arr:
         """Return upper triangular matrix R where A = R' * R
