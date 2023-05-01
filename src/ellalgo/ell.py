@@ -1,6 +1,7 @@
 import numpy as np
-from .cutting_plane import CutStatus
+# from .cutting_plane import CutStatus
 from .ell_calc import EllCalc
+from .ell_calc import CutStatus
 from typing import Tuple, Union
 
 Mat = np.ndarray

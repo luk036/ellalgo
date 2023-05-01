@@ -1,8 +1,9 @@
 from typing import Tuple
-from .cutting_plane import CutStatus, SearchSpace
+# from .cutting_plane import SearchSpace
+from .ell_calc import CutStatus
 
 
-class ell1d(SearchSpace):
+class ell1d:
     __slots__ = ("_rd", "_xc")
 
     def __init__(self, interval: Tuple[float, float]) -> None:

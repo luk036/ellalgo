@@ -1,29 +1,24 @@
 from abc import abstractmethod
-from enum import Enum
 from typing import Optional, Tuple, Union
 from typing import Generic, TypeVar
 from collections.abc import MutableSequence
+from .ell_calc import CutStatus
 import copy
 
 T = TypeVar('T', bound='Copyable')
+
+
 class Copyable(Generic[T]):
     @abstractmethod
     def copy(self: T) -> T:
         # return a copy of self
         pass
 
+
 CutChoice = Union[float, MutableSequence]  # single or parallel
 ArrayType = TypeVar("ArrayType", bound="Copyable")
 Cut = Tuple[ArrayType, CutChoice]
 Num = Union[float, int]
-
-
-class CutStatus(Enum):
-    Success = 0
-    NoSoln = 1
-    SmallEnough = 2
-    NoEffect = 3
-    Unknown = 4
 
 
 class Options:
@@ -104,6 +99,7 @@ class SearchSpace2(SearchSpace[ArrayType]):
     @abstractmethod
     def set_xc(self, xc: ArrayType) -> None:
         pass
+
 
 def cutting_plane_feas(
     omega: OracleFeas[ArrayType], space: SearchSpace[ArrayType], options=Options()
