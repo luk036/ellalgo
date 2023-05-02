@@ -1,10 +1,11 @@
-from typing import Optional, Tuple
+# -*- coding: utf-8 -*-
+from typing import Optional, Tuple, Union
 
 import numpy as np
 
-from .chol_ext import LDLTMgr
+from .ldlt_mgr import LDLTMgr
 
-Arr = np.ndarray
+Arr = Union[np.ndarray]
 Cut = Tuple[Arr, float]
 
 
@@ -12,11 +13,11 @@ class LMI0Oracle:
     """Oracle for Linear Matrix Inequality constraint
 
     find  x
-    s.t.​  F * x ⪰ 0
+    s.t.  F * x ⪰ 0
 
     """
 
-    def __init__(self, F) -> None:
+    def __init__(self, F):
         """[summary]
 
         Arguments:

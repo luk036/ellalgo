@@ -5,9 +5,9 @@ from __future__ import print_function
 from typing import Optional, Tuple, Union
 
 import numpy as np
-
 from ellalgo.cutting_plane import cutting_plane_optim
 from ellalgo.ell import Ell
+
 from ellalgo.oracles.lmi_old_oracle import LMIOldOracle
 from ellalgo.oracles.lmi_oracle import LMIOracle
 
@@ -42,12 +42,12 @@ class MyOracle:
         self.lmi1 = oracle(F1, B1)
         self.lmi2 = oracle(F2, B2)
 
-    def assess_optim(self, x: Arr, target: float) -> Tuple[Cut, Optional[float]]:
+    def assess_optim(self, x: Arr, t: float) -> Tuple[Cut, Optional[float]]:
         """[summary]
 
         Arguments:
             x (Arr): [description]
-            target (float): the best-so-far optimal value
+            t (float): the best-so-far optimal value
 
         Returns:
             Tuple[Cut, float]: [description]
@@ -59,7 +59,7 @@ class MyOracle:
             return cut, None
 
         f0 = self.c @ x
-        if (fj := f0 - target) > 0.0:
+        if (fj := f0 - t) > 0.0:
             return (self.c, fj), None
         return (self.c, 0.0), f0
 
@@ -83,7 +83,7 @@ def run_lmi(oracle):
     # time.sleep(duration)
 
     # fmt = '{:f} {} {} {}'
-    # print(fmt.format(fbest, niter, feasible, status))
+    # print(fmt.format(fb, niter, feasible, status))
     # print(xbest)
     assert xbest is not None
     return num_iters

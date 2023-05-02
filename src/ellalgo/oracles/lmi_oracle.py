@@ -1,11 +1,8 @@
+import numpy as np
+from .ldlt_mgr import LDLTMgr
 from typing import Optional, Tuple
 
-import numpy as np
-
-from .chol_ext import LDLTMgr
-
-Arr = np.ndarray
-Cut = Tuple[Arr, float]
+Cut = Tuple[np.ndarray, float]
 
 
 class LMIOracle:
@@ -18,34 +15,33 @@ class LMIOracle:
 
     """
 
-    def __init__(self, F, B) -> None:
+    def __init__(self, F, B):
         """Construct a new lmi oracle object
 
         Arguments:
-            F (List[Arr]): [description]
-            B (Arr): [description]
+            F (List[np.ndarray]): [description]
+            B (np.ndarray): [description]
         """
         self.F = F
         self.F0 = B
         self.Q = LDLTMgr(len(B))
 
-    def assess_feas(self, x: Arr) -> Optional[Cut]:
+    def assess_feas(self, x: np.ndarray) -> Optional[Cut]:
         """[summary]
 
         Arguments:
-            x (Arr): [description]
+            x (np.ndarray): [description]
 
         Returns:
             Optional[Cut]: [description]
         """
 
         def get_elem(i, j):
-            n = len(x)
-            return self.F0[i, j] - sum(self.F[k][i, j] * x[k] for k in range(n))
+            return self.F0[i, j] - sum(
+                Fk[i, j] * xk for Fk, xk in zip(self.F, x))
 
         if self.Q.factor(get_elem):
             return None
-
         ep = self.Q.witness()
         g = np.array([self.Q.sym_quad(Fk) for Fk in self.F])
         return g, ep

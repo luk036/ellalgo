@@ -1,10 +1,11 @@
-from typing import Optional, Tuple
+# -*- coding: utf-8 -*-
+from typing import Optional, Tuple, Union
 
 import numpy as np
 
-from .chol_ext import LDLTMgr
+from .ldlt_mgr import LDLTMgr
 
-Arr = np.ndarray
+Arr = Union[np.ndarray]
 Cut = Tuple[Arr, float]
 
 
@@ -18,7 +19,7 @@ class LMIOldOracle:
 
     """
 
-    def __init__(self, F, B) -> None:
+    def __init__(self, F, B):
         """[summary]
 
         Arguments:
