@@ -298,7 +298,7 @@ def bsearch(
     return upper, options.max_iter
 
 
-class bsearch_adaptor(Generic[ArrayType]):
+class BSearchAdaptor(Generic[ArrayType]):
     def __init__(
         self, omega: OracleFeas2[ArrayType], space: SearchSpace2[ArrayType], options=Options()
     ) -> None:
