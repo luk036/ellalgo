@@ -1,10 +1,10 @@
 from typing import Tuple
 # from .cutting_plane import SearchSpace
-from .ell_calc import CutStatus
+from .ell_config import CutStatus
 
 
 class ell1d:
-    __slots__ = ("_rd", "_xc")
+    __slots__ = ("_rd", "_xc", "_tsq")
 
     def __init__(self, interval: Tuple[float, float]) -> None:
         """[summary]

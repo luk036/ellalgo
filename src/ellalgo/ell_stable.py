@@ -1,6 +1,5 @@
-# from .cutting_plane import CutStatus
 from .ell_calc import EllCalc
-from .ell_calc import CutStatus
+from .ell_config import CutStatus
 import numpy as np
 from typing import Tuple, Union
 
@@ -73,7 +72,7 @@ class EllStable:
         """
         return self._helper.tsq
 
-    def update(self, cut: Cut, central_cut: bool = False) -> CutStatus:
+    def update(self, cut, central_cut: bool = False) -> CutStatus:
         """Update ellipsoid by cut
 
         Arguments:

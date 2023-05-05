@@ -1,7 +1,7 @@
 import numpy as np
 # from .cutting_plane import CutStatus
 from .ell_calc import EllCalc
-from .ell_calc import CutStatus
+from .ell_config import CutStatus
 from typing import Tuple, Union
 
 Mat = np.ndarray
@@ -70,7 +70,7 @@ class Ell:
         """
         return self._helper.tsq
 
-    def update(self, cut: Cut, central_cut: bool = False) -> CutStatus:
+    def update(self, cut, central_cut: bool = False) -> CutStatus:
         grad, beta = cut
         grad_t = self._mq @ grad  # n^2 multiplications
         omega = grad.dot(grad_t)  # n multiplications

@@ -1,42 +1,38 @@
+# from .ell_config import CutStatus, Options
+from .ell_config import CutStatus, Options
+import copy
+
 from abc import abstractmethod
 from typing import Optional, Tuple, Union
 from typing import Generic, TypeVar
 from collections.abc import MutableSequence
-from .ell_calc import CutStatus
-import copy
+# from .ell_config import CutStatus, Options
 
-T = TypeVar('T', bound='Copyable')
-
-
-class Copyable(Generic[T]):
-    @abstractmethod
-    def copy(self: T) -> T:
-        # return a copy of self
-        pass
+T = TypeVar('T')
 
 
 CutChoice = Union[float, MutableSequence]  # single or parallel
-ArrayType = TypeVar("ArrayType", bound="Copyable")
+ArrayType = TypeVar("ArrayType")
 Cut = Tuple[ArrayType, CutChoice]
 Num = Union[float, int]
 
 
-class Options:
-    max_iter: int = 2000  # maximum number of iterations
-    tol: float = 1e-8  # error tolerance
+# class Options:
+#     max_iter: int = 2000  # maximum number of iterations
+#     tol: float = 1e-8  # error tolerance
 
 
-class CInfo:
-    def __init__(self, feasible: bool, num_iters: int) -> None:
-        """Construct a new CInfo object
+# class CInfo:
+#     def __init__(self, feasible: bool, num_iters: int) -> None:
+#         """Construct a new CInfo object
 
-        Arguments:
-            feasible (bool): [description]
-            num_iters (int): [description]
-            status (int): [description]
-        """
-        self.feasible: bool = feasible
-        self.num_iters: int = num_iters
+#         Arguments:
+#             feasible (bool): [description]
+#             num_iters (int): [description]
+#             status (int): [description]
+#         """
+#         self.feasible: bool = feasible
+#         self.num_iters: int = num_iters
 
 
 class OracleFeas(Generic[ArrayType]):
@@ -184,9 +180,9 @@ def cutting_plane_optim(
     """
     x_best = None
     for niter in range(options.max_iter):
-        cut, tea1 = omega.assess_optim(space.xc(), tea)
-        if tea1 is not None:  # better t obtained
-            tea = tea1
+        cut, t1 = omega.assess_optim(space.xc(), tea)
+        if t1 is not None:  # better t obtained
+            tea = t1
             x_best = copy.copy(space.xc())
             status = space.update(cut, central_cut=True)
         else:
@@ -219,12 +215,14 @@ def cutting_plane_feas_q(
         if cut is None:  # better t obtained
             return x_q, niter
         status = space.update(cut)
-        if status == CutStatus.NoEffect:
+        if status == CutStatus.Success:
+            retry = False
+        elif status == CutStatus.NoSoln:
+            return None, niter
+        elif status == CutStatus.NoEffect:
             if not more_alt:  # no more alternative cut
                 return None, niter
             retry = True
-        elif status == CutStatus.NoSoln:
-            return None, niter
         if space.tsq() < options.tol:
             return None, niter
     return None, options.max_iter
@@ -257,12 +255,14 @@ def cutting_plane_q(
             tea = t1
             x_best = x_q
         status = space.update(cut)
-        if status == CutStatus.NoEffect:
+        if status == CutStatus.Success:
+            retry = False
+        elif status == CutStatus.NoSoln:
+            return x_best, tea, niter
+        elif status == CutStatus.NoEffect:
             if not more_alt:  # no more alternative cut
                 return x_best, tea, niter
             retry = True
-        elif status == CutStatus.NoSoln:
-            return x_best, tea, niter
         if space.tsq() < options.tol:
             return x_best, tea, niter
     return x_best, tea, options.max_iter

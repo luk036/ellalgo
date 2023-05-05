@@ -1,15 +1,15 @@
+from .ell_config import CutStatus
 from math import sqrt
 from typing import List
-# from .cutting_plane import CutStatus
-from enum import Enum
+# from enum import Enum
 
 
-class CutStatus(Enum):
-    Success = 0
-    NoSoln = 1
-    SmallEnough = 2
-    NoEffect = 3
-    Unknown = 4
+# class CutStatus(Enum):
+#     Success = 0
+#     NoSoln = 1
+#     SmallEnough = 2
+#     NoEffect = 3
+#     Unknown = 4
 
 
 class EllCalc:
@@ -80,7 +80,7 @@ class EllCalc:
             int: [description]
         """
         if isinstance(beta, (int, float)) or len(beta) < 2:
-            return self.calc_cc(sqrt(self.tsq))
+            return self.calc_cc()
         if beta[1] < 0.0:
             return CutStatus.NoSoln  # no sol'n
         return self.calc_ll_cc(beta[1])
@@ -121,7 +121,7 @@ class EllCalc:
 
                   2    2
             ζ  = τ  - β
-             1         0
+             1         1
                        __________________________
                       ╱                         2
                      ╱           ⎛    ⎛ 2    2⎞⎞
@@ -207,7 +207,7 @@ class EllCalc:
         """
         b1sq = b1**2
         if self.tsq < b1sq or not self.use_parallel_cut:
-            return self.calc_cc(sqrt(self.tsq))
+            return self.calc_cc()
         a1sq = b1sq / self.tsq
         xi = sqrt(1.0 - a1sq + (self.half_n * a1sq) ** 2)
         self.sigma = self.cst3 + self.cst2 * (1.0 - xi) / a1sq
@@ -241,22 +241,17 @@ class EllCalc:
         Returns:
             CutStatus: _description_
         """
-        tau = sqrt(self.tsq)
-        if tau < beta:
+        bsq = beta * beta
+        if self.tsq < bsq:
             return CutStatus.NoSoln  # no sol'n
-        # if beta == 0.0:
-        #     return self.calc_cc(tau)
+        tau = sqrt(self.tsq)
         gamma = tau + self.n_f * beta
-
-        # if gamma < 0.0:  # discrete optimization only
-        #     return CutStatus.NoEffect  # no effect
-
         self.rho = self.cst0 * gamma
         self.sigma = self.cst2 * gamma / (tau + beta)
-        self.delta = self.cst1 * (self.tsq - beta**2) / self.tsq
+        self.delta = self.cst1 * (self.tsq - bsq) / self.tsq
         return CutStatus.Success
 
-    def calc_cc(self, tau: float) -> CutStatus:
+    def calc_cc(self) -> CutStatus:
         """Central Cut
 
                   2
@@ -279,6 +274,7 @@ class EllCalc:
         Returns:
             CutStatus: _description_
         """
+        tau = sqrt(self.tsq)
         self.sigma = self.cst2
         self.rho = self.cst0 * tau
         self.delta = self.cst1
@@ -311,7 +307,7 @@ class EllCalcQ(EllCalc):
         if isinstance(beta, (int, float)):
             return self.calc_dc_q(beta)
         elif len(beta) < 2:  # unlikely
-            return self.calc_dc(beta[0])
+            return self.calc_dc_q(beta[0])
         return self.calc_ll_q(beta[0], beta[1])
 
     def calc_ll_q(self, b0: float, b1: float) -> CutStatus:

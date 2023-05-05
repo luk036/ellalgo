@@ -1,4 +1,5 @@
-from .cutting_plane import Options, cutting_plane_optim
+from .cutting_plane import cutting_plane_optim
+from .ell_config import Options
 
 
 class Problem:

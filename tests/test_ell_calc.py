@@ -1,6 +1,6 @@
 from pytest import approx
 
-from ellalgo.ell_calc import CutStatus
+from ellalgo.ell_config import CutStatus
 from ellalgo.ell_calc import EllCalc, EllCalcQ
 
 
@@ -17,7 +17,8 @@ def test_construct():
 
 def test_calc_cc():
     ell_calc = EllCalc(4)
-    ell_calc.calc_cc(0.1)
+    ell_calc.tsq = 0.01
+    ell_calc.calc_cc()
     assert ell_calc.sigma == approx(0.4)
     assert ell_calc.rho == approx(0.02)
     assert ell_calc.delta == approx(16.0 / 15.0)
