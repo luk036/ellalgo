@@ -168,7 +168,7 @@ class ProfitQOracle:
     def assess_optim_q(
         self, y: Arr, target: float, retry: bool
     ) -> Tuple[Cut, Arr, Optional[float], bool]:
-        """Make object callable for cutting_plane_q()
+        """Make object callable for cutting_plane_optim_q()
 
         Arguments:
             y (Arr): input quantity (in log scale)
@@ -182,7 +182,7 @@ class ProfitQOracle:
             Tuple: Cut, target, and the actual evaluation point
 
         See also:
-            cutting_plane_q
+            cutting_plane_optim_q
         """
         if not retry:
             x = np.round(np.exp(y))

@@ -18,13 +18,12 @@ class Ell:
     _kappa: float
 
     def __init__(self, val, xc: ArrayType, Calc=EllCalc) -> None:
-        n = len(xc)
-        self._helper = Calc(n)
+        ndim = len(xc)
+        self._helper = Calc(ndim)
         self._xc = xc
-        self._n = n
         if isinstance(val, (int, float)):
             self._kappa = val
-            self._mq = np.eye(n)
+            self._mq = np.eye(ndim)
         else:
             self._kappa = 1.0
             self._mq = np.diag(val)
@@ -68,16 +67,23 @@ class Ell:
         """
         return self._helper.tsq
 
-    def update(self, cut, central_cut: bool = False) -> CutStatus:
+    def update(self, cut) -> CutStatus:
+        return self._update_core(cut, self._helper.calc_single_or_ll)
+
+    def update_cc(self, cut) -> CutStatus:
+        return self._update_core(cut, self._helper.calc_single_or_ll_cc)
+
+    def _update_core(self, cut, f_core) -> CutStatus:
         grad, beta = cut
         grad_t = self._mq @ grad  # n^2 multiplications
         omega = grad.dot(grad_t)  # n multiplications
         self._helper.tsq = self._kappa * omega
 
-        if central_cut:
-            status = self._helper.calc_single_or_ll_cc(beta)
-        else:
-            status = self._helper.calc_single_or_ll(beta)
+        status = f_core(beta)
+        # if central_cut:
+        #     status = self._helper.calc_single_or_ll_cc(beta)
+        # else:
+        #     status = self._helper.calc_single_or_ll(beta)
 
         if status != CutStatus.Success:
             return status

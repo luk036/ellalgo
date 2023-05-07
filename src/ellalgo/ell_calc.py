@@ -9,7 +9,6 @@ class EllCalc:
     sigma: float = 0.0
     delta: float = 0.0
     tsq: float = 0.0
-    ndim: int
     n_f: float
     half_n: float
     cst0: float
@@ -23,7 +22,6 @@ class EllCalc:
         Args:
             n (float): _description_
         """
-        self.ndim = n
         self.n_f = float(n)
         self.half_n = self.n_f / 2.0
         self.cst0 = 1.0 / (self.n_f + 1.0)
@@ -31,19 +29,19 @@ class EllCalc:
         self.cst2 = 2.0 * self.cst0
         self.cst3 = self.n_f * self.cst0
 
-    def copy(self):
-        """[summary]
+    # def copy(self):
+    #     """[summary]
 
-        Returns:
-            EllCalc: [description]
-        """
-        ellip = EllCalc(self.ndim)
-        ellip.use_parallel_cut = self.use_parallel_cut
-        ellip.rho = self.rho
-        ellip.sigma = self.sigma
-        ellip.delta = self.delta
-        ellip.tsq = self.tsq
-        return ellip
+    #     Returns:
+    #         EllCalc: [description]
+    #     """
+    #     ellip = EllCalc(self.ndim)
+    #     ellip.use_parallel_cut = self.use_parallel_cut
+    #     ellip.rho = self.rho
+    #     ellip.sigma = self.sigma
+    #     ellip.delta = self.delta
+    #     ellip.tsq = self.tsq
+    #     return ellip
 
     # def update_cut(self, beta: float) -> CutStatus { self.calc_dc(beta)
     def calc_single_or_ll(self, beta) -> CutStatus:

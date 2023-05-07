@@ -79,7 +79,11 @@ class OracleBS(Generic[ArrayType]):
 
 class SearchSpace(Generic[ArrayType]):
     @abstractmethod
-    def update(self, cut: Cut, central_cut: bool = False) -> CutStatus:
+    def update(self, cut: Cut) -> CutStatus:
+        pass
+
+    @abstractmethod
+    def update_cc(self, cut: Cut) -> CutStatus:
         pass
 
     @abstractmethod
@@ -184,9 +188,9 @@ def cutting_plane_optim(
         if t1 is not None:  # better t obtained
             tea = t1
             x_best = copy.copy(space.xc())
-            status = space.update(cut, central_cut=True)
+            status = space.update_cc(cut)
         else:
-            status = space.update(cut, central_cut=False)
+            status = space.update(cut)
         if status != CutStatus.Success or space.tsq() < options.tol:
             return x_best, tea, niter
     return x_best, tea, options.max_iter
@@ -228,8 +232,8 @@ def cutting_plane_feas_q(
     return None, options.max_iter
 
 
-def cutting_plane_q(
-        omega: OracleOptimQ[ArrayType], space: SearchSpace[ArrayType], tea: float, options=Options()
+def cutting_plane_optim_q(
+        omega: OracleOptimQ[ArrayType], space_q: SearchSpace[ArrayType], tea: float, options=Options()
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for solving convex discrete optimization problem
 
@@ -250,11 +254,11 @@ def cutting_plane_q(
     x_best = None
     retry = False
     for niter in range(options.max_iter):
-        cut, x_q, t1, more_alt = omega.assess_optim_q(space.xc(), tea, retry)
+        cut, x_q, t1, more_alt = omega.assess_optim_q(space_q.xc(), tea, retry)
         if t1 is not None:  # better t obtained
             tea = t1
             x_best = x_q
-        status = space.update(cut)
+        status = space_q.update(cut)
         if status == CutStatus.Success:
             retry = False
         elif status == CutStatus.NoSoln:
@@ -263,7 +267,7 @@ def cutting_plane_q(
             if not more_alt:  # no more alternative cut
                 return x_best, tea, niter
             retry = True
-        if space.tsq() < options.tol:
+        if space_q.tsq() < options.tol:
             return x_best, tea, niter
     return x_best, tea, options.max_iter
 

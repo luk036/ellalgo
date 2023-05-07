@@ -3,7 +3,7 @@ from __future__ import print_function
 
 import numpy as np
 
-from ellalgo.cutting_plane import cutting_plane_optim, cutting_plane_q
+from ellalgo.cutting_plane import cutting_plane_optim, cutting_plane_optim_q
 from ellalgo.ell import Ell
 from ellalgo.ell_calc import EllCalcQ
 from ellalgo.oracles.profit_oracle import ProfitOracle, ProfitQOracle, ProfitRbOracle
@@ -39,6 +39,6 @@ def test_profit_rb():
 def test_profit_q():
     ellip = Ell(r, np.array([0.0, 0.0]), EllCalcQ)
     omega = ProfitQOracle(params, a, v)
-    xbest, _, num_iters = cutting_plane_q(omega, ellip, 0.0)
+    xbest, _, num_iters = cutting_plane_optim_q(omega, ellip, 0.0)
     assert xbest is not None
     assert num_iters == 27

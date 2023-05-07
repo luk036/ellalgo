@@ -16,7 +16,7 @@ def test_construct():
 def test_update_cc():
     ell = EllStable(0.01, np.zeros(4))
     cut = 0.5 * np.ones(4), 0.0
-    ell.update(cut, central_cut=True)
+    ell.update_cc(cut)
     # omega = 1.0
     # assert ell.sigma == approx(0.4)
     # assert ell.rho == approx(0.02)
@@ -42,7 +42,7 @@ def test_update_dc():
 def test_update_ll_cc():
     ell = EllStable(0.01, np.zeros(4))
     cut = 0.5 * np.ones(4), [0.0, 0.05]
-    ell.update(cut, central_cut=True)
+    ell.update_cc(cut)
     # assert ell.sigma == approx(0.8)
     # assert ell.rho == approx(0.02)
     # assert ell.delta == approx(1.2)
