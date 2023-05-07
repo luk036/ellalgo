@@ -142,3 +142,8 @@ def test_calc_ll_q():
     assert ell_calc_q.sigma == approx(0.928)
     assert ell_calc_q.rho == approx(0.0232)
     assert ell_calc_q.delta == approx(1.232)
+
+    status = ell_calc_q.calc_ll_q(-0.0100000001, 0.0100000002)
+    assert ell_calc_q.sigma == approx(-24.8)
+    assert ell_calc_q.rho == approx(-1.24e-9)
+    assert ell_calc_q.delta == approx(1.32)

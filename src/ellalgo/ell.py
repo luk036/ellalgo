@@ -16,32 +16,30 @@ class Ell:
     _mq: Mat
     _xc: ArrayType
     _kappa: float
-    _helper: EllCalc
 
-    def _new_with_matrix(self, kappa, mq: Mat, xc: ArrayType) -> None:
+    def __init__(self, val, xc: ArrayType, Calc=EllCalc) -> None:
         n = len(xc)
-        self._helper = EllCalc(n)
-        self._kappa = kappa
-        self._mq = mq
+        self._helper = Calc(n)
         self._xc = xc
-
-    def __init__(self, val, xc: ArrayType) -> None:
-        if np.isscalar(val):
-            self._new_with_matrix(val, np.eye(len(xc)), xc)
+        self._n = n
+        if isinstance(val, (int, float)):
+            self._kappa = val
+            self._mq = np.eye(n)
         else:
-            self._new_with_matrix(1.0, np.diag(val), xc)
+            self._kappa = 1.0
+            self._mq = np.diag(val)
 
-    def copy(self):
-        """[summary]
+    # def copy(self):
+    #     """[summary]
 
-        Returns:
-            Ell: [description]
-        """
-        ellip = Ell(self._kappa, self._xc)
-        ellip._mq = self._mq.copy()
-        ellip._helper = self._helper.copy()
-        ellip.no_defer_trick = self.no_defer_trick
-        return ellip
+    #     Returns:
+    #         Ell: [description]
+    #     """
+    #     ellip = Ell(self._kappa, self._xc)
+    #     ellip._mq = self._mq.copy()
+    #     ellip._helper = self._helper.copy()
+    #     ellip.no_defer_trick = self.no_defer_trick
+    #     return ellip
 
     # @property
     def xc(self) -> ArrayType:

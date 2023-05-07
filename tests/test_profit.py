@@ -5,6 +5,7 @@ import numpy as np
 
 from ellalgo.cutting_plane import cutting_plane_optim, cutting_plane_q
 from ellalgo.ell import Ell
+from ellalgo.ell_calc import EllCalcQ
 from ellalgo.oracles.profit_oracle import ProfitOracle, ProfitQOracle, ProfitRbOracle
 
 p, A, k = 20.0, 40.0, 30.5
@@ -36,7 +37,7 @@ def test_profit_rb():
 
 
 def test_profit_q():
-    ellip = Ell(r, np.array([0.0, 0.0]))
+    ellip = Ell(r, np.array([0.0, 0.0]), EllCalcQ)
     omega = ProfitQOracle(params, a, v)
     xbest, _, num_iters = cutting_plane_q(omega, ellip, 0.0)
     assert xbest is not None
