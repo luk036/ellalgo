@@ -9,7 +9,7 @@ class CutStatus(Enum):
 
 
 class Options:
-    max_iter: int = 2000  # maximum number of iterations
+    max_iters: int = 2000  # maximum number of iterations
     tol: float = 1e-8  # error tolerance
 
 
@@ -24,4 +24,3 @@ class CInfo:
         """
         self.feasible: bool = feasible
         self.num_iters: int = num_iters
-

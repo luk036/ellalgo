@@ -18,7 +18,7 @@ Num = Union[float, int]
 
 
 # class Options:
-#     max_iter: int = 2000  # maximum number of iterations
+#     max_iters: int = 2000  # maximum number of iterations
 #     tol: float = 1e-8  # error tolerance
 
 
@@ -154,14 +154,14 @@ def cutting_plane_feas(
         niter (int): number of iterations performed
         status (CutStatus): cut status
     """
-    for niter in range(options.max_iter):
+    for niter in range(options.max_iters):
         cut = omega.assess_feas(space.xc())  # query the oracle at space.xc()
         if cut is None:  # feasible sol'n obtained
             return space.xc(), niter
         status = space.update(cut)  # update space
         if status != CutStatus.Success or space.tsq() < options.tol:
             return None, niter
-    return None, options.max_iter
+    return None, options.max_iters
 
 
 def cutting_plane_optim(
@@ -183,7 +183,7 @@ def cutting_plane_optim(
         ret {CInfo}
     """
     x_best = None
-    for niter in range(options.max_iter):
+    for niter in range(options.max_iters):
         cut, t1 = omega.assess_optim(space.xc(), tea)
         if t1 is not None:  # better t obtained
             tea = t1
@@ -193,7 +193,7 @@ def cutting_plane_optim(
             status = space.update(cut)
         if status != CutStatus.Success or space.tsq() < options.tol:
             return x_best, tea, niter
-    return x_best, tea, options.max_iter
+    return x_best, tea, options.max_iters
 
 
 def cutting_plane_feas_q(
@@ -214,7 +214,7 @@ def cutting_plane_feas_q(
     """
     # x_last = space.xc()
     retry = False
-    for niter in range(options.max_iter):
+    for niter in range(options.max_iters):
         cut, x_q, more_alt = omega.assess_feas_q(space.xc(), retry)
         if cut is None:  # better t obtained
             return x_q, niter
@@ -229,7 +229,7 @@ def cutting_plane_feas_q(
             retry = True
         if space.tsq() < options.tol:
             return None, niter
-    return None, options.max_iter
+    return None, options.max_iters
 
 
 def cutting_plane_optim_q(
@@ -253,7 +253,7 @@ def cutting_plane_optim_q(
     # x_last = space.xc()
     x_best = None
     retry = False
-    for niter in range(options.max_iter):
+    for niter in range(options.max_iters):
         cut, x_q, t1, more_alt = omega.assess_optim_q(space_q.xc(), tea, retry)
         if t1 is not None:  # better t obtained
             tea = t1
@@ -269,7 +269,7 @@ def cutting_plane_optim_q(
             retry = True
         if space_q.tsq() < options.tol:
             return x_best, tea, niter
-    return x_best, tea, options.max_iter
+    return x_best, tea, options.max_iters
 
 
 def bsearch(
@@ -290,7 +290,7 @@ def bsearch(
     # assume monotone
     lower, upper = intrvl
     T = type(upper)  # T could be `int`
-    for niter in range(options.max_iter):
+    for niter in range(options.max_iters):
         tau = (upper - lower) / 2
         if tau < options.tol:
             return upper, niter
@@ -299,7 +299,7 @@ def bsearch(
             upper = tea
         else:
             lower = tea
-    return upper, options.max_iter
+    return upper, options.max_iters
 
 
 class BSearchAdaptor(Generic[ArrayType]):
