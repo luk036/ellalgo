@@ -14,14 +14,15 @@ class EllStable:
 
     _mq: Matrix
     _xc: ArrayType
-    _helper: EllCalc
     _kappa: float
+    _tsq: float
     _n: int
 
-    def __init__(self, val, xc: ArrayType, Calc = EllCalc) -> None:
+    def __init__(self, val, xc: ArrayType, CalcStrategy = EllCalc) -> None:
         ndim = len(xc)
-        self._helper = Calc(ndim)
+        self._helper = CalcStrategy(ndim)
         self._xc = xc
+        self._tsq = 0.0
         self._n = ndim
         if isinstance(val, (int, float)):
             self._kappa = val
@@ -68,15 +69,15 @@ class EllStable:
         Returns:
             [type]: [description]
         """
-        return self._helper.tsq
+        return self._tsq
 
-    def update(self, cut) -> CutStatus:
+    def update_dc(self, cut) -> CutStatus:
         return self._update_core(cut, self._helper.calc_single_or_ll)
 
     def update_cc(self, cut) -> CutStatus:
         return self._update_core(cut, self._helper.calc_single_or_ll_cc)
 
-    def _update_core(self, cut, f_core) -> CutStatus:
+    def _update_core(self, cut, dc_or_cc_strategy) -> CutStatus:
         """Update ellipsoid by cut
 
         Arguments:
@@ -109,9 +110,9 @@ class EllStable:
         gg_t = invLg * invDinvLg
         omega = sum(gg_t)
 
-        self._helper.tsq = self._kappa * omega  # need for helper
+        self._tsq = self._kappa * omega  # need for helper
 
-        status = f_core(beta)
+        status, rho, sigma, delta = dc_or_cc_strategy(beta, self._tsq)
 
         # if central_cut:
         #     status = self._helper.calc_single_or_ll_cc(beta)
@@ -131,11 +132,11 @@ class EllStable:
 
         # print(g_t)
         # calculate xc: n
-        self._xc -= (self._helper.rho / omega) * g_t
+        self._xc -= (rho / omega) * g_t
 
         # rank-one update: 3*n + (n-1)*n/2
         # r = self._sigma / omega
-        mu = self._helper.sigma / (1.0 - self._helper.sigma)
+        mu = sigma / (1.0 - sigma)
         oldt = omega / mu  # initially
         v = g.copy()
         for j in range(self._n):
@@ -151,7 +152,7 @@ class EllStable:
                 self._mq[k, j] += beta2 * v[k]
             oldt = newt
 
-        self._kappa *= self._helper.delta
+        self._kappa *= delta
 
         if self.no_defer_trick:
             self._mq *= self._kappa

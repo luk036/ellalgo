@@ -79,7 +79,7 @@ class OracleBS(Generic[ArrayType]):
 
 class SearchSpace(Generic[ArrayType]):
     @abstractmethod
-    def update(self, cut: Cut) -> CutStatus:
+    def update_dc(self, cut: Cut) -> CutStatus:
         pass
 
     @abstractmethod
@@ -158,7 +158,7 @@ def cutting_plane_feas(
         cut = omega.assess_feas(space.xc())  # query the oracle at space.xc()
         if cut is None:  # feasible sol'n obtained
             return space.xc(), niter
-        status = space.update(cut)  # update space
+        status = space.update_dc(cut)  # update space
         if status != CutStatus.Success or space.tsq() < options.tol:
             return None, niter
     return None, options.max_iters
@@ -190,7 +190,7 @@ def cutting_plane_optim(
             x_best = copy.copy(space.xc())
             status = space.update_cc(cut)
         else:
-            status = space.update(cut)
+            status = space.update_dc(cut)
         if status != CutStatus.Success or space.tsq() < options.tol:
             return x_best, tea, niter
     return x_best, tea, options.max_iters
@@ -218,7 +218,7 @@ def cutting_plane_feas_q(
         cut, x_q, more_alt = omega.assess_feas_q(space.xc(), retry)
         if cut is None:  # better t obtained
             return x_q, niter
-        status = space.update(cut)
+        status = space.update_dc(cut)
         if status == CutStatus.Success:
             retry = False
         elif status == CutStatus.NoSoln:
@@ -258,7 +258,7 @@ def cutting_plane_optim_q(
         if t1 is not None:  # better t obtained
             tea = t1
             x_best = x_q
-        status = space_q.update(cut)
+        status = space_q.update_dc(cut)
         if status == CutStatus.Success:
             retry = False
         elif status == CutStatus.NoSoln:

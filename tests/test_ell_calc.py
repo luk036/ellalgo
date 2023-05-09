@@ -17,133 +17,125 @@ def test_construct():
 
 def test_calc_cc():
     ell_calc = EllCalc(4)
-    ell_calc.tsq = 0.01
-    ell_calc.calc_cc()
-    assert ell_calc.sigma == approx(0.4)
-    assert ell_calc.rho == approx(0.02)
-    assert ell_calc.delta == approx(16.0 / 15.0)
+    status, rho, sigma, delta = ell_calc.calc_cc(0.01)
+    assert status == CutStatus.Success
+    assert sigma == approx(0.4)
+    assert rho == approx(0.02)
+    assert delta == approx(16.0 / 15.0)
 
 
 def test_calc_dc():
     ell_calc = EllCalc(4)
-    ell_calc.tsq = 0.01
-    status = ell_calc.calc_dc(0.11)
+    status, rho, sigma, delta = ell_calc.calc_dc(0.11, 0.01)
     assert status == CutStatus.NoSoln
-    status = ell_calc.calc_dc(0.01)
+    status, rho, sigma, delta = ell_calc.calc_dc(0.01, 0.01)
     assert status == CutStatus.Success
-    # status = ell_calc.calc_dc(-0.05)
+    # status, rho, sigma, delta = ell_calc.calc_dc(-0.05)
     # assert status == CutStatus.NoEffect
 
-    ell_calc.tsq = 0.01
-    status = ell_calc.calc_dc(0.05)
+    status, rho, sigma, delta = ell_calc.calc_dc(0.05, 0.01)
     assert status == CutStatus.Success
-    assert ell_calc.sigma == approx(0.8)
-    assert ell_calc.rho == approx(0.06)
-    assert ell_calc.delta == approx(0.8)
+    assert sigma == approx(0.8)
+    assert rho == approx(0.06)
+    assert delta == approx(0.8)
 
 
 def test_calc_ll_cc():
     ell_calc = EllCalc(4)
-    ell_calc.tsq = 0.01
-    status = ell_calc.calc_ll_cc(0.11)
+    status, rho, sigma, delta = ell_calc.calc_ll_cc(0.11, 0.01)
     assert status == CutStatus.Success
     # Central cut
-    assert ell_calc.sigma == approx(0.4)
-    assert ell_calc.rho == approx(0.02)
-    assert ell_calc.delta == approx(16.0 / 15.0)
+    assert sigma == approx(0.4)
+    assert rho == approx(0.02)
+    assert delta == approx(16.0 / 15.0)
 
-    status = ell_calc.calc_ll_cc(0.05)
+    status, rho, sigma, delta = ell_calc.calc_ll_cc(0.05, 0.01)
     assert status == CutStatus.Success
-    assert ell_calc.sigma == approx(0.8)
-    assert ell_calc.rho == approx(0.02)
-    assert ell_calc.delta == approx(1.2)
+    assert sigma == approx(0.8)
+    assert rho == approx(0.02)
+    assert delta == approx(1.2)
 
 
 def test_calc_ll():
     ell_calc = EllCalc(4)
-    ell_calc.tsq = 0.01
-    status = ell_calc.calc_ll(0.07, 0.03)
+    status, rho, sigma, delta = ell_calc.calc_ll(0.07, 0.03, 0.01)
     assert status == CutStatus.NoSoln
 
-    status = ell_calc.calc_ll(0.0, 0.05)
+    status, rho, sigma, delta = ell_calc.calc_ll(0.0, 0.05, 0.01)
     assert status == CutStatus.Success
-    assert ell_calc.sigma == approx(0.8)
-    assert ell_calc.rho == approx(0.02)
-    assert ell_calc.delta == approx(1.2)
+    assert sigma == approx(0.8)
+    assert rho == approx(0.02)
+    assert delta == approx(1.2)
 
-    status = ell_calc.calc_ll(0.05, 0.11)
+    status, rho, sigma, delta = ell_calc.calc_ll(0.05, 0.11, 0.01)
     assert status == CutStatus.Success
-    assert ell_calc.sigma == approx(0.8)
-    assert ell_calc.rho == approx(0.06)
-    assert ell_calc.delta == approx(0.8)
+    assert sigma == approx(0.8)
+    assert rho == approx(0.06)
+    assert delta == approx(0.8)
 
-    # status = ell_calc.calc_ll(-0.07, 0.07)
+    # status, rho, sigma, delta = ell_calc.calc_ll(-0.07, 0.07)
     # assert status == CutStatus.NoEffect
 
-    status = ell_calc.calc_ll(0.01, 0.04)
+    status, rho, sigma, delta = ell_calc.calc_ll(0.01, 0.04, 0.01)
     assert status == CutStatus.Success
-    assert ell_calc.sigma == approx(0.928)
-    assert ell_calc.rho == approx(0.0232)
-    assert ell_calc.delta == approx(1.232)
+    assert sigma == approx(0.928)
+    assert rho == approx(0.0232)
+    assert delta == approx(1.232)
 
 
 def test_calc_ll_noeffect():
     ell_calc = EllCalc(4)
-    ell_calc.tsq = 0.01
 
-    status = ell_calc.calc_ll(-0.04, 0.0625)
+    status, rho, sigma, delta = ell_calc.calc_ll(-0.04, 0.0625, 0.01)
     assert status == CutStatus.Success
-    assert ell_calc.sigma == approx(0.0)
-    assert ell_calc.rho == approx(0.0)
-    assert ell_calc.delta == approx(1.0)
+    assert sigma == approx(0.0)
+    assert rho == approx(0.0)
+    assert delta == approx(1.0)
 
 
 def test_calc_dc_q():
     ell_calc_q = EllCalcQ(4)
-    ell_calc_q.tsq = 0.01
-    status = ell_calc_q.calc_dc_q(0.11)
+    status, rho, sigma, delta = ell_calc_q.calc_dc_q(0.11, 0.01)
     assert status == CutStatus.NoSoln
-    status = ell_calc_q.calc_dc_q(0.01)
+    status, rho, sigma, delta = ell_calc_q.calc_dc_q(0.01, 0.01)
     assert status == CutStatus.Success
-    status = ell_calc_q.calc_dc_q(-0.05)
+    status, rho, sigma, delta = ell_calc_q.calc_dc_q(-0.05, 0.01)
     assert status == CutStatus.NoEffect
 
-    ell_calc_q.tsq = 0.01
-    status = ell_calc_q.calc_dc_q(0.05)
+    status, rho, sigma, delta = ell_calc_q.calc_dc_q(0.05, 0.01)
     assert status == CutStatus.Success
-    assert ell_calc_q.sigma == approx(0.8)
-    assert ell_calc_q.rho == approx(0.06)
-    assert ell_calc_q.delta == approx(0.8)
+    assert sigma == approx(0.8)
+    assert rho == approx(0.06)
+    assert delta == approx(0.8)
 
 
 def test_calc_ll_q():
     ell_calc_q = EllCalcQ(4)
-    ell_calc_q.tsq = 0.01
-    status = ell_calc_q.calc_ll_q(0.07, 0.03)
+    status, rho, sigma, delta = ell_calc_q.calc_ll_q(0.07, 0.03, 0.01)
     assert status == CutStatus.NoSoln
 
-    status = ell_calc_q.calc_ll_q(0.0, 0.05)
+    status, rho, sigma, delta = ell_calc_q.calc_ll_q(0.0, 0.05, 0.01)
     assert status == CutStatus.Success
-    assert ell_calc_q.sigma == approx(0.8)
-    assert ell_calc_q.rho == approx(0.02)
-    assert ell_calc_q.delta == approx(1.2)
+    assert sigma == approx(0.8)
+    assert rho == approx(0.02)
+    assert delta == approx(1.2)
 
-    status = ell_calc_q.calc_ll_q(0.05, 0.11)
+    status, rho, sigma, delta = ell_calc_q.calc_ll_q(0.05, 0.11, 0.01)
     assert status == CutStatus.Success
-    assert ell_calc_q.sigma == approx(0.8)
-    assert ell_calc_q.rho == approx(0.06)
-    assert ell_calc_q.delta == approx(0.8)
+    assert sigma == approx(0.8)
+    assert rho == approx(0.06)
+    assert delta == approx(0.8)
 
-    # status = ell_calc.calc_ll(-0.07, 0.07)
+    # status, rho, sigma, delta = ell_calc.calc_ll(-0.07, 0.07)
     # assert status == CutStatus.NoEffect
 
-    status = ell_calc_q.calc_ll_q(0.01, 0.04)
+    status, rho, sigma, delta = ell_calc_q.calc_ll_q(0.01, 0.04, 0.01)
     assert status == CutStatus.Success
-    assert ell_calc_q.sigma == approx(0.928)
-    assert ell_calc_q.rho == approx(0.0232)
-    assert ell_calc_q.delta == approx(1.232)
+    assert sigma == approx(0.928)
+    assert rho == approx(0.0232)
+    assert delta == approx(1.232)
 
-    status = ell_calc_q.calc_ll_q(-0.0100000001, 0.0100000002)
-    assert ell_calc_q.sigma == approx(-24.8)
-    assert ell_calc_q.rho == approx(-1.24e-9)
-    assert ell_calc_q.delta == approx(1.32)
+    status, rho, sigma, delta = ell_calc_q.calc_ll_q(-0.0100000001, 0.0100000002, 0.01)
+    assert sigma == approx(-24.8)
+    assert rho == approx(-1.24e-9)
+    assert delta == approx(1.32)

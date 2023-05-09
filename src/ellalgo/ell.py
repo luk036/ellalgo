@@ -16,11 +16,13 @@ class Ell:
     _mq: Mat
     _xc: ArrayType
     _kappa: float
+    _tsq: float
 
-    def __init__(self, val, xc: ArrayType, Calc=EllCalc) -> None:
+    def __init__(self, val, xc: ArrayType, CalcStrategy=EllCalc) -> None:
         ndim = len(xc)
-        self._helper = Calc(ndim)
+        self._helper = CalcStrategy(ndim)
         self._xc = xc
+        self._tsq = 0.0
         if isinstance(val, (int, float)):
             self._kappa = val
             self._mq = np.eye(ndim)
@@ -65,21 +67,21 @@ class Ell:
         Returns:
             [type]: [description]
         """
-        return self._helper.tsq
+        return self._tsq
 
-    def update(self, cut) -> CutStatus:
+    def update_dc(self, cut) -> CutStatus:
         return self._update_core(cut, self._helper.calc_single_or_ll)
 
     def update_cc(self, cut) -> CutStatus:
         return self._update_core(cut, self._helper.calc_single_or_ll_cc)
 
-    def _update_core(self, cut, f_core) -> CutStatus:
+    def _update_core(self, cut, dc_or_cc_strategy) -> CutStatus:
         grad, beta = cut
         grad_t = self._mq @ grad  # n^2 multiplications
         omega = grad.dot(grad_t)  # n multiplications
-        self._helper.tsq = self._kappa * omega
+        self._tsq = self._kappa * omega
 
-        status = f_core(beta)
+        status, rho, sigma, delta = dc_or_cc_strategy(beta, self._tsq)
         # if central_cut:
         #     status = self._helper.calc_single_or_ll_cc(beta)
         # else:
@@ -88,9 +90,9 @@ class Ell:
         if status != CutStatus.Success:
             return status
 
-        self._xc -= (self._helper.rho / omega) * grad_t
-        self._mq -= (self._helper.sigma / omega) * np.outer(grad_t, grad_t)
-        self._kappa *= self._helper.delta
+        self._xc -= (rho / omega) * grad_t
+        self._mq -= (sigma / omega) * np.outer(grad_t, grad_t)
+        self._kappa *= delta
 
         if self.no_defer_trick:
             self._mq *= self._kappa

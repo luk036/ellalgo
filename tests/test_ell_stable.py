@@ -29,7 +29,7 @@ def test_update_cc():
 def test_update_dc():
     ell = EllStable(0.01, np.zeros(4))
     cut = 0.5 * np.ones(4), 0.05
-    ell.update(cut)
+    ell.update_dc(cut)
 
     # assert ell.sigma == approx(0.8)
     # assert ell.rho == approx(0.06)
@@ -54,7 +54,7 @@ def test_update_ll_cc():
 def test_calc_ll():
     ell = EllStable(0.01, np.zeros(4))
     cut = 0.5 * np.ones(4), [0.01, 0.04]
-    ell.update(cut)
+    ell.update_dc(cut)
 
     # assert ell.sigma == approx(0.928)
     # assert ell.rho == approx(0.0232)
@@ -67,7 +67,7 @@ def test_calc_ll():
 def test_calc_ll_no_effect():
     ell = EllStable(0.01, np.zeros(4))
     cut = 0.5 * np.ones(4), [-0.04, 0.0625]
-    ell.update(cut)
+    ell.update_dc(cut)
     # assert ell.sigma == approx(0.0)
     # assert ell.rho == approx(0.0)
     # assert ell.delta == approx(1.0)
