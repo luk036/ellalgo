@@ -1,7 +1,7 @@
 from pytest import approx
 
 from ellalgo.ell_config import CutStatus
-from ellalgo.ell_calc import EllCalc, EllCalcQ
+from ellalgo.ell_calc import EllCalc
 
 
 def test_construct():
@@ -86,7 +86,7 @@ def test_calc_ll():
 def test_calc_ll_noeffect():
     ell_calc = EllCalc(4)
 
-    status, rho, sigma, delta = ell_calc.calc_ll(-0.04, 0.0625, 0.01)
+    status, rho, sigma, delta = ell_calc.calc_ll_q(-0.04, 0.0625, 0.01)
     assert status == CutStatus.Success
     assert sigma == approx(0.0)
     assert rho == approx(0.0)
@@ -94,7 +94,7 @@ def test_calc_ll_noeffect():
 
 
 def test_calc_dc_q():
-    ell_calc_q = EllCalcQ(4)
+    ell_calc_q = EllCalc(4)
     status, rho, sigma, delta = ell_calc_q.calc_dc_q(0.11, 0.01)
     assert status == CutStatus.NoSoln
     status, rho, sigma, delta = ell_calc_q.calc_dc_q(0.01, 0.01)
@@ -110,17 +110,17 @@ def test_calc_dc_q():
 
 
 def test_calc_ll_q():
-    ell_calc_q = EllCalcQ(4)
-    status, rho, sigma, delta = ell_calc_q.calc_ll_q(0.07, 0.03, 0.01)
+    ell_calc = EllCalc(4)
+    status, rho, sigma, delta = ell_calc.calc_ll_q(0.07, 0.03, 0.01)
     assert status == CutStatus.NoSoln
 
-    status, rho, sigma, delta = ell_calc_q.calc_ll_q(0.0, 0.05, 0.01)
+    status, rho, sigma, delta = ell_calc.calc_ll_q(0.0, 0.05, 0.01)
     assert status == CutStatus.Success
     assert sigma == approx(0.8)
     assert rho == approx(0.02)
     assert delta == approx(1.2)
 
-    status, rho, sigma, delta = ell_calc_q.calc_ll_q(0.05, 0.11, 0.01)
+    status, rho, sigma, delta = ell_calc.calc_ll_q(0.05, 0.11, 0.01)
     assert status == CutStatus.Success
     assert sigma == approx(0.8)
     assert rho == approx(0.06)
@@ -129,13 +129,13 @@ def test_calc_ll_q():
     # status, rho, sigma, delta = ell_calc.calc_ll(-0.07, 0.07)
     # assert status == CutStatus.NoEffect
 
-    status, rho, sigma, delta = ell_calc_q.calc_ll_q(0.01, 0.04, 0.01)
+    status, rho, sigma, delta = ell_calc.calc_ll_q(0.01, 0.04, 0.01)
     assert status == CutStatus.Success
     assert sigma == approx(0.928)
     assert rho == approx(0.0232)
     assert delta == approx(1.232)
 
-    status, rho, sigma, delta = ell_calc_q.calc_ll_q(-0.0100000001, 0.0100000002, 0.01)
+    status, rho, sigma, delta = ell_calc.calc_ll_q(-0.0100000001, 0.0100000002, 0.01)
     assert sigma == approx(-24.8)
     assert rho == approx(-1.24e-9)
     assert delta == approx(1.32)

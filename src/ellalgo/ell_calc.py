@@ -278,12 +278,6 @@ class EllCalc:
         delta = self._cst1
         return (CutStatus.Success, rho, sigma, delta)
 
-# trait UpdateByCutChoices:
-#     def update_by(self, ell: &mut EllCalc, tsq: float) -> CutStatus
-#
-
-
-class EllCalcQ(EllCalc):
     def calc_single_or_ll_q(self, beta, tsq: float) -> Tuple[CutStatus, float, float, float]:
         """single or parallel cut
         (override the base class)
@@ -360,21 +354,24 @@ class EllCalcQ(EllCalc):
             return (CutStatus.NoEffect, 0.0, 0.0, 0.0)
         return self.calc_dc_core(beta, tau, gamma)
 
+# trait UpdateByCutChoices:
+#     def update_by(self, ell: &mut EllCalc, tsq: float) -> CutStatus
+#
 
 if __name__ == "__main__":
     from pytest import approx
 
-    ell_calc_q = EllCalcQ(4)
-    status, rho, sigma, delta = ell_calc_q.calc_ll_q(0.07, 0.03, 0.01)
+    ell_calc = EllCalc(4)
+    status, rho, sigma, delta = ell_calc.calc_ll_q(0.07, 0.03, 0.01)
     assert status == CutStatus.NoSoln
 
-    status, rho, sigma, delta = ell_calc_q.calc_ll_q(0.0, 0.05, 0.01)
+    status, rho, sigma, delta = ell_calc.calc_ll_q(0.0, 0.05, 0.01)
     assert status == (CutStatus.Success, rho, sigma, delta)
     assert sigma == approx(0.8)
     assert rho == approx(0.02)
     assert delta == approx(1.2)
 
-    status, rho, sigma, delta = ell_calc_q.calc_ll_q(0.05, 0.11, 0.01)
+    status, rho, sigma, delta = ell_calc.calc_ll_q(0.05, 0.11, 0.01)
     assert status == (CutStatus.Success, rho, sigma, delta)
     assert sigma == approx(0.8)
     assert rho == approx(0.06)
@@ -383,7 +380,7 @@ if __name__ == "__main__":
     # status, rho, sigma, delta = ell_calc.calc_ll(-0.07, 0.07)
     # assert status == CutStatus.NoEffect
 
-    status, rho, sigma, delta = ell_calc_q.calc_ll_q(0.01, 0.04, 0.01)
+    status, rho, sigma, delta = ell_calc.calc_ll_q(0.01, 0.04, 0.01)
     assert status == (CutStatus.Success, rho, sigma, delta)
     assert sigma == approx(0.928)
     assert rho == approx(0.0232)

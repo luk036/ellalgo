@@ -17,10 +17,11 @@ class EllStable:
     _kappa: float
     _tsq: float
     _n: int
+    _helper: EllCalc
 
-    def __init__(self, val, xc: ArrayType, CalcStrategy = EllCalc) -> None:
+    def __init__(self, val, xc: ArrayType) -> None:
         ndim = len(xc)
-        self._helper = CalcStrategy(ndim)
+        self._helper = EllCalc(ndim)
         self._xc = xc
         self._tsq = 0.0
         self._n = ndim
@@ -67,7 +68,7 @@ class EllStable:
     def update_q(self, cut) -> CutStatus:
         return self._update_core(cut, self._helper.calc_single_or_ll_q)
 
-    def _update_core(self, cut, dc_or_cc_strategy) -> CutStatus:
+    def _update_core(self, cut, cut_strategy) -> CutStatus:
         """Update ellipsoid by cut
 
         Arguments:
@@ -102,7 +103,7 @@ class EllStable:
 
         self._tsq = self._kappa * omega  # need for helper
 
-        status, rho, sigma, delta = dc_or_cc_strategy(beta, self._tsq)
+        status, rho, sigma, delta = cut_strategy(beta, self._tsq)
 
         # if central_cut:
         #     status = self._helper.calc_single_or_ll_cc(beta)

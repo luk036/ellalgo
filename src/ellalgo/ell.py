@@ -2,7 +2,7 @@ import numpy as np
 # from .cutting_plane import CutStatus
 from .ell_calc import EllCalc
 from .ell_config import CutStatus
-from typing import Tuple, Union
+from typing import Tuple, Union, Callable
 
 Mat = np.ndarray
 ArrayType = np.ndarray
@@ -17,10 +17,11 @@ class Ell:
     _xc: ArrayType
     _kappa: float
     _tsq: float
+    _helper: EllCalc
 
-    def __init__(self, val, xc: ArrayType, CalcStrategy=EllCalc) -> None:
+    def __init__(self, val, xc: ArrayType) -> None:
         ndim = len(xc)
-        self._helper = CalcStrategy(ndim)
+        self._helper = EllCalc(ndim)
         self._xc = xc
         self._tsq = 0.0
         if isinstance(val, (int, float)):
@@ -66,17 +67,13 @@ class Ell:
     def update_q(self, cut) -> CutStatus:
         return self._update_core(cut, self._helper.calc_single_or_ll_q)
 
-    def _update_core(self, cut, dc_or_cc_strategy) -> CutStatus:
+    def _update_core(self, cut, cut_strategy: Callable) -> CutStatus:
         grad, beta = cut
         grad_t = self._mq @ grad  # n^2 multiplications
         omega = grad.dot(grad_t)  # n multiplications
         self._tsq = self._kappa * omega
 
-        status, rho, sigma, delta = dc_or_cc_strategy(beta, self._tsq)
-        # if central_cut:
-        #     status = self._helper.calc_single_or_ll_cc(beta)
-        # else:
-        #     status = self._helper.calc_single_or_ll(beta)
+        status, rho, sigma, delta = cut_strategy(beta, self._tsq)
 
         if status != CutStatus.Success:
             return status
