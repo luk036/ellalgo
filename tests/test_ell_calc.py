@@ -7,12 +7,12 @@ from ellalgo.ell_calc import EllCalc, EllCalcQ
 def test_construct():
     ell_calc = EllCalc(4)
     assert ell_calc.use_parallel_cut is True
-    assert ell_calc.n_f == 4.0
-    assert ell_calc.half_n == 2.0
-    assert ell_calc.cst0 == approx(0.2)
-    assert ell_calc.cst1 == approx(16.0 / 15.0)
-    assert ell_calc.cst2 == approx(0.4)
-    assert ell_calc.cst3 == approx(0.8)
+    assert ell_calc._n_f == 4.0
+    assert ell_calc._half_n == 2.0
+    assert ell_calc._cst0 == approx(0.2)
+    assert ell_calc._cst1 == approx(16.0 / 15.0)
+    assert ell_calc._cst2 == approx(0.4)
+    assert ell_calc._cst3 == approx(0.8)
 
 
 def test_calc_cc():
