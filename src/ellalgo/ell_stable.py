@@ -31,19 +31,6 @@ class EllStable:
             self._kappa = 1.0 
             self._mq = np.diag(val)
 
-    # def copy(self):
-    #     """[summary]
-
-    #     Returns:
-    #         EllStable: [description]
-    #     """
-    #     ellip = EllStable(self._kappa, self._xc)
-    #     ellip._mq = self._mq.copy()
-    #     ellip._helper = self._helper.copy()
-    #     ellip._n = self._n
-    #     ellip.no_defer_trick = self.no_defer_trick
-    #     return ellip
-
     # @property
     def xc(self) -> ArrayType:
         """copy the whole array anyway
@@ -76,6 +63,9 @@ class EllStable:
 
     def update_cc(self, cut) -> CutStatus:
         return self._update_core(cut, self._helper.calc_single_or_ll_cc)
+
+    def update_q(self, cut) -> CutStatus:
+        return self._update_core(cut, self._helper.calc_single_or_ll_q)
 
     def _update_core(self, cut, dc_or_cc_strategy) -> CutStatus:
         """Update ellipsoid by cut
