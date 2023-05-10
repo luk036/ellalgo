@@ -1,12 +1,9 @@
-# -*- coding: utf-8 -*-
 from typing import Optional, Tuple, Union
-
+from ellalgo.cutting_plane import OracleFeas
 import numpy as np
-
 from .ldlt_mgr import LDLTMgr
 
-Arr = Union[np.ndarray]
-Cut = Tuple[Arr, float]
+Cut = Tuple[np.ndarray, float]
 
 
 class LMI0Oracle:
@@ -21,16 +18,16 @@ class LMI0Oracle:
         """[summary]
 
         Arguments:
-            F (List[Arr]): [description]
+            F (List[np.ndarray]): [description]
         """
         self.F = F
         self.Q = LDLTMgr(len(F[0]))
 
-    def assess_feas(self, x: Arr) -> Optional[Cut]:
+    def assess_feas(self, x: np.ndarray) -> Optional[Cut]:
         """[summary]
 
         Arguments:
-            x (Arr): [description]
+            x (np.ndarray): [description]
 
         Returns:
             Optional[Cut]: [description]

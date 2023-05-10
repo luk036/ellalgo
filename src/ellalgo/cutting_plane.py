@@ -1,34 +1,37 @@
-# from .ell_config import CutStatus, Options
 from .ell_config import CutStatus, Options
 import copy
 
-from abc import abstractmethod
-from typing import Optional, Tuple, Union
-from typing import Generic, TypeVar
+from abc import abstractmethod, ABC
 from collections.abc import MutableSequence
+from typing import Optional, Tuple, Union
+from typing import TYPE_CHECKING
 
-T = TypeVar('T')
-
+if TYPE_CHECKING:
+    import numpy as np
+    ArrayType = np.ndarray
+else:
+    from typing import Any
+    ArrayType = Any
 
 CutChoice = Union[float, MutableSequence]  # single or parallel
-ArrayType = TypeVar("ArrayType")
 Cut = Tuple[ArrayType, CutChoice]
+
 Num = Union[float, int]
 
 
-class OracleFeas(Generic[ArrayType]):
+class OracleFeas(ABC):
     @abstractmethod
     def assess_feas(self, xc: ArrayType) -> Optional[Cut]:
         pass
 
 
-class OracleFeas2(OracleFeas[ArrayType]):
+class OracleFeas2(OracleFeas):
     @abstractmethod
     def update(self, tea: Num) -> None:
         pass
 
 
-class OracleOptim(Generic[ArrayType]):
+class OracleOptim(ABC):
     @abstractmethod
     def assess_optim(
         self, xc: ArrayType, tea: float  # what?
@@ -36,7 +39,7 @@ class OracleOptim(Generic[ArrayType]):
         pass
 
 
-class OracleFeasQ(Generic[ArrayType]):
+class OracleFeasQ(ABC):
     @abstractmethod
     def assess_feas_q(
         self, xc: ArrayType, retry: bool
@@ -44,7 +47,7 @@ class OracleFeasQ(Generic[ArrayType]):
         pass
 
 
-class OracleOptimQ(Generic[ArrayType]):
+class OracleOptimQ(ABC):
     @abstractmethod
     def assess_optim_q(
         self, xc: ArrayType, tea: float, retry: bool
@@ -52,13 +55,13 @@ class OracleOptimQ(Generic[ArrayType]):
         pass
 
 
-class OracleBS(Generic[ArrayType]):
+class OracleBS(ABC):
     @abstractmethod
     def assess_bs(self, tea: Num) -> bool:
         pass
 
 
-class SearchSpace(Generic[ArrayType]):
+class SearchSpace(ABC):
     @abstractmethod
     def update_dc(self, cut: Cut) -> CutStatus:
         pass
@@ -76,7 +79,7 @@ class SearchSpace(Generic[ArrayType]):
         pass
 
 
-class SearchSpaceQ(Generic[ArrayType]):
+class SearchSpaceQ(ABC):
     @abstractmethod
     def update_q(self, cut: Cut) -> CutStatus:
         pass
@@ -90,14 +93,14 @@ class SearchSpaceQ(Generic[ArrayType]):
         pass
 
 
-class SearchSpace2(SearchSpace[ArrayType]):
+class SearchSpace2(SearchSpace):
     @abstractmethod
     def set_xc(self, xc: ArrayType) -> None:
         pass
 
 
 def cutting_plane_feas(
-    omega: OracleFeas[ArrayType], space: SearchSpace[ArrayType], options=Options()
+    omega: OracleFeas, space: SearchSpace, options=Options()
 ) -> Tuple[Optional[ArrayType], int]:
     """Find a point in a convex set (defined through a cutting-plane oracle).
 
@@ -160,7 +163,7 @@ def cutting_plane_feas(
 
 
 def cutting_plane_optim(
-    omega: OracleOptim[ArrayType], space: SearchSpace[ArrayType], tea: float, options=Options()
+    omega: OracleOptim, space: SearchSpace, tea: float, options=Options()
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for solving convex optimization problem
 
@@ -192,7 +195,7 @@ def cutting_plane_optim(
 
 
 def cutting_plane_feas_q(
-        omega: OracleFeasQ[ArrayType], space_q: SearchSpaceQ[ArrayType], options=Options()
+        omega: OracleFeasQ, space_q: SearchSpaceQ, options=Options()
 ) -> Tuple[Optional[ArrayType], int]:
     """Cutting-plane method for solving convex discrete optimization problem
 
@@ -207,7 +210,6 @@ def cutting_plane_feas_q(
         x_best (float): solution vector
         niter ([type]): number of iterations performed
     """
-    # x_last = space.xc()
     retry = False
     for niter in range(options.max_iters):
         cut, x_q, more_alt = omega.assess_feas_q(space_q.xc(), retry)
@@ -228,7 +230,7 @@ def cutting_plane_feas_q(
 
 
 def cutting_plane_optim_q(
-        omega: OracleOptimQ[ArrayType], space_q: SearchSpaceQ[ArrayType], tea: float, options=Options()
+        omega: OracleOptimQ, space_q: SearchSpaceQ, tea: float, options=Options()
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for solving convex discrete optimization problem
 
@@ -297,9 +299,9 @@ def bsearch(
     return upper, options.max_iters
 
 
-class BSearchAdaptor(Generic[ArrayType]):
+class BSearchAdaptor(ABC):
     def __init__(
-        self, omega: OracleFeas2[ArrayType], space: SearchSpace2[ArrayType], options=Options()
+        self, omega: OracleFeas2, space: SearchSpace2, options=Options()
     ) -> None:
         """[summary]
 

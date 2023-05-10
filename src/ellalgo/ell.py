@@ -1,5 +1,5 @@
 import numpy as np
-# from .cutting_plane import CutStatus
+from .cutting_plane import SearchSpace, SearchSpaceQ
 from .ell_calc import EllCalc
 from .ell_config import CutStatus
 from typing import Tuple, Union, Callable
@@ -10,7 +10,7 @@ CutChoice = Union[float, ArrayType]  # single or parallel
 Cut = Tuple[ArrayType, CutChoice]
 
 
-class Ell:
+class Ell(SearchSpace, SearchSpaceQ):
     no_defer_trick: bool = False
 
     _mq: Mat
@@ -31,7 +31,6 @@ class Ell:
             self._kappa = 1.0
             self._mq = np.diag(val)
 
-    # @property
     def xc(self) -> ArrayType:
         """copy the whole array anyway
 
@@ -40,7 +39,6 @@ class Ell:
         """
         return self._xc
 
-    # @xc.setter
     def set_xc(self, x: ArrayType) -> None:
         """Set the xc object
 
@@ -49,7 +47,6 @@ class Ell:
         """
         self._xc = x
 
-    # @property
     def tsq(self) -> float:
         """Measure the distance square between xc and x*
 
@@ -58,14 +55,19 @@ class Ell:
         """
         return self._tsq
 
+    # Implement SearchSpace interface
     def update_dc(self, cut) -> CutStatus:
         return self._update_core(cut, self._helper.calc_single_or_ll)
 
+    # Implement SearchSpace interface
     def update_cc(self, cut) -> CutStatus:
         return self._update_core(cut, self._helper.calc_single_or_ll_cc)
 
+    # Implement SearchSpaceQ interface
     def update_q(self, cut) -> CutStatus:
         return self._update_core(cut, self._helper.calc_single_or_ll_q)
+
+    # private:
 
     def _update_core(self, cut, cut_strategy: Callable) -> CutStatus:
         grad, beta = cut

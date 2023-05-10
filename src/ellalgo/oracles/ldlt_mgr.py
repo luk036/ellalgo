@@ -139,7 +139,7 @@ class LDLTMgr:
         """
         s, n = self.p
         v = self.v[s:n]
-        return v @ A[s:n, s:n] @ v
+        return v.dot(A[s:n, s:n] @ v)
 
     def sqrt(self) -> np.ndarray:
         """Return upper triangular matrix R where A = R' * R

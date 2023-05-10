@@ -7,10 +7,11 @@ import numpy as np
 from pytest import approx
 
 from ellalgo.cutting_plane import cutting_plane_optim
+from ellalgo.cutting_plane import OracleOptim
 from ellalgo.ell_stable import EllStable
 
 
-class MyQuasicvxOracle:
+class MyQuasicvxOracle(OracleOptim):
     def assess_optim(self, z, target: float):
         """[summary]
 

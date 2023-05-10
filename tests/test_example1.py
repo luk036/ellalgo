@@ -4,10 +4,11 @@ from __future__ import print_function
 import numpy as np
 
 from ellalgo.cutting_plane import cutting_plane_optim
+from ellalgo.cutting_plane import OracleOptim, OracleFeas
 from ellalgo.ell_stable import EllStable
 
 
-class MyOracle2:
+class MyOracle2(OracleFeas):
     def assess_feas(self, z):
         """[summary]
 
@@ -28,7 +29,7 @@ class MyOracle2:
             return np.array([-1.0, 1.0]), fj
 
 
-class MyOracle:
+class MyOracle(OracleOptim):
     def assess_optim(self, z, tea: float):
         """[summary]
 

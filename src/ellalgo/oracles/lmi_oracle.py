@@ -1,11 +1,12 @@
 import numpy as np
 from .ldlt_mgr import LDLTMgr
 from typing import Optional, Tuple
+from ellalgo.cutting_plane import OracleFeas
 
 Cut = Tuple[np.ndarray, float]
 
 
-class LMIOracle:
+class LMIOracle(OracleFeas):
     """Oracle for Linear Matrix Inequality constraint.
 
     This oracle solves the following feasibility problem:

@@ -6,16 +6,16 @@ from typing import Optional, Tuple, Union
 
 import numpy as np
 from ellalgo.cutting_plane import cutting_plane_optim
+from ellalgo.cutting_plane import OracleOptim
 from ellalgo.ell import Ell
 
 from ellalgo.oracles.lmi_old_oracle import LMIOldOracle
 from ellalgo.oracles.lmi_oracle import LMIOracle
 
-Arr = Union[np.ndarray, float]
-Cut = Tuple[Arr, float]
+Cut = Tuple[np.ndarray, float]
 
 
-class MyOracle:
+class MyOracle(OracleOptim):
     def __init__(self, oracle):
         """[summary]
 
@@ -42,24 +42,24 @@ class MyOracle:
         self.lmi1 = oracle(F1, B1)
         self.lmi2 = oracle(F2, B2)
 
-    def assess_optim(self, x: Arr, t: float) -> Tuple[Cut, Optional[float]]:
+    def assess_optim(self, xc: np.ndarray, tea: float) -> Tuple[Cut, Optional[float]]:
         """[summary]
 
         Arguments:
-            x (Arr): [description]
-            t (float): the best-so-far optimal value
+            xc (np.ndarray): [description]
+            tea (float): the best-so-far optimal value
 
         Returns:
             Tuple[Cut, float]: [description]
         """
-        if cut := self.lmi1.assess_feas(x):
+        if cut := self.lmi1.assess_feas(xc):
             return cut, None
 
-        if cut := self.lmi2.assess_feas(x):
+        if cut := self.lmi2.assess_feas(xc):
             return cut, None
 
-        f0 = self.c @ x
-        if (fj := f0 - t) > 0.0:
+        f0 = self.c.dot(xc)
+        if (fj := f0 - tea) > 0.0:
             return (self.c, fj), None
         return (self.c, 0.0), f0
 
