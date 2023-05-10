@@ -2,7 +2,7 @@
 from __future__ import print_function
 
 # import time
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 import numpy as np
 from ellalgo.cutting_plane import cutting_plane_optim
