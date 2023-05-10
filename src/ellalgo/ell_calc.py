@@ -284,7 +284,7 @@ class EllCalc:
 
 
 class EllCalcQ(EllCalc):
-    def calc_single_or_ll(self, beta, tsq: float) -> Tuple[CutStatus, float, float, float]:
+    def calc_single_or_ll_q(self, beta, tsq: float) -> Tuple[CutStatus, float, float, float]:
         """single or parallel cut
         (override the base class)
 

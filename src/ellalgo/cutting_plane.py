@@ -6,7 +6,6 @@ from abc import abstractmethod
 from typing import Optional, Tuple, Union
 from typing import Generic, TypeVar
 from collections.abc import MutableSequence
-# from .ell_config import CutStatus, Options
 
 T = TypeVar('T')
 
@@ -15,24 +14,6 @@ CutChoice = Union[float, MutableSequence]  # single or parallel
 ArrayType = TypeVar("ArrayType")
 Cut = Tuple[ArrayType, CutChoice]
 Num = Union[float, int]
-
-
-# class Options:
-#     max_iters: int = 2000  # maximum number of iterations
-#     tol: float = 1e-8  # error tolerance
-
-
-# class CInfo:
-#     def __init__(self, feasible: bool, num_iters: int) -> None:
-#         """Construct a new CInfo object
-
-#         Arguments:
-#             feasible (bool): [description]
-#             num_iters (int): [description]
-#             status (int): [description]
-#         """
-#         self.feasible: bool = feasible
-#         self.num_iters: int = num_iters
 
 
 class OracleFeas(Generic[ArrayType]):
@@ -84,6 +65,20 @@ class SearchSpace(Generic[ArrayType]):
 
     @abstractmethod
     def update_cc(self, cut: Cut) -> CutStatus:
+        pass
+
+    @abstractmethod
+    def xc(self) -> ArrayType:
+        pass
+
+    @abstractmethod
+    def tsq(self) -> float:
+        pass
+
+
+class SearchSpaceQ(Generic[ArrayType]):
+    @abstractmethod
+    def update_q(self, cut: Cut) -> CutStatus:
         pass
 
     @abstractmethod
@@ -197,7 +192,7 @@ def cutting_plane_optim(
 
 
 def cutting_plane_feas_q(
-        omega: OracleFeasQ[ArrayType], space: SearchSpace[ArrayType], options=Options()
+        omega: OracleFeasQ[ArrayType], space_q: SearchSpaceQ[ArrayType], options=Options()
 ) -> Tuple[Optional[ArrayType], int]:
     """Cutting-plane method for solving convex discrete optimization problem
 
@@ -215,10 +210,10 @@ def cutting_plane_feas_q(
     # x_last = space.xc()
     retry = False
     for niter in range(options.max_iters):
-        cut, x_q, more_alt = omega.assess_feas_q(space.xc(), retry)
+        cut, x_q, more_alt = omega.assess_feas_q(space_q.xc(), retry)
         if cut is None:  # better t obtained
             return x_q, niter
-        status = space.update_dc(cut)
+        status = space_q.update_q(cut)
         if status == CutStatus.Success:
             retry = False
         elif status == CutStatus.NoSoln:
@@ -227,13 +222,13 @@ def cutting_plane_feas_q(
             if not more_alt:  # no more alternative cut
                 return None, niter
             retry = True
-        if space.tsq() < options.tol:
+        if space_q.tsq() < options.tol:
             return None, niter
     return None, options.max_iters
 
 
 def cutting_plane_optim_q(
-        omega: OracleOptimQ[ArrayType], space_q: SearchSpace[ArrayType], tea: float, options=Options()
+        omega: OracleOptimQ[ArrayType], space_q: SearchSpaceQ[ArrayType], tea: float, options=Options()
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for solving convex discrete optimization problem
 
@@ -258,7 +253,7 @@ def cutting_plane_optim_q(
         if t1 is not None:  # better t obtained
             tea = t1
             x_best = x_q
-        status = space_q.update_dc(cut)
+        status = space_q.update_q(cut)
         if status == CutStatus.Success:
             retry = False
         elif status == CutStatus.NoSoln:
