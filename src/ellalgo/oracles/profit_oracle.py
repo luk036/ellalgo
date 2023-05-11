@@ -174,7 +174,7 @@ class ProfitQOracle(OracleOptimQ):
 
         Arguments:
             y (Arr): input quantity (in log scale)
-            t (float): the best-so-far optimal value
+            tea (float): the best-so-far optimal value
             retry ([type]): unused
 
         Raises:
@@ -189,9 +189,9 @@ class ProfitQOracle(OracleOptimQ):
         if not retry:
             x = np.round(np.exp(y))
             if x[0] == 0:
-                x[0] = 0.00001
+                x[0] = 1.0 # nearest integer than 0
             if x[1] == 0:
-                x[1] = 0.00001
+                x[1] = 1.0
             self.yd = np.log(x)
 
         (g, h), tnew = self.omega.assess_optim(self.yd, tea)

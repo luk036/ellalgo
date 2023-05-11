@@ -89,21 +89,21 @@ def run_lmi(oracle):
     return num_iters
 
 
-def test_lmi_lazy():
+def test_lmi_lazy(benchmark):
     """[summary]
 
     Arguments:
-         ([type]): [description]
+        benchmark ([type]): [description]
     """
-    result = run_lmi(LMIOracle)
+    result = benchmark(run_lmi, LMIOracle)
     assert result == 112
 
 
-def test_lmi_old():
+def test_lmi_old(benchmark):
     """[summary]
 
     Arguments:
-         ([type]): [description]
+        benchmark ([type]): [description]
     """
-    result = run_lmi(LMIOldOracle)
+    result = benchmark(run_lmi, LMIOldOracle)
     assert result == 112

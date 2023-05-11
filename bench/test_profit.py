@@ -44,31 +44,31 @@ def run_profit_q(E):
     return num_iters
 
 
-def test_profit_ell():
-    num_iters = run_profit(Ell)
+def test_profit_ell(benchmark):
+    num_iters = benchmark(run_profit, Ell)
     assert num_iters == 36
 
 
-def test_profit_ell_stable():
-    num_iters = run_profit(EllStable)
+def test_profit_ell_stable(benchmark):
+    num_iters = benchmark(run_profit, EllStable)
     assert num_iters == 36
 
 
-def test_profit_rb_ell():
-    num_iters = run_profit_rb(Ell)
+def test_profit_rb_ell(benchmark):
+    num_iters = benchmark(run_profit_rb, Ell)
     assert num_iters == 41
 
 
-def test_profit_rb_ell_stable():
-    num_iters = run_profit_rb(EllStable)
+def test_profit_rb_ell_stable(benchmark):
+    num_iters = benchmark(run_profit_rb, EllStable)
     assert num_iters == 41
 
 
-def test_profit_q_ell():
-    num_iters = run_profit_q(Ell)
+def test_profit_q_ell(benchmark):
+    num_iters = benchmark(run_profit_q, Ell)
     assert num_iters == 27
 
 
-def test_profit_q_ell_stable():
-    num_iters = run_profit_q(EllStable)
+def test_profit_q_ell_stable(benchmark):
+    num_iters = benchmark(run_profit_q, EllStable)
     assert num_iters == 27
