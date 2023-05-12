@@ -25,6 +25,10 @@ class ProfitOracle(OracleOptim):
         v: output price
         k: a given constant that restricts the quantity of x1
     """
+    log_pA: float
+    log_k: float
+    price_out: Arr
+    elasticities: Arr
 
     def __init__(self, params: Tuple[float, float, float], elasticities: Arr, price_out: Arr) -> None:
         """[summary]
