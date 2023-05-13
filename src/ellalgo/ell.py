@@ -11,6 +11,15 @@ Cut = Tuple[ArrayType, CutChoice]
 
 
 class Ell(SearchSpace, SearchSpaceQ):
+    """Ellipsoid
+
+    Args:
+        SearchSpace (_type_): _description_
+        SearchSpaceQ (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     no_defer_trick: bool = False
 
     _mq: Mat
@@ -20,6 +29,12 @@ class Ell(SearchSpace, SearchSpaceQ):
     _helper: EllCalc
 
     def __init__(self, val, xc: ArrayType) -> None:
+        """_summary_
+
+        Args:
+            val (_type_): _description_
+            xc (ArrayType): _description_
+        """
         ndim = len(xc)
         self._helper = EllCalc(ndim)
         self._xc = xc
@@ -32,44 +47,74 @@ class Ell(SearchSpace, SearchSpaceQ):
             self._mq = np.diag(val)
 
     def xc(self) -> ArrayType:
-        """copy the whole array anyway
+        """_summary_
 
         Returns:
-            [type]: [description]
+            ArrayType: _description_
         """
         return self._xc
 
-    def set_xc(self, x: ArrayType) -> None:
-        """Set the xc object
+    def set_xc(self, xc: ArrayType) -> None:
+        """_summary_
 
-        Arguments:
-            x ([type]): [description]
+        Args:
+            xc (ArrayType): _description_
         """
         self._xc = x
 
     def tsq(self) -> float:
-        """Measure the distance square between xc and x*
+        """Measure of the distance between xc and x*
 
         Returns:
-            [type]: [description]
+            float: [description]
         """
         return self._tsq
 
-    # Implement SearchSpace interface
     def update_dc(self, cut) -> CutStatus:
+        """Implement SearchSpace interface
+
+        Args:
+            cut (_type_): _description_
+
+        Returns:
+            CutStatus: _description_
+        """
         return self._update_core(cut, self._helper.calc_single_or_ll)
 
-    # Implement SearchSpace interface
     def update_cc(self, cut) -> CutStatus:
+        """Implement SearchSpace interface
+
+        Args:
+            cut (_type_): _description_
+
+        Returns:
+            CutStatus: _description_
+        """
         return self._update_core(cut, self._helper.calc_single_or_ll_cc)
 
-    # Implement SearchSpaceQ interface
     def update_q(self, cut) -> CutStatus:
+        """Implement SearchSpaceQ interface
+
+        Args:
+            cut (_type_): _description_
+
+        Returns:
+            CutStatus: _description_
+        """
         return self._update_core(cut, self._helper.calc_single_or_ll_q)
 
     # private:
 
     def _update_core(self, cut, cut_strategy: Callable) -> CutStatus:
+        """Update ellipsoid by cut
+
+        Args:
+            cut (_type_): _description_
+            cut_strategy (Callable): _description_
+
+        Returns:
+            CutStatus: _description_
+        """
         grad, beta = cut
         grad_t = self._mq @ grad  # n^2 multiplications
         omega = grad.dot(grad_t)  # n multiplications

@@ -12,18 +12,18 @@ class ProfitOracle(OracleOptim):
 
     This example is taken from [Aliabadi and Salahi, 2013]
 
-        max     p(A x1^α x2^β) − v1*x1 − v2*x2
-        s.t.    x1 ≤ k
+      max  p(A x1^α x2^β) − v1*x1 − v2*x2
+      s.t. x1 ≤ k
 
     where:
 
-        p(A x1^α x2^β): Cobb-Douglas production function
-        p: the market price per unit
-        A: the scale of production
-        α, β: the output elasticities
-        x: input quantity
-        v: output price
-        k: a given constant that restricts the quantity of x1
+      p(A x1^α x2^β): Cobb-Douglas production function
+      p: the market price per unit
+      A: the scale of production
+      α, β: the output elasticities
+      x: input quantity
+      v: output price
+      k: a given constant that restricts the quantity of x1
     """
     log_pA: float
     log_k: float
@@ -33,13 +33,13 @@ class ProfitOracle(OracleOptim):
     def __init__(self, params: Tuple[float, float, float], elasticities: Arr, price_out: Arr) -> None:
         """[summary]
 
-        Arguments:
-            params (Tuple[float, float, float]): price_per_unit, scale, limit
+        Args:
+            params (Tuple[float, float, float]): unit_price, scale, limit
             elasticities (Arr): the output elasticities
             price_out (Arr): output price
         """
-        price_per_unit, scale, limit = params
-        self.log_pA = np.log(price_per_unit * scale)
+        unit_price, scale, limit = params
+        self.log_pA = np.log(unit_price * scale)
         self.log_k = np.log(limit)
         self.price_out = price_out
         self.elasticities = elasticities
@@ -47,9 +47,9 @@ class ProfitOracle(OracleOptim):
     def assess_optim(self, y: Arr, tea: float) -> Tuple[Cut, Optional[float]]:
         """Make object callable for cutting_plane_optim()
 
-        Arguments:
+        Args:
             y (Arr): input quantity (in log scale)
-            t (float): the best-so-far optimal value
+            tea (float): the best-so-far optimal value
 
         Returns:
             Tuple[Cut, float]: Cut and the updated best-so-far value
@@ -78,11 +78,10 @@ class ProfitRbOracle(OracleOptim):
 
     This example is taken from [Aliabadi and Salahi, 2013]:
 
-        max  p'(A x1^α' x2^β') - v1'*x1 - v2'*x2
-        s.t. x1 ≤ k'
+      max  p'(A x1^α' x2^β') - v1'*x1 - v2'*x2
+      s.t. x1 ≤ k'
 
     where:
-
         α' = α ± e1
         β' = β ± e2
         p' = p ± e3
@@ -102,8 +101,8 @@ class ProfitRbOracle(OracleOptim):
     ) -> None:
         """[summary]
 
-        Arguments:
-            params (Tuple[float, float, float]): price_per_unit, A, limit
+        Args:
+            params (Tuple[float, float, float]): unit_price, scale, limit
             elasticities (Arr): the output elasticities
             price_out (Arr): output price
             vparams (Tuple): parameters for uncertainty
@@ -111,16 +110,16 @@ class ProfitRbOracle(OracleOptim):
         e1, e2, e3, e4, e5 = vparams
         self.elasticities = elasticities
         self.e = [e1, e2]
-        price_per_unit, scale, limit = params
-        params_rb = price_per_unit - e3, scale, limit - e4
+        unit_price, scale, limit = params
+        params_rb = unit_price - e3, scale, limit - e4
         self.omega = ProfitOracle(params_rb, elasticities, price_out + np.array([e5, e5]))
 
     def assess_optim(self, y: Arr, tea: float) -> Tuple[Cut, Optional[float]]:
         """Make object callable for cutting_plane_optim()
 
-        Arguments:
+        Args:
             y (Arr): input quantity (in log scale)
-            t (float): the best-so-far optimal value
+            tea (float): the best-so-far optimal value
 
         Returns:
             Tuple[Cut, float]: Cut and the updated best-so-far value
@@ -136,10 +135,10 @@ class ProfitRbOracle(OracleOptim):
 
 
 class ProfitQOracle(OracleOptimQ):
-    """Oracle for a decrete profit maximization problem.
+    """Oracle for a discrete profit maximization problem.
 
-        max     p(A x1^α x2^β) - v1*x1 - v2*x2
-        s.t.    x1 ≤ k
+      max   p(A x1^α x2^β) - v1*x1 - v2*x2
+      s.t.  x1 ≤ k
 
     where:
 
@@ -163,8 +162,8 @@ class ProfitQOracle(OracleOptimQ):
     def __init__(self, params, elasticities, price_out) -> None:
         """[summary]
 
-        Arguments:
-            params (Tuple[float, float, float]): price_per_unit, scale, limit
+        Args:
+            params (Tuple[float, float, float]): unit_price, scale, limit
             elasticities (Arr): the output elasticities
             price_out (Arr): output price
         """
@@ -176,7 +175,7 @@ class ProfitQOracle(OracleOptimQ):
     ) -> Tuple[Cut, Arr, Optional[float], bool]:
         """Make object callable for cutting_plane_optim_q()
 
-        Arguments:
+        Args:
             y (Arr): input quantity (in log scale)
             tea (float): the best-so-far optimal value
             retry ([type]): unused

@@ -2,7 +2,7 @@ from .cutting_plane import SearchSpace, SearchSpaceQ
 from .ell_calc import EllCalc
 from .ell_config import CutStatus
 import numpy as np
-from typing import Tuple, Union
+from typing import Tuple, Union, Callable
 
 Matrix = np.ndarray
 ArrayType = np.ndarray
@@ -21,6 +21,12 @@ class EllStable(SearchSpace, SearchSpaceQ):
     _helper: EllCalc
 
     def __init__(self, val, xc: ArrayType) -> None:
+        """_summary_
+
+        Args:
+            val (_type_): _description_
+            xc (ArrayType): _description_
+        """
         ndim = len(xc)
         self._helper = EllCalc(ndim)
         self._xc = xc
@@ -34,51 +40,73 @@ class EllStable(SearchSpace, SearchSpaceQ):
             self._mq = np.diag(val)
 
     def xc(self) -> ArrayType:
-        """copy the whole array anyway
+        """_summary_
 
         Returns:
-            [type]: [description]
+            ArrayType: _description_
         """
         return self._xc
 
     def set_xc(self, x: ArrayType) -> None:
-        """Set the xc object
+        """_summary_
 
-        arguments:
-            x ([type]): [description]
+        Args:
+            x (ArrayType): _description_
         """
         self._xc = x
 
     def tsq(self) -> float:
-        """Measure the distance square between xc and x*
+        """Measure of the distance between xc and x*
 
         Returns:
-            [type]: [description]
+            float: [description]
         """
         return self._tsq
     
-    # Implement SearchSpace interface
     def update_dc(self, cut) -> CutStatus:
+        """Implement SearchSpace interface
+
+        Args:
+            cut (_type_): _description_
+
+        Returns:
+            CutStatus: _description_
+        """
         return self._update_core(cut, self._helper.calc_single_or_ll)
 
-    # Implement SearchSpace interface
     def update_cc(self, cut) -> CutStatus:
+        """Implement SearchSpace interface
+
+        Args:
+            cut (_type_): _description_
+
+        Returns:
+            CutStatus: _description_
+        """
         return self._update_core(cut, self._helper.calc_single_or_ll_cc)
 
-    # Implement SearchSpaceQ interface
     def update_q(self, cut) -> CutStatus:
+        """Implement SearchSpaceQ interface
+
+        Args:
+            cut (_type_): _description_
+
+        Returns:
+            CutStatus: _description_
+        """
         return self._update_core(cut, self._helper.calc_single_or_ll_q)
 
     # private:
 
-    def _update_core(self, cut, cut_strategy) -> CutStatus:
+    def _update_core(self, cut, cut_strategy: Callable) -> CutStatus:
         """Update ellipsoid by cut
 
-        Arguments:
-            cut ([type]): [description]
+        Args:
+            cut (_type_): _description_
+            cut_strategy (Callable): _description_
 
         Returns:
-            [type]: [description]
+            CutStatus: _description_
 
         Reference:
             Gill, Murray, and Wright, "Practical Optimization", p43.
@@ -118,8 +146,6 @@ class EllStable(SearchSpace, SearchSpaceQ):
 
         # calculate Q*g = inv(L')*inv(D)*inv(L)*g : (n-1)*n/2
         g_t = invDinvLg.copy()  # initially
-        # print(g_t)
-        # print(self._mq)
         for i in range(self._n - 1, 0, -1):
             for j in range(i, self._n):
                 g_t[i - 1] -= self._mq[j, i - 1] * g_t[j]  # TODO

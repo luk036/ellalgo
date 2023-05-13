@@ -17,7 +17,7 @@ class EllCalc:
         """_summary_
 
         Args:
-            n (float): _description_
+            n (int): _description_
         """
         self._n_f = float(n)
         self._half_n = self._n_f / 2.0
@@ -26,15 +26,15 @@ class EllCalc:
         self._cst2 = 2.0 * self._cst0
         self._cst3 = self._n_f * self._cst0
 
-    # def update_cut(self, beta: float, tsq: float) -> CutStatus { self.calc_dc(beta, tsq)
     def calc_single_or_ll(self, beta, tsq: float) -> Tuple[CutStatus, float, float, float]:
-        """single or parallel cut
+        """single deep cut or parallel cut
 
         Args:
-            beta ([type]): [description]
+            beta (_type_): _description_
+            tsq (float): _description_
 
         Returns:
-            int: [description]
+            Tuple[CutStatus, float, float, float]: _description_
         """
         if isinstance(beta, (int, float)):
             return self.calc_dc(beta, tsq)
@@ -43,20 +43,21 @@ class EllCalc:
         return self.calc_ll(beta[0], beta[1], tsq)
 
     def calc_single_or_ll_cc(self, beta, tsq: float) -> Tuple[CutStatus, float, float, float]:
-        """single or parallel cut
+        """single central cut or parallel cut
 
         Args:
-            beta ([type]): [description]
+            beta (_type_): _description_
+            tsq (float): _description_
 
         Returns:
-            int: [description]
+            Tuple[CutStatus, float, float, float]: _description_
         """
         if isinstance(beta, (int, float)) or len(beta) < 2 or not self.use_parallel_cut:
             return self.calc_cc(tsq)
         return self.calc_ll_cc(beta[1], tsq)
 
     def calc_ll(self, b0: float, b1: float, tsq: float) -> Tuple[CutStatus, float, float, float]:
-        """Parallel Cut
+        """parallel deep cut
 
              ⎛                      ╱     ╱    ⎞
             -τ                0    β0    β1    +τ
@@ -65,6 +66,7 @@ class EllCalc:
         Args:
             b0 (float): _description_
             b1 (float): _description_
+            tsq (float): _description_
 
         Returns:
             Tuple[CutStatus, float, float, float]: _description_
@@ -80,7 +82,7 @@ class EllCalc:
         return self.calc_ll_core(b0, b1, b1sq, b0b1, tsq)
 
     def calc_ll_core(self, b0: float, b1: float, b1sq: float, b0b1: float, tsq) -> Tuple[CutStatus, float, float, float]:
-        """Parallel Cut Core
+        """Parallel deep cut core
 
                   2    2
             ζ  = τ  - β
@@ -121,7 +123,9 @@ class EllCalc:
         Args:
             b0 (float): _description_
             b1 (float): _description_
+            b0sq (float): _description_
             b0b1 (float): _description_
+            tsq (float): _description_
 
         Returns:
             Tuple[CutStatus, float, float, float]: _description_
@@ -137,7 +141,7 @@ class EllCalc:
         return (CutStatus.Success, rho, sigma, delta)
 
     def calc_ll_cc(self, b1: float, tsq: float) -> Tuple[CutStatus, float, float, float]:
-        """Parallel Cut with beta0 = 0
+        """Parallel central cut
                        __________________________
                       ╱                         2
                      ╱                  ⎛     2⎞
@@ -169,6 +173,7 @@ class EllCalc:
 
         Args:
             b1 (float): _description_
+            tsq (float): _description_
 
         Returns:
             Tuple[CutStatus, float, float, float]: _description_
@@ -208,6 +213,7 @@ class EllCalc:
 
         Args:
             beta (float): _description_
+            tsq (float): _description_
 
         Returns:
             Tuple[CutStatus, float, float, float]: _description_
@@ -221,7 +227,7 @@ class EllCalc:
         return self.calc_dc_core(beta, tau, gamma)
 
     def calc_dc_core(self, beta: float, tau: float, gamma: float) -> Tuple[CutStatus, float, float, float]:
-        """Deep Cut (core)
+        """Deep cut core
 
             γ = τ + n ⋅ β
 
@@ -241,6 +247,7 @@ class EllCalc:
 
         Args:
             beta (float): _description_
+            tau (float): _description_
 
         Returns:
             Tuple[CutStatus, float, float, float]: _description_
@@ -279,14 +286,14 @@ class EllCalc:
         return (CutStatus.Success, rho, sigma, delta)
 
     def calc_single_or_ll_q(self, beta, tsq: float) -> Tuple[CutStatus, float, float, float]:
-        """single or parallel cut
-        (override the base class)
+        """single deep cut or parallel cut (discrete)
 
         Args:
             beta ([type]): [description]
+            tsq (float): _description_
 
         Returns:
-            int: [description]
+            Tuple[CutStatus, float, float, float]: _description_
         """
         if isinstance(beta, (int, float)):
             return self.calc_dc_q(beta, tsq)
@@ -295,7 +302,7 @@ class EllCalc:
         return self.calc_ll_q(beta[0], beta[1], tsq)
 
     def calc_ll_q(self, b0: float, b1: float, tsq: float) -> Tuple[CutStatus, float, float, float]:
-        """Parallel Cut
+        """Parallel deep cut (discrete)
 
              ⎛                      ╱     ╱    ⎞
             -τ                0    β0    β1    +τ
@@ -304,6 +311,7 @@ class EllCalc:
         Args:
             b0 (float): _description_
             b1 (float): _description_
+            tsq (float): _description_
 
         Returns:
             Tuple[CutStatus, float, float, float]: _description_
@@ -322,7 +330,7 @@ class EllCalc:
         return self.calc_ll_core(b0, b1, b1sq, b0b1, tsq)
 
     def calc_dc_q(self, beta: float, tsq: float) -> Tuple[CutStatus, float, float, float]:
-        """Deep Cut
+        """Deep Cut (discrete)
 
             γ = τ + n ⋅ β
 
@@ -342,6 +350,7 @@ class EllCalc:
 
         Args:
             beta (float): _description_
+            tsq (float): _description_
 
         Returns:
             Tuple[CutStatus, float, float, float]: _description_
@@ -354,9 +363,6 @@ class EllCalc:
             return (CutStatus.NoEffect, 0.0, 0.0, 0.0)
         return self.calc_dc_core(beta, tau, gamma)
 
-# trait UpdateByCutChoices:
-#     def update_by(self, ell: &mut EllCalc, tsq: float) -> CutStatus
-#
 
 if __name__ == "__main__":
     from pytest import approx

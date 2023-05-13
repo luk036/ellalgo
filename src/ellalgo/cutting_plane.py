@@ -22,12 +22,25 @@ Num = Union[float, int]
 class OracleFeas(ABC):
     @abstractmethod
     def assess_feas(self, xc: ArrayType) -> Optional[Cut]:
+        """assessment of feasibility
+
+        Args:
+            xc (ArrayType): _description_
+
+        Returns:
+            Optional[Cut]: _description_
+        """
         pass
 
 
 class OracleFeas2(OracleFeas):
     @abstractmethod
     def update(self, tea: Num) -> None:
+        """update t
+
+        Args:
+            tea (Num): _description_
+        """
         pass
 
 
@@ -36,6 +49,15 @@ class OracleOptim(ABC):
     def assess_optim(
         self, xc: ArrayType, tea: float  # what?
     ) -> Tuple[Cut, Optional[float]]:
+        """assessment of optimization
+
+        Args:
+            xc (ArrayType): _description_
+            tea (float): _description_
+
+        Returns:
+            Tuple[Cut, Optional[float]]: _description_
+        """
         pass
 
 
@@ -44,6 +66,15 @@ class OracleFeasQ(ABC):
     def assess_feas_q(
         self, xc: ArrayType, retry: bool
     ) -> Tuple[Optional[Cut], Optional[ArrayType], bool]:
+        """assessment of feasibility (discrete)
+
+        Args:
+            xc (ArrayType): _description_
+            retry (bool): _description_
+
+        Returns:
+            Tuple[Optional[Cut], Optional[ArrayType], bool]: _description_
+        """
         pass
 
 
@@ -52,22 +83,56 @@ class OracleOptimQ(ABC):
     def assess_optim_q(
         self, xc: ArrayType, tea: float, retry: bool
     ) -> Tuple[Cut, ArrayType, Optional[float], bool]:
+        """assessment of optimization (discrete)
+
+        Args:
+            xc (ArrayType): _description_
+            tea (float): _description_
+            retry (bool): _description_
+
+        Returns:
+            Tuple[Cut, ArrayType, Optional[float], bool]: _description_
+        """
         pass
 
 
 class OracleBS(ABC):
     @abstractmethod
     def assess_bs(self, tea: Num) -> bool:
+        """assessment of the binary search
+
+        Args:
+            tea (Num): _description_
+
+        Returns:
+            bool: _description_
+        """
         pass
 
 
 class SearchSpace(ABC):
     @abstractmethod
     def update_dc(self, cut: Cut) -> CutStatus:
+        """update of deep-cut
+
+        Args:
+            cut (Cut): _description_
+
+        Returns:
+            CutStatus: _description_
+        """
         pass
 
     @abstractmethod
     def update_cc(self, cut: Cut) -> CutStatus:
+        """update of central cut
+
+        Args:
+            cut (Cut): _description_
+
+        Returns:
+            CutStatus: _description_
+        """
         pass
 
     @abstractmethod
@@ -82,6 +147,14 @@ class SearchSpace(ABC):
 class SearchSpaceQ(ABC):
     @abstractmethod
     def update_q(self, cut: Cut) -> CutStatus:
+        """update of shadow cut (discrete)
+
+        Args:
+            cut (Cut): _description_
+
+        Returns:
+            CutStatus: _description_
+        """
         pass
 
     @abstractmethod
@@ -140,17 +213,14 @@ def cutting_plane_feas(
          │CuttingPlane│    │SearchSpace││OracleFeas│
          └────────────┘    └───────────┘└──────────┘
 
-    Arguments:
+    Args:
         omega (OracleFeas): perform assessment on xinit
         space (SearchSpace): Initial search space known to contain x*
-
-    Keyword Arguments:
-        options (Options): [description] (default: {Options()})
+        options (Options, optional): _description_. Defaults to Options().
 
     Returns:
-        feasible (bool): whether it is feasible
-        niter (int): number of iterations performed
-        status (CutStatus): cut status
+        Optional[ArrayType]: feasible solution or None if no solution
+        int: number of iterations performed
     """
     for niter in range(options.max_iters):
         cut = omega.assess_feas(space.xc())  # query the oracle at space.xc()
@@ -171,14 +241,12 @@ def cutting_plane_optim(
         omega (OracleOptim): perform assessment on xinit
         space (SearchSpace): Search Space containing x*
         tea (float): initial best-so-far value
-
-    Keyword Arguments:
-        options ([type]): [description] (default: {Options()})
+        options (Options, optional): _description_. Defaults to Options().
 
     Returns:
-        x_best (Any): solution vector
-        tea: final best-so-far value
-        ret {CInfo}
+        Optional[ArrayType]: optimal solution or None if no solution
+        float: final best-so-far value
+        int: number of iterations performed
     """
     x_best = None
     for niter in range(options.max_iters):
@@ -202,13 +270,11 @@ def cutting_plane_feas_q(
     Arguments:
         omega (OracleFeasQ): perform assessment on xinit
         space ([type]): Search Space containing x*
-
-    Keyword Arguments:
-        options ([type]): [description] (default: {Options()})
+        options (Options, optional): _description_. Defaults to Options().
 
     Returns:
-        x_best (float): solution vector
-        niter ([type]): number of iterations performed
+        Optional[ArrayType]: feasible solution or None if no solution
+        int: number of iterations performed
     """
     retry = False
     for niter in range(options.max_iters):
@@ -238,14 +304,12 @@ def cutting_plane_optim_q(
         omega (OracleOptimQ): perform assessment on xinit
         space ([type]): Search Space containing x*
         tea (float): initial best-so-far value
-
-    Keyword Arguments:
-        options ([type]): [description] (default: {Options()})
+        options (Options, optional): _description_. Defaults to Options().
 
     Returns:
-        x_best (float): solution vector
-        tea (float): best-so-far optimal value
-        niter ([type]): number of iterations performed
+        Optional[ArrayType]: optimal solution or None if no solution
+        float: final best-so-far value
+        int: number of iterations performed
     """
     # x_last = space.xc()
     x_best = None
@@ -272,17 +336,17 @@ def cutting_plane_optim_q(
 def bsearch(
     omega: OracleBS, intrvl: Tuple[Num, Num], options=Options()
 ) -> Tuple[Num, int]:
-    """[summary]
+    """binary search
 
-    Arguments:
-        omega ([type]): [description]
-        I ([type]): interval (initial search space)
-
-    Keyword Arguments:
-        options ([type]): [description] (default: {Options()})
+    Args:
+        omega (OracleBS): _description_
+        intrvl (Tuple[Num, Num]): _description_
+        options (_type_, optional): _description_. Defaults to Options().
 
     Returns:
-        [type]: [description]
+        Optional[ArrayType]: optimal solution or None if no solution
+        float: final best-so-far value
+        int: number of iterations performed
     """
     # assume monotone
     lower, upper = intrvl
@@ -300,17 +364,16 @@ def bsearch(
 
 
 class BSearchAdaptor(ABC):
+
     def __init__(
         self, omega: OracleFeas2, space: SearchSpace2, options=Options()
     ) -> None:
-        """[summary]
+        """_summary_
 
-        Arguments:
-            omega ([type]): [description]
-            space ([type]): [description]
-
-        Keyword Arguments:
-            options ([type]): [description] (default: {Options()})
+        Args:
+            omega (OracleFeas2): _description_
+            space (SearchSpace2): _description_
+            options (Options, optional): _description_. Defaults to Options().
         """
         self.omega = omega
         self.space = space
@@ -318,10 +381,10 @@ class BSearchAdaptor(ABC):
 
     @property
     def x_best(self) -> ArrayType:
-        """[summary]
+        """_summary_
 
         Returns:
-            [type]: [description]
+            ArrayType: _description_
         """
         return self.space.xc()
 
@@ -329,10 +392,10 @@ class BSearchAdaptor(ABC):
         """[summary]
 
         Arguments:
-            t (float): the best-so-far optimal value
+            tea (float): the best-so-far optimal value
 
         Returns:
-            [type]: [description]
+            bool: [description]
         """
         space = copy.deepcopy(self.space)
         self.omega.update(tea)
