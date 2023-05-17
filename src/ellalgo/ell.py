@@ -60,7 +60,7 @@ class Ell(SearchSpace, SearchSpaceQ):
         Args:
             xc (ArrayType): _description_
         """
-        self._xc = x
+        self._xc = xc
 
     def tsq(self) -> float:
         """Measure of the distance between xc and x*
