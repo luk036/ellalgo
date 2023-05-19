@@ -3,8 +3,9 @@ from __future__ import print_function
 
 import numpy as np
 
-from ellalgo.cutting_plane import cutting_plane_feas, OracleFeas
+from ellalgo.cutting_plane import cutting_plane_feas
 from ellalgo.ell import Ell
+from ellalgo.ell_typing import OracleFeas
 
 
 class MyOracle(OracleFeas):

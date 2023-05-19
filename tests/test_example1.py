@@ -4,7 +4,7 @@ from __future__ import print_function
 import numpy as np
 
 from ellalgo.cutting_plane import cutting_plane_optim
-from ellalgo.cutting_plane import OracleOptim, OracleFeas
+from ellalgo.ell_typing import OracleOptim, OracleFeas
 from ellalgo.ell_stable import EllStable
 
 

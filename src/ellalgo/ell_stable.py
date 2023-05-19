@@ -1,7 +1,7 @@
-from .cutting_plane import SearchSpace, SearchSpaceQ
+import numpy as np
 from .ell_calc import EllCalc
 from .ell_config import CutStatus
-import numpy as np
+from .ell_typing import SearchSpace, SearchSpaceQ
 from typing import Tuple, Union, Callable
 
 Matrix = np.ndarray
