@@ -26,7 +26,9 @@ class EllCalc:
         self._cst2 = 2.0 * self._cst0
         self._cst3 = self._n_f * self._cst0
 
-    def calc_single_or_ll(self, beta, tsq: float) -> Tuple[CutStatus, float, float, float]:
+    def calc_single_or_ll(
+        self, beta, tsq: float
+    ) -> Tuple[CutStatus, float, float, float]:
         """single deep cut or parallel cut
 
         Args:
@@ -42,7 +44,9 @@ class EllCalc:
             return self.calc_dc(beta[0], tsq)
         return self.calc_ll(beta[0], beta[1], tsq)
 
-    def calc_single_or_ll_cc(self, beta, tsq: float) -> Tuple[CutStatus, float, float, float]:
+    def calc_single_or_ll_cc(
+        self, beta, tsq: float
+    ) -> Tuple[CutStatus, float, float, float]:
         """single central cut or parallel cut
 
         Args:
@@ -56,7 +60,9 @@ class EllCalc:
             return self.calc_cc(tsq)
         return self.calc_ll_cc(beta[1], tsq)
 
-    def calc_ll(self, b0: float, b1: float, tsq: float) -> Tuple[CutStatus, float, float, float]:
+    def calc_ll(
+        self, b0: float, b1: float, tsq: float
+    ) -> Tuple[CutStatus, float, float, float]:
         """parallel deep cut
 
              ⎛                      ╱     ╱    ⎞
@@ -81,7 +87,9 @@ class EllCalc:
         b0b1 = b0 * b1
         return self.calc_ll_core(b0, b1, b1sq, b0b1, tsq)
 
-    def calc_ll_core(self, b0: float, b1: float, b1sq: float, b0b1: float, tsq) -> Tuple[CutStatus, float, float, float]:
+    def calc_ll_core(
+        self, b0: float, b1: float, b1sq: float, b0b1: float, tsq
+    ) -> Tuple[CutStatus, float, float, float]:
         """Parallel deep cut core
 
                   2    2
@@ -140,7 +148,9 @@ class EllCalc:
         delta = self._cst1 * ((t0 + t1) / 2.0 + xi / self._n_f) / tsq
         return (CutStatus.Success, rho, sigma, delta)
 
-    def calc_ll_cc(self, b1: float, tsq: float) -> Tuple[CutStatus, float, float, float]:
+    def calc_ll_cc(
+        self, b1: float, tsq: float
+    ) -> Tuple[CutStatus, float, float, float]:
         """Parallel central cut
                        __________________________
                       ╱                         2
@@ -226,7 +236,9 @@ class EllCalc:
         gamma = tau + self._n_f * beta
         return self.calc_dc_core(beta, tau, gamma)
 
-    def calc_dc_core(self, beta: float, tau: float, gamma: float) -> Tuple[CutStatus, float, float, float]:
+    def calc_dc_core(
+        self, beta: float, tau: float, gamma: float
+    ) -> Tuple[CutStatus, float, float, float]:
         """Deep cut core
 
             γ = τ + n ⋅ β
@@ -254,7 +266,7 @@ class EllCalc:
         """
         rho = self._cst0 * gamma
         sigma = self._cst2 * gamma / (tau + beta)
-        delta = self._cst1 * (1.0 - (beta / tau)**2) 
+        delta = self._cst1 * (1.0 - (beta / tau) ** 2)
         return (CutStatus.Success, rho, sigma, delta)
 
     def calc_cc(self, tsq: float) -> Tuple[CutStatus, float, float, float]:
@@ -285,7 +297,9 @@ class EllCalc:
         delta = self._cst1
         return (CutStatus.Success, rho, sigma, delta)
 
-    def calc_single_or_ll_q(self, beta, tsq: float) -> Tuple[CutStatus, float, float, float]:
+    def calc_single_or_ll_q(
+        self, beta, tsq: float
+    ) -> Tuple[CutStatus, float, float, float]:
         """single deep cut or parallel cut (discrete)
 
         Args:
@@ -301,7 +315,9 @@ class EllCalc:
             return self.calc_dc_q(beta[0], tsq)
         return self.calc_ll_q(beta[0], beta[1], tsq)
 
-    def calc_ll_q(self, b0: float, b1: float, tsq: float) -> Tuple[CutStatus, float, float, float]:
+    def calc_ll_q(
+        self, b0: float, b1: float, tsq: float
+    ) -> Tuple[CutStatus, float, float, float]:
         """Parallel deep cut (discrete)
 
              ⎛                      ╱     ╱    ⎞
@@ -329,7 +345,9 @@ class EllCalc:
         # TODO: check b0 + b1 == 0
         return self.calc_ll_core(b0, b1, b1sq, b0b1, tsq)
 
-    def calc_dc_q(self, beta: float, tsq: float) -> Tuple[CutStatus, float, float, float]:
+    def calc_dc_q(
+        self, beta: float, tsq: float
+    ) -> Tuple[CutStatus, float, float, float]:
         """Deep Cut (discrete)
 
             γ = τ + n ⋅ β

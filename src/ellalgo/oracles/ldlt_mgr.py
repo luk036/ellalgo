@@ -60,8 +60,7 @@ class LDLTMgr:
                 self._T[j, i] = d  # keep it for later use
                 self._T[i, j] = d / self._T[j, j]  # the L[i, j]
                 s = j + 1
-                d = get_elem(i, s) - \
-                    self._T[i, start:s].dot(self._T[start:s, s])
+                d = get_elem(i, s) - self._T[i, start:s].dot(self._T[start:s, s])
             self._T[i, i] = d
             if d <= 0.0:
                 self.p = start, i + 1
@@ -87,8 +86,7 @@ class LDLTMgr:
                 self._T[j, i] = d  # keep it for later use
                 self._T[i, j] = d / self._T[j, j]  # the L[i, j]
                 s = j + 1
-                d = get_elem(i, s) - \
-                    self._T[i, start:s].dot(self._T[start:s, s])
+                d = get_elem(i, s) - self._T[i, start:s].dot(self._T[start:s, s])
             self._T[i, i] = d
             if d < 0.0:
                 self.p = start, i + 1

@@ -1,4 +1,5 @@
 from typing import Tuple
+
 # from .cutting_plane import SearchSpace
 from .ell_config import CutStatus
 
@@ -53,9 +54,7 @@ class ell1d:
         """
         return self._tsq
 
-    def update(
-        self, cut: Tuple[float, float], central_cut=False
-    ) -> CutStatus:
+    def update(self, cut: Tuple[float, float], central_cut=False) -> CutStatus:
         """Update ellipsoid core function using the cut
 
                 grad' * (x - xc) + beta <= 0

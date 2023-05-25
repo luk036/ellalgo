@@ -36,7 +36,7 @@ class EllStable(SearchSpace, SearchSpaceQ):
             self._kappa = val
             self._mq = np.eye(ndim)
         else:
-            self._kappa = 1.0 
+            self._kappa = 1.0
             self._mq = np.diag(val)
 
     def xc(self) -> ArrayType:
@@ -62,7 +62,7 @@ class EllStable(SearchSpace, SearchSpaceQ):
             float: [description]
         """
         return self._tsq
-    
+
     def update_dc(self, cut) -> CutStatus:
         """Implement SearchSpace interface
 

@@ -7,9 +7,11 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     import numpy as np
+
     ArrayType = np.ndarray
 else:
     from typing import Any
+
     ArrayType = Any
 
 CutChoice = Union[float, MutableSequence]  # single or parallel
@@ -168,4 +170,3 @@ class SearchSpace2(SearchSpace):
     @abstractmethod
     def set_xc(self, xc: ArrayType) -> None:
         pass
-

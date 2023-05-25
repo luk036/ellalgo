@@ -25,12 +25,15 @@ class ProfitOracle(OracleOptim):
       v: output price
       k: a given constant that restricts the quantity of x1
     """
+
     log_pA: float
     log_k: float
     price_out: Arr
     elasticities: Arr
 
-    def __init__(self, params: Tuple[float, float, float], elasticities: Arr, price_out: Arr) -> None:
+    def __init__(
+        self, params: Tuple[float, float, float], elasticities: Arr, price_out: Arr
+    ) -> None:
         """[summary]
 
         Args:
@@ -112,7 +115,9 @@ class ProfitRbOracle(OracleOptim):
         self.e = [e1, e2]
         unit_price, scale, limit = params
         params_rb = unit_price - e3, scale, limit - e4
-        self.omega = ProfitOracle(params_rb, elasticities, price_out + np.array([e5, e5]))
+        self.omega = ProfitOracle(
+            params_rb, elasticities, price_out + np.array([e5, e5])
+        )
 
     def assess_optim(self, y: Arr, tea: float) -> Tuple[Cut, Optional[float]]:
         """Make object callable for cutting_plane_optim()
@@ -192,7 +197,7 @@ class ProfitQOracle(OracleOptimQ):
         if not retry:
             x = np.round(np.exp(y))
             if x[0] == 0:
-                x[0] = 1.0 # nearest integer than 0
+                x[0] = 1.0  # nearest integer than 0
             if x[1] == 0:
                 x[1] = 1.0
             self.yd = np.log(x)

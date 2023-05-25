@@ -20,6 +20,7 @@ class Ell(SearchSpace, SearchSpaceQ):
     Returns:
         _type_: _description_
     """
+
     no_defer_trick: bool = False
 
     _mq: Mat

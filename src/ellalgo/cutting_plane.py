@@ -5,20 +5,30 @@ from abc import ABC
 from collections.abc import MutableSequence
 from typing import Optional, Tuple, Union
 from typing import TYPE_CHECKING
-from .ell_typing import OracleFeas, OracleFeas2, OracleOptim, OracleFeasQ, OracleOptimQ, OracleBS
+from .ell_typing import (
+    OracleFeas,
+    OracleFeas2,
+    OracleOptim,
+    OracleFeasQ,
+    OracleOptimQ,
+    OracleBS,
+)
 from .ell_typing import SearchSpace, SearchSpaceQ, SearchSpace2
 
 if TYPE_CHECKING:
     import numpy as np
+
     ArrayType = np.ndarray
 else:
     from typing import Any
+
     ArrayType = Any
 
 CutChoice = Union[float, MutableSequence]  # single or parallel
 Cut = Tuple[ArrayType, CutChoice]
 
 Num = Union[float, int]
+
 
 def cutting_plane_feas(
     omega: OracleFeas, space: SearchSpace, options=Options()
@@ -111,7 +121,7 @@ def cutting_plane_optim(
 
 
 def cutting_plane_feas_q(
-        omega: OracleFeasQ, space_q: SearchSpaceQ, options=Options()
+    omega: OracleFeasQ, space_q: SearchSpaceQ, options=Options()
 ) -> Tuple[Optional[ArrayType], int]:
     """Cutting-plane method for solving convex discrete optimization problem
 
@@ -144,7 +154,7 @@ def cutting_plane_feas_q(
 
 
 def cutting_plane_optim_q(
-        omega: OracleOptimQ, space_q: SearchSpaceQ, tea: float, options=Options()
+    omega: OracleOptimQ, space_q: SearchSpaceQ, tea: float, options=Options()
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for solving convex discrete optimization problem
 
@@ -212,7 +222,6 @@ def bsearch(
 
 
 class BSearchAdaptor(ABC):
-
     def __init__(
         self, omega: OracleFeas2, space: SearchSpace2, options=Options()
     ) -> None:
