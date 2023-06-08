@@ -3,9 +3,9 @@ import copy
 
 from abc import ABC
 from collections.abc import MutableSequence
-from typing import Optional, Tuple, Union
-from typing import TYPE_CHECKING
+from typing import Optional, Tuple, Union, Any
 from .ell_typing import (
+    ArrayType,
     OracleFeas,
     OracleFeas2,
     OracleOptim,
@@ -15,14 +15,6 @@ from .ell_typing import (
 )
 from .ell_typing import SearchSpace, SearchSpaceQ, SearchSpace2
 
-if TYPE_CHECKING:
-    import numpy as np
-
-    ArrayType = np.ndarray
-else:
-    from typing import Any
-
-    ArrayType = Any
 
 CutChoice = Union[float, MutableSequence]  # single or parallel
 Cut = Tuple[ArrayType, CutChoice]
@@ -91,14 +83,14 @@ def cutting_plane_feas(
 
 
 def cutting_plane_optim(
-    omega: OracleOptim, space: SearchSpace, tea: float, options=Options()
+    omega: OracleOptim, space: SearchSpace, tea, options=Options()
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for solving convex optimization problem
 
     Arguments:
         omega (OracleOptim): perform assessment on xinit
         space (SearchSpace): Search Space containing x*
-        tea (float): initial best-so-far value
+        tea (Any): initial best-so-far value
         options (Options, optional): _description_. Defaults to Options().
 
     Returns:
@@ -154,14 +146,14 @@ def cutting_plane_feas_q(
 
 
 def cutting_plane_optim_q(
-    omega: OracleOptimQ, space_q: SearchSpaceQ, tea: float, options=Options()
+    omega: OracleOptimQ, space_q: SearchSpaceQ, tea, options=Options()
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for solving convex discrete optimization problem
 
     Arguments:
         omega (OracleOptimQ): perform assessment on xinit
         space ([type]): Search Space containing x*
-        tea (float): initial best-so-far value
+        tea (Any): initial best-so-far value
         options (Options, optional): _description_. Defaults to Options().
 
     Returns:
@@ -192,8 +184,8 @@ def cutting_plane_optim_q(
 
 
 def bsearch(
-    omega: OracleBS, intrvl: Tuple[Num, Num], options=Options()
-) -> Tuple[Num, int]:
+    omega: OracleBS, intrvl: Tuple[Any, Any], options=Options()
+) -> Tuple[Any, int]:
     """binary search
 
     Args:

@@ -35,11 +35,11 @@ class OracleFeas(ABC):
 
 class OracleFeas2(OracleFeas):
     @abstractmethod
-    def update(self, tea: Num) -> None:
+    def update(self, tea) -> None:
         """update t
 
         Args:
-            tea (Num): _description_
+            tea (Any): _description_
         """
         pass
 
@@ -47,13 +47,13 @@ class OracleFeas2(OracleFeas):
 class OracleOptim(ABC):
     @abstractmethod
     def assess_optim(
-        self, xc: ArrayType, tea: float  # what?
+        self, xc: ArrayType, tea
     ) -> Tuple[Cut, Optional[float]]:
         """assessment of optimization
 
         Args:
             xc (ArrayType): _description_
-            tea (float): _description_
+            tea (Any): _description_
 
         Returns:
             Tuple[Cut, Optional[float]]: _description_
@@ -81,13 +81,13 @@ class OracleFeasQ(ABC):
 class OracleOptimQ(ABC):
     @abstractmethod
     def assess_optim_q(
-        self, xc: ArrayType, tea: float, retry: bool
+        self, xc: ArrayType, tea, retry: bool
     ) -> Tuple[Cut, ArrayType, Optional[float], bool]:
         """assessment of optimization (discrete)
 
         Args:
             xc (ArrayType): _description_
-            tea (float): _description_
+            tea (Any): _description_
             retry (bool): _description_
 
         Returns:
@@ -98,11 +98,11 @@ class OracleOptimQ(ABC):
 
 class OracleBS(ABC):
     @abstractmethod
-    def assess_bs(self, tea: Num) -> bool:
+    def assess_bs(self, tea) -> bool:
         """assessment of the binary search
 
         Args:
-            tea (Num): _description_
+            tea (Any): _description_
 
         Returns:
             bool: _description_
