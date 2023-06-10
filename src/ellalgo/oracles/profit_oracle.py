@@ -2,6 +2,8 @@ from typing import Optional, Tuple
 from ellalgo.cutting_plane import OracleOptim, OracleOptimQ
 
 import numpy as np
+import math
+import copy
 
 Arr = np.ndarray
 Cut = Tuple[Arr, float]
@@ -42,8 +44,8 @@ class ProfitOracle(OracleOptim):
             price_out (Arr): output price
         """
         unit_price, scale, limit = params
-        self.log_pA = np.log(unit_price * scale)
-        self.log_k = np.log(limit)
+        self.log_pA = math.log(unit_price * scale)
+        self.log_k = math.log(limit)
         self.price_out = price_out
         self.elasticities = elasticities
 
@@ -64,10 +66,10 @@ class ProfitOracle(OracleOptim):
             g = np.array([1.0, 0.0])
             return (g, fj), None
 
-        log_Cobb = self.log_pA + self.elasticities @ y
+        log_Cobb = self.log_pA + self.elasticities.dot(y)
         q = self.price_out * np.exp(y)
         vx = q[0] + q[1]
-        if (fj := np.log(tea + vx) - log_Cobb) >= 0.0:
+        if (fj := math.log(tea + vx) - log_Cobb) >= 0.0:
             g = q / (tea + vx) - self.elasticities
             return (g, fj), None
 
@@ -132,7 +134,7 @@ class ProfitRbOracle(OracleOptim):
         See also:
             cutting_plane_optim
         """
-        a_rb = self.elasticities.copy()
+        a_rb = copy.copy(self.elasticities)
         for i in [0, 1]:
             a_rb[i] += -self.e[i] if y[i] > 0.0 else self.e[i]
         self.omega.elasticities = a_rb
