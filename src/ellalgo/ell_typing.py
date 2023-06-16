@@ -46,9 +46,7 @@ class OracleFeas2(OracleFeas):
 
 class OracleOptim(ABC):
     @abstractmethod
-    def assess_optim(
-        self, xc: ArrayType, tea
-    ) -> Tuple[Cut, Optional[float]]:
+    def assess_optim(self, xc: ArrayType, tea) -> Tuple[Cut, Optional[float]]:
         """assessment of optimization
 
         Args:
