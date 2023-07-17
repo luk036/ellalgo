@@ -1,7 +1,7 @@
 from .ell_config import CutStatus
 
 from abc import abstractmethod, ABC
-from collections.abc import MutableSequence
+from typing import MutableSequence
 from typing import Optional, Tuple, Union
 from typing import TYPE_CHECKING
 

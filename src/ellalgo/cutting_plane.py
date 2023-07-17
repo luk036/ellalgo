@@ -2,7 +2,7 @@ from .ell_config import CutStatus, Options
 import copy
 
 from abc import ABC
-from collections.abc import MutableSequence
+from typing import MutableSequence
 from typing import Optional, Tuple, Union, Any
 from .ell_typing import (
     ArrayType,
