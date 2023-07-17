@@ -7,6 +7,14 @@ import numpy as np
 class LDLTMgr:
     """LDLT factorization (mainly for LMI oracles)
 
+    `LDLTMgr` is a class that performs the LDLT factorization for a given
+    symmetric matrix. The LDLT factorization decomposes a symmetric matrix A into
+    the product of a lower triangular matrix L, a diagonal matrix D, and the
+    transpose of L. This factorization is useful for solving linear systems and
+    eigenvalue problems. The class provides methods to perform the factorization,
+    check if the matrix is positive definite, calculate a witness vector if it is
+    not positive definite, and calculate the symmetric quadratic form.
+ 
     - LDL^T square-root-free version
     - Option allow semidefinite
     - Cholesky–Banachiewicz style, row-based
