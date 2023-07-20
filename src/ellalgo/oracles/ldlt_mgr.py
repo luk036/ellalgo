@@ -14,7 +14,7 @@ class LDLTMgr:
     eigenvalue problems. The class provides methods to perform the factorization,
     check if the matrix is positive definite, calculate a witness vector if it is
     not positive definite, and calculate the symmetric quadratic form.
- 
+
     - LDL^T square-root-free version
     - Option allow semidefinite
     - Cholesky–Banachiewicz style, row-based
