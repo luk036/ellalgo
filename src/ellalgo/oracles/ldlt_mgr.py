@@ -30,7 +30,7 @@ class LDLTMgr:
         """
         The above function is the constructor for a LDLT Ext object, which initializes various attributes
         and pre-allocates storage.
-        
+
         :param N: The parameter N represents the dimension of the object. It is an integer value that
         determines the size of the object being constructed
         :type N: int
@@ -60,7 +60,7 @@ class LDLTMgr:
     def factor(self, get_elem: Callable[[int, int], float]) -> bool:
         """
         The function performs LDLT Factorization on a symmetric matrix using lazy evaluation.
-        
+
         :param get_elem: The `get_elem` parameter is a callable function that is used to access the elements
         of a symmetric matrix. It takes two integer arguments `i` and `j` and returns the value of the
         element at the `(i, j)` position in the matrix
@@ -90,7 +90,7 @@ class LDLTMgr:
         """
         The function performs LDLT Factorization on a symmetric matrix using lazy evaluation and checks
         if the matrix is positive definite.
-        
+
         :param get_elem: The `get_elem` parameter is a callable function that takes two integer arguments
         `i` and `j` and returns a float value. This function is used to access the elements of a symmetric
         matrix `A`. The `factor_with_allow_semidefinite` method performs LDLT Factorization on
@@ -150,7 +150,7 @@ class LDLTMgr:
     def sym_quad(self, A: np.ndarray):
         """
         The `sym_quad` function calculates the quadratic form of a vector `v` with a symmetric matrix `A`.
-        
+
         :param A: A is a numpy array
         :type A: np.ndarray
         :return: The function `sym_quad` returns the result of the dot product between `v` and the matrix
@@ -184,7 +184,8 @@ def test_ldlt_mgr_sqrt():
     ldlt_obj = LDLTMgr(3)
     ldlt_obj.factor(lambda i, j: A[i, j])
     R = ldlt_obj.sqrt()
-    assert (np.allclose(R, np.array([[1.0, 0.0, 0.0], [0.5, 1.0, 0.0], [0.5, 0.5, 1.0]])))
+    assert np.allclose(R, np.array([[1.0, 0.0, 0.0], [0.5, 1.0, 0.0], [0.5, 0.5, 1.0]]))
+
 
 if __name__ == "__main__":
     pass

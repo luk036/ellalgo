@@ -8,8 +8,9 @@ class EllCalc:
 
     Examples:
         >>> from ellalgo.ell_calc import EllCalc
-        >>> calc = EllCalc(3)   
+        >>> calc = EllCalc(3)
     """
+
     use_parallel_cut: bool = True
 
     _n_f: float
@@ -27,7 +28,7 @@ class EllCalc:
 
         Examples:
             >>> from ellalgo.ell_calc import EllCalc
-            >>> calc = EllCalc(3)   
+            >>> calc = EllCalc(3)
         """
         self._n_f = float(n)
         self._half_n = self._n_f / 2.0

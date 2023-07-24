@@ -119,4 +119,4 @@ def test_ldlt_mgr_sqrt():
     ldlt_obj = LDLTMgr(3)
     ldlt_obj.factor(lambda i, j: A[i, j])
     R = ldlt_obj.sqrt()
-    assert (np.allclose(R, np.array([[1.0, 0.5, 0.5], [0.0, 1.0, 0.5], [0.0, 0.0, 1.0]])))
+    assert np.allclose(R, np.array([[1.0, 0.5, 0.5], [0.0, 1.0, 0.5], [0.0, 0.0, 1.0]]))
