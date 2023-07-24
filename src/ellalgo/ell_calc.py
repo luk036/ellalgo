@@ -4,6 +4,12 @@ from typing import Tuple
 
 
 class EllCalc:
+    """_summary_
+
+    Examples:
+        >>> from ellalgo.ell_calc import EllCalc
+        >>> calc = EllCalc(3)   
+    """
     use_parallel_cut: bool = True
 
     _n_f: float
@@ -18,6 +24,10 @@ class EllCalc:
 
         Args:
             n (int): _description_
+
+        Examples:
+            >>> from ellalgo.ell_calc import EllCalc
+            >>> calc = EllCalc(3)   
         """
         self._n_f = float(n)
         self._half_n = self._n_f / 2.0
@@ -291,6 +301,8 @@ class EllCalc:
 
         Returns:
             Tuple[CutStatus, float, float, float]: _description_
+
+        Examples:
         """
         sigma = self._cst2
         rho = self._cst0 * sqrt(tsq)

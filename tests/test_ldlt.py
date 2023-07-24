@@ -34,7 +34,7 @@ def test_ldlt1():
 #     Q = LDLTMgr(len(m2))
 #     assert not Q.factorize(m2)
 #     Q.witness()
-#     assert Q.p == (0, 2)
+#     assert Q.pos == (0, 2)
 #     # assert ep == 1.0
 #
 #
@@ -45,7 +45,7 @@ def test_ldlt1():
 #     Q = LDLTMgr(len(m3))
 #     assert not Q.factorize(m3)
 #     ep = Q.witness()
-#     assert Q.p == (0, 1)
+#     assert Q.pos == (0, 1)
 #     assert Q.v[0] == 1.0
 #     assert ep == 0.0
 #
@@ -72,7 +72,7 @@ def test_ldlt1():
 #     Q.allow_semidefinite = True
 #     assert not Q.factorize(m2)
 #     Q.witness()
-#     assert Q.p == (0, 2)
+#     assert Q.pos == (0, 2)
 #     # assert ep == 1.0
 #
 #

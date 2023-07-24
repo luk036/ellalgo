@@ -22,7 +22,7 @@ def test_chol2():
     Q = LDLTMgr(len(m2))
     assert not Q.factorize(m2)
     Q.witness()
-    assert Q.p == (0, 2)
+    assert Q.pos == (0, 2)
     # assert ep == 1.0
 
 
@@ -33,7 +33,7 @@ def test_chol3():
     Q = LDLTMgr(len(m3))
     assert not Q.factorize(m3)
     ep = Q.witness()
-    assert Q.p == (0, 1)
+    assert Q.pos == (0, 1)
     assert Q.v[0] == 1.0
     assert ep == 0.0
 
@@ -60,7 +60,7 @@ def test_chol5():
     Q.allow_semidefinite = True
     assert not Q.factorize(m2)
     Q.witness()
-    assert Q.p == (0, 2)
+    assert Q.pos == (0, 2)
     # assert ep == 1.0
 
 
@@ -112,3 +112,11 @@ def test_chol9():
     # Q.allow_semidefinite = True
     # assert Q.factorize(m3)
     assert Q.factor_with_allow_semidefinite(lambda i, j: m3[i, j])
+
+
+def test_ldlt_mgr_sqrt():
+    A = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
+    ldlt_obj = LDLTMgr(3)
+    ldlt_obj.factor(lambda i, j: A[i, j])
+    R = ldlt_obj.sqrt()
+    assert (np.allclose(R, np.array([[1.0, 0.5, 0.5], [0.0, 1.0, 0.5], [0.0, 0.0, 1.0]])))

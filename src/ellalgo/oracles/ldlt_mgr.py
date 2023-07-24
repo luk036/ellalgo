@@ -24,95 +24,110 @@ class LDLTMgr:
     - O(p^3) per iteration, independent of N
     """
 
-    __slots__ = ("p", "v", "_n", "_T", "allow_semidefinite")
+    __slots__ = ("pos", "v", "_ndim", "_Temp", "allow_semidefinite")
 
     def __init__(self, N: int):
-        """Construct a new chol ext object
-
-        Arguments:
-            N (int): dimension
         """
-        self.p = (0, 0)
+        The above function is the constructor for a LDLT Ext object, which initializes various attributes
+        and pre-allocates storage.
+        
+        :param N: The parameter N represents the dimension of the object. It is an integer value that
+        determines the size of the object being constructed
+        :type N: int
+        """
+        self.pos = (0, 0)
         self.v: np.ndarray = np.zeros(N)
 
-        self._n: int = N
-        self._T: np.ndarray = np.zeros((N, N))  # pre-allocate storage
+        self._ndim: int = N
+        self._Temp: np.ndarray = np.zeros((N, N))  # pre-allocate storage
 
     def factorize(self, A: np.ndarray) -> bool:
-        """Perform Cholesky Factorization
+        """
+        The function factorize performs LDLT Factorization on a symmetric matrix A and returns a boolean
+        value indicating whether the factorization was successful.
 
-        Arguments:
-            A (np.array): Symmetric Matrix
+        If $A$ is positive definite, then $p$ is zero.
+        If it is not, then $p$ is a positive integer,
+        such that $v = R^{-1} e_p$ is a certificate vector
+        to make $v'*A[:p,:p]*v < 0$
 
-         If $A$ is positive definite, then $p$ is zero.
-         If it is not, then $p$ is a positive integer,
-         such that $v = R^{-1} e_p$ is a certificate vector
-         to make $v'*A[:p,:p]*v < 0$
+        :param A: A is a numpy array representing a symmetric matrix
+        :type A: np.ndarray
+        :return: the result of calling the `factor` method with a lambda function as an argument.
         """
         return self.factor(lambda i, j: A[i, j])
 
     def factor(self, get_elem: Callable[[int, int], float]) -> bool:
-        """Perform Cholesky Factorization (square-root free version)
-
-        Arguments:
-            get_elem (callable): function to access symmetric matrix
-
-         Construct $A(i, j)$ on demand, lazy evalution
+        """
+        The function performs LDLT Factorization on a symmetric matrix using lazy evaluation.
+        
+        :param get_elem: The `get_elem` parameter is a callable function that is used to access the elements
+        of a symmetric matrix. It takes two integer arguments `i` and `j` and returns the value of the
+        element at the `(i, j)` position in the matrix
+        :type get_elem: Callable[[int, int], float]
+        :return: The function `factor` returns a boolean value indicating whether the matrix is symmetric
+        positive definite (SPD).
         """
         start = 0  # range start
-        self.p = (0, 0)
-        for i in range(self._n):
+        self.pos = (0, 0)
+        for i in range(self._ndim):
             # j = start
             d = get_elem(i, start)
             for j in range(start, i):
-                self._T[j, i] = d  # keep it for later use
-                self._T[i, j] = d / self._T[j, j]  # the L[i, j]
+                self._Temp[j, i] = d  # keep it for later use
+                self._Temp[i, j] = d / self._Temp[j, j]  # the L[i, j]
                 s = j + 1
-                d = get_elem(i, s) - self._T[i, start:s].dot(self._T[start:s, s])
-            self._T[i, i] = d
+                d = get_elem(i, s) - self._Temp[i, start:s].dot(self._Temp[start:s, s])
+            self._Temp[i, i] = d
             if d <= 0.0:
-                self.p = start, i + 1
+                self.pos = start, i + 1
                 break
         return self.is_spd()
 
     def factor_with_allow_semidefinite(
         self, get_elem: Callable[[int, int], float]
     ) -> bool:
-        """Perform Cholesky Factorization (square-root free version)
-
-        Arguments:
-            get_elem (callable): function to access symmetric matrix
-
-         Construct $A(i, j)$ on demand, lazy evalution
+        """
+        The function performs LDLT Factorization on a symmetric matrix using lazy evaluation and checks
+        if the matrix is positive definite.
+        
+        :param get_elem: The `get_elem` parameter is a callable function that takes two integer arguments
+        `i` and `j` and returns a float value. This function is used to access the elements of a symmetric
+        matrix `A`. The `factor_with_allow_semidefinite` method performs LDLT Factorization on
+        :type get_elem: Callable[[int, int], float]
+        :return: The function `factor_with_allow_semidefinite` returns a boolean value indicating whether
+        the matrix is symmetric positive definite (SPD).
         """
         start = 0  # range start
-        self.p = (0, 0)
-        for i in range(self._n):
+        self.pos = (0, 0)
+        for i in range(self._ndim):
             # j = start
             d = get_elem(i, start)
             for j in range(start, i):
-                self._T[j, i] = d  # keep it for later use
-                self._T[i, j] = d / self._T[j, j]  # the L[i, j]
+                self._Temp[j, i] = d  # keep it for later use
+                self._Temp[i, j] = d / self._Temp[j, j]  # the L[i, j]
                 s = j + 1
-                d = get_elem(i, s) - self._T[i, start:s].dot(self._T[start:s, s])
-            self._T[i, i] = d
+                d = get_elem(i, s) - self._Temp[i, start:s].dot(self._Temp[start:s, s])
+            self._Temp[i, i] = d
             if d < 0.0:
-                self.p = start, i + 1
+                self.pos = start, i + 1
                 break
             elif d == 0:
                 start = i + 1  # T[i, i] == 0 (very unlikely), restart at i+1
         return self.is_spd()
 
     def is_spd(self):
-        """Is $A$ symmetric positive definite (spd)
-
-        Returns:
-            bool: True if $A$ is a spd
         """
-        return self.p[1] == 0
+        The function `is_spd` checks if a matrix `A` is symmetric positive definite (spd) and returns `True`
+        if it is.
+        :return: a boolean value. It returns True if the matrix A is symmetric positive definite (spd), and
+        False otherwise.
+        """
+        return self.pos[1] == 0
 
-    def witness(self):
-        """witness that certifies $A$ is not symmetric positive definite (spd)
+    def witness(self) -> float:
+        """
+        The function "witness" provides evidence that a matrix is not symmetric positive definite.
             (square-root-free version)
 
            evidence: v' A v = -ep
@@ -121,29 +136,27 @@ class LDLTMgr:
             AssertionError: $A$ indeeds a spd matrix
 
         Returns:
-            array: v
             float: ep
         """
         if self.is_spd():
             raise AssertionError()
-        start, n = self.p
+        start, n = self.pos
         m = n - 1
         self.v[m] = 1.0
         for i in range(m, start, -1):
-            self.v[i - 1] = -self._T[i:n, i - 1].dot(self.v[i:n])
-        return -self._T[m, m]
+            self.v[i - 1] = -self._Temp[i:n, i - 1].dot(self.v[i:n])
+        return -self._Temp[m, m]
 
     def sym_quad(self, A: np.ndarray):
-        """[summary]
-
-        Arguments:
-            v ([type]): [description]
-            A ([type]): [description]
-
-        Returns:
-            [type]: [description]
         """
-        s, n = self.p
+        The `sym_quad` function calculates the quadratic form of a vector `v` with a symmetric matrix `A`.
+        
+        :param A: A is a numpy array
+        :type A: np.ndarray
+        :return: The function `sym_quad` returns the result of the dot product between `v` and the matrix
+        product of `A[s:n, s:n]` and `v`.
+        """
+        s, n = self.pos
         v = self.v[s:n]
         return v.dot(A[s:n, s:n] @ v)
 
@@ -158,13 +171,20 @@ class LDLTMgr:
         """
         if not self.is_spd():
             raise AssertionError()
-        M = np.zeros((self._n, self._n))
-        for i in range(self._n):
-            M[i, i] = math.sqrt(self._T[i, i])
-            for j in range(i + 1, self._n):
-                M[i, j] = self._T[j, i] * M[i, i]
+        M = np.zeros((self._ndim, self._ndim))
+        for i in range(self._ndim):
+            M[i, i] = math.sqrt(self._Temp[i, i])
+            for j in range(i + 1, self._ndim):
+                M[i, j] = self._Temp[j, i] * M[i, i]
         return M
 
+
+def test_ldlt_mgr_sqrt():
+    A = np.array([[1.0, 2.0, 3.0], [2.0, 4.0, 5.0], [3.0, 5.0, 6.0]])
+    ldlt_obj = LDLTMgr(3)
+    ldlt_obj.factor(lambda i, j: A[i, j])
+    R = ldlt_obj.sqrt()
+    assert (np.allclose(R, np.array([[1.0, 0.0, 0.0], [0.5, 1.0, 0.0], [0.5, 0.5, 1.0]])))
 
 if __name__ == "__main__":
     pass

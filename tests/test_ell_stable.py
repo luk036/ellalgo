@@ -10,7 +10,7 @@ def test_construct():
     assert ell._kappa == 0.01
     assert ell._mq == approx(np.eye(4))
     assert ell._xc == approx(np.zeros(4))
-    assert ell._n == 4
+    assert ell._ndim == 4
 
 
 def test_update_cc():
