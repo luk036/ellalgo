@@ -14,6 +14,10 @@
 [![Documentation Status](https://readthedocs.org/projects/ellalgo/badge/?version=latest)](https://ellalgo.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/luk036/ellalgo/branch/main/graph/badge.svg?token=6lpjUzPavX)](https://codecov.io/gh/luk036/ellalgo)
 
+<p align="center">
+  <img src="./ellipsoid-method-for-convex-optimization.svg"/>
+</p>
+
 # 🏉 ellalgo
 
 > Ellipsoid Method in Python
