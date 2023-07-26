@@ -54,6 +54,12 @@ class LDLTMgr:
         :param A: A is a numpy array representing a symmetric matrix
         :type A: np.ndarray
         :return: the result of calling the `factor` method with a lambda function as an argument.
+
+        Examples:
+            >>> A = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
+            >>> ldl = LDLTMgr(3)
+            >>> ldl.factorize(A)
+            True
         """
         return self.factor(lambda i, j: A[i, j])
 
@@ -67,6 +73,13 @@ class LDLTMgr:
         :type get_elem: Callable[[int, int], float]
         :return: The function `factor` returns a boolean value indicating whether the matrix is symmetric
         positive definite (SPD).
+
+        Examples:
+            >>> A = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
+            >>> ldl = LDLTMgr(3)
+            >>> ldl.factor(lambda i, j: A[i, j])
+            True
+
         """
         start = 0  # range start
         self.pos = (0, 0)
@@ -97,6 +110,13 @@ class LDLTMgr:
         :type get_elem: Callable[[int, int], float]
         :return: The function `factor_with_allow_semidefinite` returns a boolean value indicating whether
         the matrix is symmetric positive definite (SPD).
+
+        Examples:
+            >>> A = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
+            >>> ldl = LDLTMgr(3)
+            >>> ldl.factor_with_allow_semidefinite(lambda i, j: A[i, j])
+            True
+
         """
         start = 0  # range start
         self.pos = (0, 0)
@@ -122,6 +142,14 @@ class LDLTMgr:
         if it is.
         :return: a boolean value. It returns True if the matrix A is symmetric positive definite (spd), and
         False otherwise.
+
+        Examples:
+            >>> A = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
+            >>> ldl = LDLTMgr(3)
+            >>> ldl.factorize(A)
+            True
+            >>> ldl.is_spd()
+            True
         """
         return self.pos[1] == 0
 
@@ -137,6 +165,15 @@ class LDLTMgr:
 
         Returns:
             float: ep
+
+        Examples:
+            >>> A = np.array([[1.0, 2.0, 3.0], [2.0, 3.5, 5.0], [3.0, 5.0, 6.0]])
+            >>> ldl = LDLTMgr(3)
+            >>> ldl.factorize(A)
+            False
+            >>> ldl.witness()
+            0.5
+
         """
         if self.is_spd():
             raise AssertionError()
@@ -155,6 +192,22 @@ class LDLTMgr:
         :type A: np.ndarray
         :return: The function `sym_quad` returns the result of the dot product between `v` and the matrix
         product of `A[s:n, s:n]` and `v`.
+
+        Examples:
+            >>> A = np.array([[1.0, 2.0, 3.0], [2.0, 3.5, 5.0], [3.0, 5.0, 6.0]])
+            >>> ldl = LDLTMgr(3)
+            >>> ldl.factorize(A)
+            False
+            >>> ldl.pos
+            (0, 2)
+            >>> ldl.witness() # call this before sym_quad()
+            0.5
+            >>> ldl.v
+            array([-2.,  1.,  0.])
+            >>> B = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
+            >>> ldl.sym_quad(B)
+            3.25
+
         """
         s, n = self.pos
         v = self.v[s:n]
@@ -168,23 +221,26 @@ class LDLTMgr:
 
         Returns:
             np.ndarray: [description]
+
+        Examples:
+            >>> A = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
+            >>> ldl = LDLTMgr(3)
+            >>> ldl.factorize(A)
+            True
+            >>> ldl.sqrt()
+            array([[1. , 0.5, 0.5],
+                   [0. , 1. , 0.5],
+                   [0. , 0. , 1. ]])
+
         """
         if not self.is_spd():
             raise AssertionError()
-        M = np.zeros((self._ndim, self._ndim))
+        R = np.zeros((self._ndim, self._ndim))
         for i in range(self._ndim):
-            M[i, i] = math.sqrt(self._Temp[i, i])
+            R[i, i] = math.sqrt(self._Temp[i, i])
             for j in range(i + 1, self._ndim):
-                M[i, j] = self._Temp[j, i] * M[i, i]
-        return M
-
-
-def test_ldlt_mgr_sqrt():
-    A = np.array([[1.0, 2.0, 3.0], [2.0, 4.0, 5.0], [3.0, 5.0, 6.0]])
-    ldlt_obj = LDLTMgr(3)
-    ldlt_obj.factor(lambda i, j: A[i, j])
-    R = ldlt_obj.sqrt()
-    assert np.allclose(R, np.array([[1.0, 0.0, 0.0], [0.5, 1.0, 0.0], [0.5, 0.5, 1.0]]))
+                R[i, j] = self._Temp[j, i] * R[i, i]
+        return R
 
 
 if __name__ == "__main__":

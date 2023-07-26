@@ -29,6 +29,18 @@ class EllCalc:
         Examples:
             >>> from ellalgo.ell_calc import EllCalc
             >>> calc = EllCalc(3)
+            >>> calc._n_f
+            3.0
+            >>> calc._half_n
+            1.5
+            >>> calc._cst0
+            0.25
+            >>> calc._cst1
+            1.125
+            >>> calc._cst2
+            0.5
+            >>> calc._cst3
+            0.75
         """
         self._n_f = float(n)
         self._half_n = self._n_f / 2.0
@@ -48,6 +60,10 @@ class EllCalc:
 
         Returns:
             Tuple[CutStatus, float, float, float]: _description_
+
+        Examples:
+            >>> from ellalgo.ell_calc import EllCalc
+            >>> calc = EllCalc(3)
         """
         if isinstance(beta, (int, float)):
             return self.calc_dc(beta, tsq)
@@ -273,7 +289,16 @@ class EllCalc:
             tau (float): _description_
 
         Returns:
-            Tuple[CutStatus, float, float, float]: _description_
+            Tuple[CutStatus, float, float, float]:
+
+        Examples:
+            >>> from ellalgo.ell_calc import EllCalc
+            >>> calc = EllCalc(3)
+            >>> calc.calc_dc_core(1.0, 2.0, 2.0 + 3 * 1.0)
+            (<CutStatus.Success: 0>, 1.25, 0.8333333333333334, 0.84375)
+            >>> calc.calc_dc_core(0.0, 2.0, 2.0)
+            (<CutStatus.Success: 0>, 0.5, 0.5, 1.125)
+
         """
         rho = self._cst0 * gamma
         sigma = self._cst2 * gamma / (tau + beta)
@@ -304,9 +329,13 @@ class EllCalc:
             Tuple[CutStatus, float, float, float]: _description_
 
         Examples:
+            >>> from ellalgo.ell_calc import EllCalc
+            >>> calc = EllCalc(3)
+            >>> calc.calc_cc(4.0)
+            (<CutStatus.Success: 0>, 0.5, 0.5, 1.125)
         """
-        sigma = self._cst2
         rho = self._cst0 * sqrt(tsq)
+        sigma = self._cst2
         delta = self._cst1
         return (CutStatus.Success, rho, sigma, delta)
 
