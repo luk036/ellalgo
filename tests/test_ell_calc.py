@@ -45,8 +45,8 @@ def test_calc_ll_cc():
     status, rho, sigma, delta = ell_calc.calc_ll_cc(0.11, 0.01)
     assert status == CutStatus.Success
     # Central cut
-    assert sigma == approx(0.4)
     assert rho == approx(0.02)
+    assert sigma == approx(0.4)
     assert delta == approx(16.0 / 15.0)
 
     status, rho, sigma, delta = ell_calc.calc_ll_cc(0.05, 0.01)

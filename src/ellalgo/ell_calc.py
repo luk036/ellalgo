@@ -82,6 +82,14 @@ class EllCalc:
 
         Returns:
             Tuple[CutStatus, float, float, float]: _description_
+
+        Examples:
+            >>> from ellalgo.ell_calc import EllCalc
+            >>> calc = EllCalc(4)
+            >>> calc.calc_single_or_ll_cc([0, 0.11], 0.01)
+            (<CutStatus.Success: 0>, 0.020000000000000004, 0.4, 1.0666666666666667)
+            >>> calc.calc_single_or_ll_cc([0, -1], 0.01)
+            (<CutStatus.NoSoln: 1>, 0.0, 0.0, 0.0)
         """
         if isinstance(beta, (int, float)) or len(beta) < 2 or not self.use_parallel_cut:
             return self.calc_cc(tsq)
@@ -214,6 +222,14 @@ class EllCalc:
 
         Returns:
             Tuple[CutStatus, float, float, float]: _description_
+
+        Examples:
+            >>> from ellalgo.ell_calc import EllCalc
+            >>> calc = EllCalc(4)
+            >>> calc.calc_ll_cc(0.11, 0.01)
+            (<CutStatus.Success: 0>, 0.020000000000000004, 0.4, 1.0666666666666667)
+            >>> calc.calc_ll_cc(-1.0, 0.01)
+            (<CutStatus.NoSoln: 1>, 0.0, 0.0, 0.0)
         """
         if b1 < 0.0:
             return (CutStatus.NoSoln, 0.0, 0.0, 0.0)  # no sol'n
@@ -254,14 +270,24 @@ class EllCalc:
 
         Returns:
             Tuple[CutStatus, float, float, float]: _description_
+
+        Examples:
+            >>> from ellalgo.ell_calc import EllCalc
+            >>> calc = EllCalc(3)
+            >>> calc.calc_dc(1.0, 4.0)
+            (<CutStatus.Success: 0>, 1.25, 0.8333333333333334, 0.84375)
+            >>> calc.calc_dc(0.0, 4.0)
+            (<CutStatus.Success: 0>, 0.5, 0.5, 1.125)
+            >>> calc.calc_dc(1.5, 2.0)
+            (<CutStatus.NoSoln: 1>, 0.0, 0.0, 0.0)
+
         """
         assert beta >= 0.0
         bsq = beta * beta
         if tsq < bsq:
             return (CutStatus.NoSoln, 0.0, 0.0, 0.0)  # no sol'n
         tau = sqrt(tsq)
-        gamma = tau + self._n_f * beta
-        return self.calc_dc_core(beta, tau, gamma)
+        return self.calc_dc_core(beta, tau, tau + self._n_f * beta)
 
     def calc_dc_core(
         self, beta: float, tau: float, gamma: float
@@ -323,7 +349,7 @@ class EllCalc:
                 n  - 1
 
         Args:
-            tau (float): _description_
+            tsq (float): _description_
 
         Returns:
             Tuple[CutStatus, float, float, float]: _description_
@@ -414,6 +440,17 @@ class EllCalc:
 
         Returns:
             Tuple[CutStatus, float, float, float]: _description_
+
+        Examples:
+            >>> from ellalgo.ell_calc import EllCalc
+            >>> calc = EllCalc(3)
+            >>> calc.calc_dc_q(0.0, 4.0)
+            (<CutStatus.Success: 0>, 0.5, 0.5, 1.125)
+            >>> calc.calc_dc_q(1.5, 2.0)
+            (<CutStatus.NoSoln: 1>, 0.0, 0.0, 0.0)
+            >>> calc.calc_dc_q(-1.5, 4.0)
+            (<CutStatus.NoEffect: 2>, 0.0, 0.0, 0.0)
+
         """
         tau = sqrt(tsq)
         if tau < beta:
