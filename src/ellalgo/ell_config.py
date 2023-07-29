@@ -13,6 +13,8 @@ class Options:
     tol: float = 1e-8  # error tolerance
 
 
+# The `CInfo` class represents information about a computation, including whether it is feasible and
+# the number of iterations it took.
 class CInfo:
     def __init__(self, feasible: bool, num_iters: int) -> None:
         """Construct a new CInfo object

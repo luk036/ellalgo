@@ -10,6 +10,7 @@ CutChoice = Union[float, ArrayType]  # single or parallel
 Cut = Tuple[ArrayType, CutChoice]
 
 
+# The `EllStable` class represents an ellipsoidal search space with stability properties.
 class EllStable(SearchSpace, SearchSpaceQ):
     no_defer_trick: bool = False
 
@@ -21,11 +22,16 @@ class EllStable(SearchSpace, SearchSpaceQ):
     _helper: EllCalc
 
     def __init__(self, val, xc: ArrayType) -> None:
-        """_summary_
+        """
+        The function initializes an object with given values and attributes.
 
-        Args:
-            val (_type_): _description_
-            xc (ArrayType): _description_
+        :param val: The parameter `val` can be either an integer, a float, or a list of numbers. If it
+        is an integer or a float, it represents the value of kappa. If it is a list of numbers, it
+        represents the diagonal elements of a matrix, mq
+        :param xc: The parameter `xc` is of type `ArrayType`, which suggests that it is an array-like
+        object. It is used to store the values of `xc` in the `__init__` method. The length of `xc` is
+        calculated using `len(xc)` and stored in the variable
+        :type xc: ArrayType
         """
         ndim = len(xc)
         self._helper = EllCalc(ndim)
@@ -40,10 +46,9 @@ class EllStable(SearchSpace, SearchSpaceQ):
             self._mq = np.diag(val)
 
     def xc(self) -> ArrayType:
-        """_summary_
-
-        Returns:
-            ArrayType: _description_
+        """
+        The function `xc` returns the value of the `_xc` attribute.
+        :return: The method `xc` is returning the value of the attribute `_xc`.
         """
         return self._xc
 
