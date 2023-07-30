@@ -4,14 +4,19 @@ from typing import Tuple
 from .ell_config import CutStatus
 
 
+# The `ell1d` class represents a one-dimensional ellipse with attributes for the radius, center, and
+# total squared distance.
 class ell1d:
     __slots__ = ("_rd", "_xc", "_tsq")
 
     def __init__(self, interval: Tuple[float, float]) -> None:
-        """[summary]
-
-        Arguments:
-            I ([type]): [description]
+        """
+        The function initializes the instance variables `_rd`, `_xc`, and `_tsq` based on the given
+        interval.
+        
+        :param interval: The `interval` parameter is a tuple of two floats representing the lower and
+        upper bounds of a range
+        :type interval: Tuple[float, float]
         """
         l, u = interval
         self._rd: float = (u - l) / 2
@@ -29,45 +34,53 @@ class ell1d:
 
     # @property
     def xc(self) -> float:
-        """[summary]
-
-        Returns:
-            float: [description]
+        """
+        The function `xc` returns the value of the private attribute `_xc`.
+        :return: the value of the variable `self._xc`, which is of type float.
         """
         return self._xc
 
     # @xc.setter
     def set_xc(self, x: float) -> None:
-        """[summary]
-
-        Arguments:
-            x (float): [description]
+        """
+        The function sets the value of the private variable `_xc` to the given float value `x`.
+        
+        :param x: The parameter `x` is a float value that represents the value to be assigned to the
+        `_xc` attribute
+        :type x: float
         """
         self._xc = x
 
     # @property
     def tsq(self) -> float:
-        """[summary]
-
-        Returns:
-            float: [description]
+        """
+        The function `tsq` returns the measure of the distance between `xc` and `x*`.
+        :return: The method is returning a float value, which represents the measure of the distance between xc and x*.
         """
         return self._tsq
 
     def update(self, cut: Tuple[float, float], central_cut=False) -> CutStatus:
-        """Update ellipsoid core function using the cut
+        """
+        The `update` function updates an ellipsoid core using a single cut.
+        
+        :param cut: The `cut` parameter is a tuple containing two floats: `grad` and `beta`. `grad`
+        represents the gradient, and `beta` represents the beta value
+        :type cut: Tuple[float, float]
+        :param central_cut: A boolean parameter that indicates whether the cut is a central cut or not.
+        If it is set to True, the cut is a central cut. If it is set to False, the cut is not a central
+        cut, defaults to False (optional)
+        :return: a `CutStatus` enum value and the "volumn" of the ellipsoid (`tau`).
 
-                grad' * (x - xc) + beta <= 0
-
-        Note: Support single cut only
-
-        Arguments:
-            grad (float): gradient
-            beta (float): [description]
-
-        Returns:
-            status: 0: success
-            tau: "volumn" of ellipsoid
+        Examples:
+            >>> ellip = ell1d([0, 1])
+            >>> ellip.update((1, 0))
+            <CutStatus.Success: 0>
+            >>> ellip.update((-1, 0))
+            <CutStatus.Success: 0>
+            >>> ellip.update((0, 1))
+            <CutStatus.NoSoln: 1>
+            >>> ellip.update((0, -1))
+            <CutStatus.NoEffect: 2>
         """
         grad, beta = cut
         # TODO handle grad == 0

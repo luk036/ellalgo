@@ -53,68 +53,81 @@ class EllStable(SearchSpace, SearchSpaceQ):
         return self._xc
 
     def set_xc(self, x: ArrayType) -> None:
-        """_summary_
-
-        Args:
-            x (ArrayType): _description_
+        """
+        The function sets the value of the variable `_xc` to the input `x`.
+        
+        :param x: The parameter `x` is of type `ArrayType`
+        :type x: ArrayType
         """
         self._xc = x
 
     def tsq(self) -> float:
-        """Measure of the distance between xc and x*
-
-        Returns:
-            float: [description]
+        """
+        The function `tsq` returns the measure of the distance between `xc` and `x*`.
+        :return: The method is returning a float value, which represents the measure of the distance between xc and x*.
         """
         return self._tsq
 
     def update_dc(self, cut) -> CutStatus:
-        """Implement SearchSpace interface
-
-        Args:
-            cut (_type_): _description_
-
-        Returns:
-            CutStatus: _description_
+        """
+        The function `update_dc` is an implementation of the `SearchSpace` interface that updates the
+        cut status based on a given cut.
+        
+        :param cut: The `cut` parameter is of type `_type_` and it represents some kind of cut
+        :return: a `CutStatus` object.
         """
         return self._update_core(cut, self._helper.calc_single_or_ll)
 
     def update_cc(self, cut) -> CutStatus:
-        """Implement SearchSpace interface
-
-        Args:
-            cut (_type_): _description_
-
-        Returns:
-            CutStatus: _description_
+        """
+        The function `update_cc` is an implementation of the `SearchSpace` interface that updates the
+        cut status based on a given cut.
+        
+        :param cut: The `cut` parameter is of type `_type_` and it represents a cut
+        :return: a `CutStatus` object.
         """
         return self._update_core(cut, self._helper.calc_single_or_ll_cc)
 
     def update_q(self, cut) -> CutStatus:
-        """Implement SearchSpaceQ interface
-
-        Args:
-            cut (_type_): _description_
-
-        Returns:
-            CutStatus: _description_
+        """
+        The function `update_q` is an implementation of the `SearchSpaceQ` interface that updates the
+        cut status based on a given cut.
+        
+        :param cut: The `cut` parameter is of type `_type_` and it represents the cut that needs to be
+        updated
+        :return: a `CutStatus` object.
         """
         return self._update_core(cut, self._helper.calc_single_or_ll_q)
 
     # private:
 
     def _update_core(self, cut, cut_strategy: Callable) -> CutStatus:
-        """Update ellipsoid by cut
-
-        Args:
-            cut (_type_): _description_
-            cut_strategy (Callable): _description_
-
-        Returns:
-            CutStatus: _description_
+        """
+        The `_update_core` function updates an ellipsoid by applying a cut and a cut strategy.
+        
+        :param cut: The `cut` parameter is of type `_type_` and represents the cut to be applied to the
+        ellipsoid. The specific type of `_type_` is not specified in the code snippet provided
+        :param cut_strategy: The `cut_strategy` parameter is a callable object that represents the
+        strategy for determining the cut status. It takes two arguments: `beta` and `tsq`. `beta` is a
+        scalar value and `tsq` is a scalar value representing the squared norm of the current cut. The `
+        :type cut_strategy: Callable
+        :return: a `CutStatus` object.
 
         Reference:
             Gill, Murray, and Wright, "Practical Optimization", p43.
+
+        Examples:
+            >>> ell = EllStable(1.0, [1.0, 1.0, 1.0, 1.0])
+            >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 1.0)
+            >>> status = ell._update_core(cut, ell._helper.calc_single_or_ll)
+            >>> print(status)
+            CutStatus.Success
+
+            >>> ell = EllStable(1.0, [1.0, 1.0, 1.0, 1.0])
+            >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 1.0)
+            >>> status = ell._update_core(cut, ell._helper.calc_single_or_ll_cc)
+            >>> print(status)
+            CutStatus.Success
         """
         g, beta = cut
 
