@@ -13,7 +13,7 @@ class ell1d:
         """
         The function initializes the instance variables `_rd`, `_xc`, and `_tsq` based on the given
         interval.
-        
+
         :param interval: The `interval` parameter is a tuple of two floats representing the lower and
         upper bounds of a range
         :type interval: Tuple[float, float]
@@ -44,7 +44,7 @@ class ell1d:
     def set_xc(self, x: float) -> None:
         """
         The function sets the value of the private variable `_xc` to the given float value `x`.
-        
+
         :param x: The parameter `x` is a float value that represents the value to be assigned to the
         `_xc` attribute
         :type x: float
@@ -62,7 +62,7 @@ class ell1d:
     def update(self, cut: Tuple[float, float], central_cut=False) -> CutStatus:
         """
         The `update` function updates an ellipsoid core using a single cut.
-        
+
         :param cut: The `cut` parameter is a tuple containing two floats: `grad` and `beta`. `grad`
         represents the gradient, and `beta` represents the beta value
         :type cut: Tuple[float, float]

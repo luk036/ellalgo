@@ -1,8 +1,10 @@
+from typing import Callable, Tuple, Union
+
 import numpy as np
+
 from .ell_calc import EllCalc
 from .ell_config import CutStatus
 from .ell_typing import SearchSpace, SearchSpaceQ
-from typing import Tuple, Union, Callable
 
 Mat = np.ndarray
 ArrayType = np.ndarray
@@ -53,7 +55,7 @@ class Ell(SearchSpace, SearchSpaceQ):
     def set_xc(self, xc: ArrayType) -> None:
         """
         The function sets the value of the variable `_xc` to the input `x`.
-        
+
         :param x: The parameter `x` is of type `ArrayType`
         :type x: ArrayType
         """
@@ -70,7 +72,7 @@ class Ell(SearchSpace, SearchSpaceQ):
         """
         The function `update_dc` is an implementation of the `SearchSpace` interface that updates the
         cut status based on a given cut.
-        
+
         :param cut: The `cut` parameter is of type `_type_` and it represents some kind of cut
         :return: a `CutStatus` object.
         """
@@ -80,7 +82,7 @@ class Ell(SearchSpace, SearchSpaceQ):
         """
         The function `update_cc` is an implementation of the `SearchSpace` interface that updates the
         cut status based on a given cut.
-        
+
         :param cut: The `cut` parameter is of type `_type_` and it represents a cut
         :return: a `CutStatus` object.
         """
@@ -90,7 +92,7 @@ class Ell(SearchSpace, SearchSpaceQ):
         """
         The function `update_q` is an implementation of the `SearchSpaceQ` interface that updates the
         cut status based on a given cut.
-        
+
         :param cut: The `cut` parameter is of type `_type_` and it represents the cut that needs to be
         updated
         :return: a `CutStatus` object.
@@ -102,7 +104,7 @@ class Ell(SearchSpace, SearchSpaceQ):
     def _update_core(self, cut, cut_strategy: Callable) -> CutStatus:
         """
         The `_update_core` function updates an ellipsoid by applying a cut and a cut strategy.
-        
+
         :param cut: The `cut` parameter is of type `_type_` and represents the cut to be applied to the
         ellipsoid. The specific type of `_type_` is not specified in the code snippet provided
         :param cut_strategy: The `cut_strategy` parameter is a callable object that represents the

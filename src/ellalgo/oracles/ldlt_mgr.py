@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import math
 from typing import Callable
+
 import numpy as np
 
 
@@ -22,6 +23,12 @@ class LDLTMgr:
     - A matrix A in R^{m x m} is positive definite
                          iff v' A v > 0 for all v in R^n.
     - O(p^3) per iteration, independent of N
+
+    Examples:
+        >>> A = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
+        >>> ldl = LDLTMgr(3)
+        >>> ldl.factorize(A)
+        True
     """
 
     __slots__ = ("pos", "v", "_ndim", "_Temp", "allow_semidefinite")
