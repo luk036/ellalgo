@@ -24,7 +24,7 @@
 
 A longer description of your project goes here...
 
-## Used In
+## Used by
 
 - [netoptim](https://github.com/luk036/netoptim)
 - [lmi-solver](https://github.com/luk036/lmi-solver)
