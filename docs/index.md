@@ -1,6 +1,7 @@
 # ellalgo
 
-Ellipsoid Method Python Code
+Add a short description here!
+
 
 ## Note
 
@@ -11,6 +12,7 @@ Ellipsoid Method Python Code
 >
 > Please check [Sphinx] and [MyST] for more information
 > about how to document your project and how to configure your preferences.
+
 
 ## Contents
 
@@ -27,9 +29,9 @@ Module Reference <api/modules>
 
 ## Indices and tables
 
-- {ref}`genindex`
-- {ref}`modindex`
-- {ref}`search`
+* {ref}`genindex`
+* {ref}`modindex`
+* {ref}`search`
 
 [Sphinx]: http://www.sphinx-doc.org/
 [Markdown]: https://daringfireball.net/projects/markdown/
