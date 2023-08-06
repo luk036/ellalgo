@@ -1,9 +1,7 @@
-from .ell_config import CutStatus
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, MutableSequence, Optional, Tuple, Union
 
-from abc import abstractmethod, ABC
-from typing import MutableSequence
-from typing import Optional, Tuple, Union
-from typing import TYPE_CHECKING
+from .ell_config import CutStatus
 
 if TYPE_CHECKING:
     import numpy as np

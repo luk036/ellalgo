@@ -24,7 +24,7 @@ class EllCalc:
     def __init__(self, n: int) -> None:
         """
         The function initializes several variables based on the input value.
-        
+
         :param n: The parameter `n` represents an integer value. It is used to initialize the `EllCalc`
         object
         :type n: int
@@ -58,7 +58,7 @@ class EllCalc:
         """
         The `calc_single_or_ll` function calculates either a single deep cut or a parallel cut based on
         the input parameters.
-        
+
         :param beta: The parameter `beta` can be of type `int`, `float`, or a list of two elements
         :param tsq: The `tsq` parameter is a floating-point number that represents the square of the
         tolerance for the ellipsoid algorithm. It is used in the calculations performed by the
@@ -82,7 +82,7 @@ class EllCalc:
         """
         The function `calc_single_or_ll_cc` calculates either a single central cut or a parallel cut
         based on the input parameters.
-        
+
         :param beta: The parameter `beta` is of type `_type_` and represents some value. The specific
         details of its purpose and usage are not provided in the code snippet
         :param tsq: tsq is a float value representing the squared t-value
@@ -106,7 +106,7 @@ class EllCalc:
     ) -> Tuple[CutStatus, float, float, float]:
         """
         The function `calc_ll` calculates the parallel deep cut based on the given parameters.
-        
+
         :param b0: The parameter `b0` represents a float value
         :type b0: float
         :param b1: The parameter `b1` represents a float value
@@ -168,7 +168,7 @@ class EllCalc:
         """
         The `calc_ll_core` function calculates various values based on the input parameters and returns
         them as a tuple.
-        
+
         :param b0: The parameter `b0` represents a float value
         :type b0: float
         :param b1: The parameter `b1` represents a float value
@@ -199,19 +199,19 @@ class EllCalc:
     #                    ╱   ⎛ 2    2⎞    2   ⎜     1⎟
     #             ξ =   ╱    ⎜τ  - β ⎟ ⋅ τ  + ⎜──────⎟
     #                 ╲╱     ⎝      1⎠        ⎝   2  ⎠
-    # 
+    #
     #                             ⎛ 2    ⎞
     #                   n     2 ⋅ ⎝τ  - ξ⎠
     #             σ = ───── + ────────────
     #                 n + 1              2
     #                         (n + 1) ⋅ β
     #                                    1
-    # 
+    #
     #                 σ ⋅ β
     #                      1
     #             ϱ = ──────
     #                    2
-    # 
+    #
     #                      ⎛      2    ⎞
     #                      ⎜     β     ⎟
     #                  2   ⎜ 2    1   ξ⎟
@@ -220,15 +220,15 @@ class EllCalc:
     #             δ = ──────────────────
     #                    ⎛ 2    ⎞    2
     #                    ⎝n  - 1⎠ ⋅ τ
-    # 
-    # 
+    #
+    #
     def calc_ll_cc(
         self, b1: float, tsq: float
     ) -> Tuple[CutStatus, float, float, float]:
         """
         The function `calc_ll_cc` calculates the parallel central cut for given values of `b1` and
         `tsq`.
-        
+
         :param b1: The parameter `b1` represents a float value. It is used in the calculation of the
         central cut
         :type b1: float
@@ -252,25 +252,25 @@ class EllCalc:
         return (CutStatus.Success, rho, sigma, delta)
 
     #             γ = τ + n ⋅ β
-    # 
+    #
     #                   γ
     #             ϱ = ─────
     #                 n + 1
-    # 
+    #
     #                 2 ⋅ ϱ
     #             σ = ─────
     #                 τ + β
-    # 
+    #
     #                  2   ⎛ 2    2⎞
     #                 n  ⋅ ⎝τ  - β ⎠
     #             δ = ──────────────
     #                  ⎛ 2    ⎞    2
     #                  ⎝n  - 1⎠ ⋅ τ
-    # 
+    #
     def calc_dc(self, beta: float, tsq: float) -> Tuple[CutStatus, float, float, float]:
         """
         The function calculates the deep cut based on the given beta and tsq values.
-        
+
         :param beta: The parameter `beta` represents a float value
         :type beta: float
         :param tsq: tsq is the square of the value of tau
@@ -290,28 +290,28 @@ class EllCalc:
         return self.calc_dc_core(beta, tau, gamma)
 
     #             γ = τ + n ⋅ β
-    # 
+    #
     #                   γ
     #             ϱ = ─────
     #                 n + 1
-    # 
+    #
     #                 2 ⋅ ϱ
     #             σ = ─────
     #                 τ + β
-    # 
+    #
     #                  2   ⎛ 2    2⎞
     #                 n  ⋅ ⎝τ  - β ⎠
     #             δ = ──────────────
     #                  ⎛ 2    ⎞    2
     #                  ⎝n  - 1⎠ ⋅ τ
-    # 
+    #
     def calc_dc_core(
         self, beta: float, tau: float, gamma: float
     ) -> Tuple[CutStatus, float, float, float]:
         """
         The `calc_dc_core` function calculates the values of `rho`, `sigma`, and `delta` based on the
         given `beta`, `tau`, and `gamma` parameters.
-        
+
         :param beta: The parameter `beta` represents a value used in the calculation. It is a float
         value
         :type beta: float
@@ -353,7 +353,7 @@ class EllCalc:
     def calc_cc(self, tsq: float) -> Tuple[CutStatus, float, float, float]:
         """
         The `calc_cc` function calculates the central cut values based on the given input.
-        
+
         :param tsq: tsq is a float representing the value of tau squared
         :type tsq: float
         :return: The function `calc_cc` returns a tuple containing the following elements:
@@ -375,7 +375,7 @@ class EllCalc:
         """
         The function `calc_single_or_ll_q` calculates the deep cut or parallel cut based on the input
         parameters `beta` and `tsq`.
-        
+
         :param beta: The parameter `beta` can be either a single value (int or float) or a list of two
         values
         :param tsq: tsq is a float value representing the square of the threshold value
@@ -400,7 +400,7 @@ class EllCalc:
         """Parallel deep cut (discrete)
 
         The function `calc_ll_q` calculates the parallel deep cut for a given set of parameters.
-        
+
         :param b0: The parameter `b0` represents a float value
         :type b0: float
         :param b1: The parameter `b1` represents a float value
@@ -429,7 +429,7 @@ class EllCalc:
         """Deep Cut (discrete)
 
         The function `calc_dc_q` calculates the deep cut for a given beta and tsq value.
-        
+
         :param beta: The parameter `beta` represents a float value
         :type beta: float
         :param tsq: tsq is the square of the threshold value. It is a float value that represents the

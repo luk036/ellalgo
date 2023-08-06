@@ -1,6 +1,7 @@
-from .ell_config import CutStatus
 from math import sqrt
 from typing import Tuple
+
+from .ell_config import CutStatus
 
 
 class EllCalc:

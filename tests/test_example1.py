@@ -4,8 +4,8 @@ from __future__ import print_function
 import numpy as np
 
 from ellalgo.cutting_plane import cutting_plane_optim
-from ellalgo.ell_typing import OracleOptim, OracleFeas
 from ellalgo.ell_stable import EllStable
+from ellalgo.ell_typing import OracleFeas, OracleOptim
 
 
 class MyOracle2(OracleFeas):

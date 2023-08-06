@@ -6,8 +6,7 @@ import math
 import numpy as np
 from pytest import approx
 
-from ellalgo.cutting_plane import cutting_plane_optim
-from ellalgo.cutting_plane import OracleOptim
+from ellalgo.cutting_plane import OracleOptim, cutting_plane_optim
 from ellalgo.ell_stable import EllStable
 
 

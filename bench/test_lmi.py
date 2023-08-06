@@ -5,10 +5,9 @@ from __future__ import print_function
 from typing import Optional, Tuple
 
 import numpy as np
-from ellalgo.cutting_plane import cutting_plane_optim
-from ellalgo.cutting_plane import OracleOptim
-from ellalgo.ell import Ell
 
+from ellalgo.cutting_plane import OracleOptim, cutting_plane_optim
+from ellalgo.ell import Ell
 from ellalgo.oracles.lmi_old_oracle import LMIOldOracle
 from ellalgo.oracles.lmi_oracle import LMIOracle
 

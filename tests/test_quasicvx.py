@@ -7,8 +7,8 @@ import numpy as np
 from pytest import approx
 
 from ellalgo.cutting_plane import cutting_plane_optim
-from ellalgo.ell_typing import OracleOptim
 from ellalgo.ell import Ell
+from ellalgo.ell_typing import OracleOptim
 
 
 class MyQuasicvxOracle(OracleOptim):

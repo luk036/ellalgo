@@ -1,6 +1,8 @@
 from typing import Optional, Tuple
-from ellalgo.cutting_plane import OracleFeas
+
 import numpy as np
+
+from ellalgo.cutting_plane import OracleFeas
 from ellalgo.oracles.ldlt_mgr import LDLTMgr
 
 Cut = Tuple[np.ndarray, float]

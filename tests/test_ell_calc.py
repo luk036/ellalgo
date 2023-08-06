@@ -1,7 +1,7 @@
 from pytest import approx
 
-from ellalgo.ell_config import CutStatus
 from ellalgo.ell_calc import EllCalc
+from ellalgo.ell_config import CutStatus
 
 
 def test_construct():

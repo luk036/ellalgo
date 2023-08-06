@@ -1,9 +1,10 @@
+import copy
+import math
 from typing import Optional, Tuple
-from ellalgo.cutting_plane import OracleOptim, OracleOptimQ
 
 import numpy as np
-import math
-import copy
+
+from ellalgo.cutting_plane import OracleOptim, OracleOptimQ
 
 Arr = np.ndarray
 Cut = Tuple[Arr, float]

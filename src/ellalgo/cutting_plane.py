@@ -1,20 +1,20 @@
-from .ell_config import CutStatus, Options
 import copy
-
 from abc import ABC
-from typing import MutableSequence
-from typing import Optional, Tuple, Union, Any
+from typing import Any, MutableSequence, Optional, Tuple, Union
+
+from .ell_config import CutStatus, Options
 from .ell_typing import (
     ArrayType,
+    OracleBS,
     OracleFeas,
     OracleFeas2,
-    OracleOptim,
     OracleFeasQ,
+    OracleOptim,
     OracleOptimQ,
-    OracleBS,
+    SearchSpace,
+    SearchSpace2,
+    SearchSpaceQ,
 )
-from .ell_typing import SearchSpace, SearchSpaceQ, SearchSpace2
-
 
 CutChoice = Union[float, MutableSequence]  # single or parallel
 Cut = Tuple[ArrayType, CutChoice]
