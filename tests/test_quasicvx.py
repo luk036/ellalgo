@@ -12,12 +12,12 @@ from ellalgo.ell_typing import OracleOptim
 
 
 class MyQuasicvxOracle(OracleOptim):
-    def assess_optim(self, z, tea: float):
+    def assess_optim(self, z, target: float):
         """[summary]
 
         Arguments:
             z ([type]): [description]
-            tea (float): the best-so-far optimal value
+            target (float): the best-so-far optimal value
 
         Returns:
             [type]: [description]
@@ -34,11 +34,11 @@ class MyQuasicvxOracle(OracleOptim):
 
         # objective: minimize -sqrt(x) / y
         tmp2 = math.exp(ly)
-        tmp3 = tea * tmp2
+        tmp3 = target * tmp2
         if (fj := -sqrtx + tmp3) >= 0.0:  # feasible
             return (np.array([-1.0, tmp3]), fj), None
-        tea = sqrtx / tmp2
-        return (np.array([-1.0, sqrtx]), 0), tea
+        target = sqrtx / tmp2
+        return (np.array([-1.0, sqrtx]), 0), target
 
 
 def test_case_feasible():

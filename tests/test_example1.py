@@ -30,12 +30,12 @@ class MyOracle2(OracleFeas):
 
 
 class MyOracle(OracleOptim):
-    def assess_optim(self, z, tea: float):
+    def assess_optim(self, z, target: float):
         """[summary]
 
         Arguments:
             z ([type]): [description]
-            tea (float): the best-so-far optimal value
+            target (float): the best-so-far optimal value
 
         Returns:
             [type]: [description]
@@ -46,10 +46,10 @@ class MyOracle(OracleOptim):
         x, y = z
         # objective: maximize x + y
         f0 = x + y
-        if (fj := tea - f0) < 0.0:
+        if (fj := target - f0) < 0.0:
             fj = 0.0
-            tea = f0
-            return (-1.0 * np.array([1.0, 1.0]), fj), tea
+            target = f0
+            return (-1.0 * np.array([1.0, 1.0]), fj), target
         return (-1.0 * np.array([1.0, 1.0]), fj), None
 
 

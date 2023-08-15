@@ -1,4 +1,4 @@
-from typing import Callable, Tuple, Union
+from typing import Callable, Tuple, Union, TypeVar
 
 import numpy as np
 
@@ -7,7 +7,7 @@ from .ell_config import CutStatus
 from .ell_typing import SearchSpace, SearchSpaceQ
 
 Mat = np.ndarray
-ArrayType = np.ndarray
+ArrayType = TypeVar("ArrayType", bound=np.ndarray)
 CutChoice = Union[float, ArrayType]  # single or parallel
 Cut = Tuple[ArrayType, CutChoice]
 

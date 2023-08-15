@@ -41,12 +41,12 @@ class MyOracle(OracleOptim):
         self.lmi1 = oracle(F1, B1)
         self.lmi2 = oracle(F2, B2)
 
-    def assess_optim(self, xc: np.ndarray, tea: float) -> Tuple[Cut, Optional[float]]:
+    def assess_optim(self, xc: np.ndarray, target: float) -> Tuple[Cut, Optional[float]]:
         """[summary]
 
         Arguments:
             xc (np.ndarray): [description]
-            tea (float): the best-so-far optimal value
+            target (float): the best-so-far optimal value
 
         Returns:
             Tuple[Cut, float]: [description]
@@ -58,7 +58,7 @@ class MyOracle(OracleOptim):
             return cut, None
 
         f0 = self.c.dot(xc)
-        if (fj := f0 - tea) > 0.0:
+        if (fj := f0 - target) > 0.0:
             return (self.c, fj), None
         return (self.c, 0.0), f0
 
