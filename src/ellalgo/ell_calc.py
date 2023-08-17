@@ -113,29 +113,29 @@ class EllCalc:
     #            -τ                0    β0    β1    +τ
     #             ⎝                    ╱     ╱      ⎠
     def calc_ll(
-        self, b0: float, b1: float, tsq: float
+        self, beta0: float, beta1: float, tsq: float
     ) -> Tuple[CutStatus, float, float, float]:
         """parallel deep cut
 
         The function `calc_ll` calculates the parallel deep cut based on the given parameters.
 
-        :param b0: The parameter `b0` represents a float value
-        :type b0: float
-        :param b1: The parameter `b1` represents a float value
-        :type b1: float
+        :param beta0: The parameter `beta0` represents a float value
+        :type beta0: float
+        :param beta1: The parameter `beta1` represents a float value
+        :type beta1: float
         :param tsq: tsq is a float representing the value of tsq
         :type tsq: float
         :return: The function `calc_ll` returns a tuple of type `Tuple[CutStatus, float, float, float]`.
         """
-        if b1 < b0:
+        if beta1 < beta0:
             return (CutStatus.NoSoln, 0.0, 0.0, 0.0)  # no sol'n
-        # if b0 == 0.0:
-        #     return self.calc_ll_cc(b1)
-        b1sq = b1 * b1
-        if b1 > 0.0 and tsq < b1sq:
-            return self.calc_dc(b0, tsq)
-        b0b1 = b0 * b1
-        return self.calc_ll_core(b0, b1, b1sq, b0b1, tsq)
+        # if beta0 == 0.0:
+        #     return self.calc_ll_cc(beta1)
+        b1sq = beta1 * beta1
+        if beta1 > 0.0 and tsq < b1sq:
+            return self.calc_dc(beta0, tsq)
+        b0b1 = beta0 * beta1
+        return self.calc_ll_core(beta0, beta1, b1sq, b0b1, tsq)
 
     #                  2    2
     #            ζ  = τ  - β
@@ -174,33 +174,33 @@ class EllCalc:
     #                   ⎝n  - 1⎠ ⋅ τ
     #
     def calc_ll_core(
-        self, b0: float, b1: float, b1sq: float, b0b1: float, tsq
+        self, beta0: float, beta1: float, b1sq: float, b0b1: float, tsq
     ) -> Tuple[CutStatus, float, float, float]:
         """Parallel deep cut core
 
         The `calc_ll_core` function calculates various values based on the input parameters and returns
         them as a tuple.
 
-        :param b0: The parameter `b0` represents a float value
-        :type b0: float
-        :param b1: The parameter `b1` represents a float value
-        :type b1: float
-        :param b1sq: b1sq is the square of the value of b1
+        :param beta0: The parameter `beta0` represents a float value
+        :type beta0: float
+        :param beta1: The parameter `beta1` represents a float value
+        :type beta1: float
+        :param b1sq: b1sq is the square of the value of beta1
         :type b1sq: float
-        :param b0b1: The parameter `b0b1` represents the product of `b0` and `b1`
+        :param b0b1: The parameter `b0b1` represents the product of `beta0` and `beta1`
         :type b0b1: float
         :param tsq: tsq is a float representing the square of the value t
         :return: a tuple with four elements. The first element is of type `CutStatus`, the second
         element is of type `float`, the third element is of type `float`, and the fourth element is of
         type `float`.
         """
-        b0sq = b0 * b0
+        b0sq = beta0 * beta0
         t0 = tsq - b0sq
         t1 = tsq - b1sq
         xi = sqrt(t0 * t1 + (self._half_n * (b1sq - b0sq)) ** 2)
         bsumsq = b0sq + 2.0 * b0b1 + b1sq
         sigma = self._cst3 + self._cst2 * (tsq + b0b1 - xi) / bsumsq
-        rho = sigma * (b0 + b1) / 2.0
+        rho = sigma * (beta0 + beta1) / 2.0
         delta = self._cst1 * ((t0 + t1) / 2.0 + xi / self._n_f) / tsq
         return (CutStatus.Success, rho, sigma, delta)
 
@@ -234,16 +234,16 @@ class EllCalc:
     #                    ⎝n  - 1⎠ ⋅ τ
     #
     def calc_ll_cc(
-        self, b1: float, tsq: float
+        self, beta1: float, tsq: float
     ) -> Tuple[CutStatus, float, float, float]:
         """Parallel central cut
 
-        The function `calc_ll_cc` calculates the parallel central cut for given values of `b1` and
+        The function `calc_ll_cc` calculates the parallel central cut for given values of `beta1` and
         `tsq`.
 
-        :param b1: The parameter `b1` represents a float value. It is used in the calculation of the
+        :param beta1: The parameter `beta1` represents a float value. It is used in the calculation of the
         central cut
-        :type b1: float
+        :type beta1: float
         :param tsq: The parameter `tsq` represents the square of a value
         :type tsq: float
         :return: The function `calc_ll_cc` returns a tuple of four values: `CutStatus`, `float`,
@@ -257,16 +257,16 @@ class EllCalc:
             >>> calc.calc_ll_cc(-1.0, 0.01)
             (<CutStatus.NoSoln: 1>, 0.0, 0.0, 0.0)
         """
-        if b1 < 0.0:
+        if beta1 < 0.0:
             return (CutStatus.NoSoln, 0.0, 0.0, 0.0)  # no sol'n
-        b1sq = b1 * b1
+        b1sq = beta1 * beta1
         if tsq < b1sq or not self.use_parallel_cut:
             return self.calc_cc(tsq)
         # Core calculation
         a1sq = b1sq / tsq
         xi = sqrt(1.0 - a1sq + (self._half_n * a1sq) ** 2)
         sigma = self._cst3 + self._cst2 * (1.0 - xi) / a1sq
-        rho = sigma * b1 / 2.0
+        rho = sigma * beta1 / 2.0
         # temp = 1.0 - a1sq / 2 + xi / self._n_f
         delta = self._cst1 * (1.0 - a1sq / 2.0 + xi / self._n_f)
         return (CutStatus.Success, rho, sigma, delta)
@@ -425,33 +425,33 @@ class EllCalc:
     #             ⎝                    ╱     ╱      ⎠
     #
     def calc_ll_q(
-        self, b0: float, b1: float, tsq: float
+        self, beta0: float, beta1: float, tsq: float
     ) -> Tuple[CutStatus, float, float, float]:
         """Parallel deep cut (discrete)
 
         The function `calc_ll_q` calculates the parallel deep cut for a given set of parameters.
 
-        :param b0: The parameter `b0` represents a float value
-        :type b0: float
-        :param b1: The parameter `b1` represents a float value
-        :type b1: float
+        :param beta0: The parameter `beta0` represents a float value
+        :type beta0: float
+        :param beta1: The parameter `beta1` represents a float value
+        :type beta1: float
         :param tsq: tsq is a float value that represents the square of a variable
         :type tsq: float
         :return: The function `calc_ll_q` returns a tuple of type `Tuple[CutStatus, float, float,
         float]`.
         """
-        if b1 < b0:
+        if beta1 < beta0:
             return (CutStatus.NoSoln, 0.0, 0.0, 0.0)  # no sol'n
-        # if b0 == 0.0:
-        #     return self.calc_ll_cc(b1)
-        b1sq = b1 * b1
-        if b1 > 0.0 and tsq < b1sq:
-            return self.calc_dc_q(b0, tsq)
-        b0b1 = b0 * b1
+        # if beta0 == 0.0:
+        #     return self.calc_ll_cc(beta1)
+        b1sq = beta1 * beta1
+        if beta1 > 0.0 and tsq < b1sq:
+            return self.calc_dc_q(beta0, tsq)
+        b0b1 = beta0 * beta1
         if self._n_f * b0b1 < -tsq:  # for discrete optimization
             return (CutStatus.NoEffect, 0.0, 0.0, 0.0)  # no effect
-        # TODO: check b0 + b1 == 0
-        return self.calc_ll_core(b0, b1, b1sq, b0b1, tsq)
+        # TODO: check beta0 + beta1 == 0
+        return self.calc_ll_core(beta0, beta1, b1sq, b0b1, tsq)
 
     def calc_dc_q(
         self, beta: float, tsq: float
