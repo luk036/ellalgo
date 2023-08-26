@@ -108,7 +108,7 @@ class OracleBS(ABC):
 
 class SearchSpace(ABC):
     @abstractmethod
-    def update_dc(self, cut: Cut) -> CutStatus:
+    def update_deep_cut(self, cut: Cut) -> CutStatus:
         """update of deep-cut
 
         Args:
@@ -120,7 +120,7 @@ class SearchSpace(ABC):
         pass
 
     @abstractmethod
-    def update_cc(self, cut: Cut) -> CutStatus:
+    def update_central_cut(self, cut: Cut) -> CutStatus:
         """update of central cut
 
         Args:

@@ -1,6 +1,7 @@
 from enum import Enum
 
 
+# The above class defines an enumeration for different cut statuses.
 class CutStatus(Enum):
     Success = 0
     NoSoln = 1
@@ -8,6 +9,8 @@ class CutStatus(Enum):
     Unknown = 3
 
 
+# The class "Options" defines two attributes, "max_iters" and "tol", with default values of 2000 and
+# 1e-8 respectively.
 class Options:
     max_iters: int = 2000  # maximum number of iterations
     tol: float = 1e-8  # error tolerance

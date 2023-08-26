@@ -70,25 +70,25 @@ class EllStable(SearchSpace, SearchSpaceQ):
         """
         return self._tsq
 
-    def update_dc(self, cut) -> CutStatus:
+    def update_deep_cut(self, cut) -> CutStatus:
         """
-        The function `update_dc` is an implementation of the `SearchSpace` interface that updates the
+        The function `update_deep_cut` is an implementation of the `SearchSpace` interface that updates the
         cut status based on a given cut.
 
         :param cut: The `cut` parameter is of type `_type_` and it represents some kind of cut
         :return: a `CutStatus` object.
         """
-        return self._update_core(cut, self._helper.calc_single_or_ll)
+        return self._update_core(cut, self._helper.calc_single_or_parallel)
 
-    def update_cc(self, cut) -> CutStatus:
+    def update_central_cut(self, cut) -> CutStatus:
         """
-        The function `update_cc` is an implementation of the `SearchSpace` interface that updates the
+        The function `update_central_cut` is an implementation of the `SearchSpace` interface that updates the
         cut status based on a given cut.
 
         :param cut: The `cut` parameter is of type `_type_` and it represents a cut
         :return: a `CutStatus` object.
         """
-        return self._update_core(cut, self._helper.calc_single_or_ll_cc)
+        return self._update_core(cut, self._helper.calc_single_or_parallel_central_cut)
 
     def update_q(self, cut) -> CutStatus:
         """
@@ -99,7 +99,7 @@ class EllStable(SearchSpace, SearchSpaceQ):
         updated
         :return: a `CutStatus` object.
         """
-        return self._update_core(cut, self._helper.calc_single_or_ll_q)
+        return self._update_core(cut, self._helper.calc_single_or_parallel_q)
 
     # private:
 
@@ -121,13 +121,13 @@ class EllStable(SearchSpace, SearchSpaceQ):
         Examples:
             >>> ell = EllStable(1.0, [1.0, 1.0, 1.0, 1.0])
             >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 1.0)
-            >>> status = ell._update_core(cut, ell._helper.calc_single_or_ll)
+            >>> status = ell._update_core(cut, ell._helper.calc_single_or_parallel)
             >>> print(status)
             CutStatus.Success
 
             >>> ell = EllStable(1.0, [1.0, 1.0, 1.0, 1.0])
             >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 1.0)
-            >>> status = ell._update_core(cut, ell._helper.calc_single_or_ll_cc)
+            >>> status = ell._update_core(cut, ell._helper.calc_single_or_parallel_central_cut)
             >>> print(status)
             CutStatus.Success
         """
@@ -157,9 +157,9 @@ class EllStable(SearchSpace, SearchSpaceQ):
         status, rho, sigma, delta = cut_strategy(beta, self._tsq)
 
         # if central_cut:
-        #     status = self._helper.calc_single_or_ll_cc(beta)
+        #     status = self._helper.calc_single_or_parallel_central_cut(beta)
         # else:
-        #     status = self._helper.calc_single_or_ll(beta)
+        #     status = self._helper.calc_single_or_parallel(beta)
 
         if status != CutStatus.Success:
             return status
