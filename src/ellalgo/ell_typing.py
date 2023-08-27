@@ -20,13 +20,12 @@ Num = Union[float, int]
 class OracleFeas(ABC):
     @abstractmethod
     def assess_feas(self, xc: ArrayType) -> Optional[Cut]:
-        """assessment of feasibility
-
-        Args:
-            xc (ArrayType): _description_
-
-        Returns:
-            Optional[Cut]: _description_
+        """
+        The `assess_feas` function assesses the feasibility of a given input and returns a cut if it is
+        not feasible.
+        
+        :param xc: An array of type ArrayType
+        :type xc: ArrayType
         """
         pass
 
@@ -34,10 +33,11 @@ class OracleFeas(ABC):
 class OracleFeas2(OracleFeas):
     @abstractmethod
     def update(self, target) -> None:
-        """update t
-
-        Args:
-            target (Any): _description_
+        """
+        The `update` function updates a target object.
+        
+        :param target: The `target` parameter is of type `Any`, which means it can accept any type of value.
+        It is used as an argument to update the target object
         """
         pass
 
@@ -45,14 +45,16 @@ class OracleFeas2(OracleFeas):
 class OracleOptim(ABC):
     @abstractmethod
     def assess_optim(self, xc: ArrayType, target) -> Tuple[Cut, Optional[float]]:
-        """assessment of optimization
-
-        Args:
-            xc (ArrayType): _description_
-            target (Any): _description_
-
-        Returns:
-            Tuple[Cut, Optional[float]]: _description_
+        """
+        The `assess_optim` function assesses the feasibility based on the given `xc` and `target`
+        parameters.
+        
+        :param xc: An array of values that represents the current solution or point in the optimization
+        process
+        :type xc: ArrayType
+        :param target: The `target` parameter is the value that we are trying to optimize or minimize. It
+        could be a numerical value, a function, or any other type of object that represents the optimization
+        goal
         """
         pass
 
@@ -64,12 +66,14 @@ class OracleFeasQ(ABC):
     ) -> Tuple[Optional[Cut], Optional[ArrayType], bool]:
         """assessment of feasibility (discrete)
 
-        Args:
-            xc (ArrayType): _description_
-            retry (bool): _description_
-
-        Returns:
-            Tuple[Optional[Cut], Optional[ArrayType], bool]: _description_
+        The function assess_feas_q assesses the feasibility of a given input and returns a tuple containing
+        a cut, an array, and a boolean value.
+        
+        :param xc: An array of some type. It represents a variable or a set of variables that need to be
+        assessed for feasibility
+        :type xc: ArrayType
+        :param retry: A boolean flag indicating whether to retry the assessment if it fails initially
+        :type retry: bool
         """
         pass
 
@@ -81,13 +85,17 @@ class OracleOptimQ(ABC):
     ) -> Tuple[Cut, ArrayType, Optional[float], bool]:
         """assessment of optimization (discrete)
 
-        Args:
-            xc (ArrayType): _description_
-            target (Any): _description_
-            retry (bool): _description_
-
-        Returns:
-            Tuple[Cut, ArrayType, Optional[float], bool]: _description_
+        The function `assess_optim_q` assesses the feasibility of a design variable and returns a tuple
+        containing a cut, an array, an optional float, and a boolean value.
+        
+        :param xc: An array or list representing the current solution or configuration being assessed for
+        optimization
+        :type xc: ArrayType
+        :param target: The `target` parameter is the desired value or condition that the optimization
+        algorithm is trying to achieve. It could be a specific value, a range of values, or a certain
+        condition that needs to be satisfied
+        :param retry: A boolean flag indicating whether to retry the optimization if it fails
+        :type retry: bool
         """
         pass
 
@@ -95,17 +103,17 @@ class OracleOptimQ(ABC):
 class OracleBS(ABC):
     @abstractmethod
     def assess_bs(self, target) -> bool:
-        """assessment of the binary search
-
-        Args:
-            target (Any): _description_
-
-        Returns:
-            bool: _description_
+        """
+        The `assess_bs` function is a binary search assessment function that takes a target value as input
+        and returns a boolean value.
+        
+        :param target: The target parameter is the value that we are searching for in the binary search
         """
         pass
 
 
+# The `SearchSpace` class is an abstract base class that defines methods for updating deep-cut and
+# central cut, as well as accessing the xc and tsq attributes.
 class SearchSpace(ABC):
     @abstractmethod
     def update_deep_cut(self, cut: Cut) -> CutStatus:

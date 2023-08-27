@@ -77,6 +77,13 @@ class EllStable(SearchSpace, SearchSpaceQ):
 
         :param cut: The `cut` parameter is of type `_type_` and it represents some kind of cut
         :return: a `CutStatus` object.
+
+        Examples:
+            >>> ell = EllStable(1.0, [1.0, 1.0, 1.0, 1.0])
+            >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 1.0)
+            >>> status = ell.update_deep_cut(cut)
+            >>> print(status)
+            CutStatus.Success
         """
         return self._update_core(cut, self._helper.calc_single_or_parallel)
 
@@ -87,6 +94,13 @@ class EllStable(SearchSpace, SearchSpaceQ):
 
         :param cut: The `cut` parameter is of type `_type_` and it represents a cut
         :return: a `CutStatus` object.
+
+        Examples:
+            >>> ell = EllStable(1.0, [1.0, 1.0, 1.0, 1.0])
+            >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 0.0)
+            >>> status = ell.update_central_cut(cut)
+            >>> print(status)
+            CutStatus.Success
         """
         return self._update_core(cut, self._helper.calc_single_or_parallel_central_cut)
 
@@ -98,6 +112,13 @@ class EllStable(SearchSpace, SearchSpaceQ):
         :param cut: The `cut` parameter is of type `_type_` and it represents the cut that needs to be
         updated
         :return: a `CutStatus` object.
+
+        Examples:
+            >>> ell = EllStable(1.0, [1.0, 1.0, 1.0, 1.0])
+            >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), -0.01)
+            >>> status = ell.update_q(cut)
+            >>> print(status)
+            CutStatus.Success
         """
         return self._update_core(cut, self._helper.calc_single_or_parallel_q)
 
@@ -126,7 +147,7 @@ class EllStable(SearchSpace, SearchSpaceQ):
             CutStatus.Success
 
             >>> ell = EllStable(1.0, [1.0, 1.0, 1.0, 1.0])
-            >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 1.0)
+            >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 0.0)
             >>> status = ell._update_core(cut, ell._helper.calc_single_or_parallel_central_cut)
             >>> print(status)
             CutStatus.Success
