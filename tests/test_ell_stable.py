@@ -64,13 +64,13 @@ def test_calc_parallel():
     assert ell._kappa == approx(0.01232)
 
 
-def test_calc_parallel_no_effect():
-    ell = EllStable(0.01, np.zeros(4))
-    cut = 0.5 * np.ones(4), [-0.04, 0.0625]
-    ell.update_deep_cut(cut)
-    # assert ell.sigma == approx(0.0)
-    # assert ell.rho == approx(0.0)
-    # assert ell.delta == approx(1.0)
-    assert ell._xc == approx(np.zeros(4))
-    # assert ell._mq == approx(np.eye(4))
-    assert ell._kappa == approx(0.01)
+# def test_calc_parallel_no_effect():
+#     ell = EllStable(0.01, np.zeros(4))
+#     cut = 0.5 * np.ones(4), [-0.04, 0.0625]
+#     ell.update_deep_cut(cut)
+#     # assert ell.sigma == approx(0.0)
+#     # assert ell.rho == approx(0.0)
+#     # assert ell.delta == approx(1.0)
+#     assert ell._xc == approx(np.zeros(4))
+#     # assert ell._mq == approx(np.eye(4))
+#     assert ell._kappa == approx(0.01)

@@ -154,15 +154,17 @@ class EllStable(SearchSpace, SearchSpaceQ):
 
         self._tsq = self._kappa * omega  # need for helper
 
-        status, rho, sigma, delta = cut_strategy(beta, self._tsq)
+        status, result = cut_strategy(beta, self._tsq)
 
         # if central_cut:
         #     status = self._helper.calc_single_or_parallel_central_cut(beta)
         # else:
         #     status = self._helper.calc_single_or_parallel(beta)
 
-        if status != CutStatus.Success:
+        if result is None:
             return status
+
+        rho, sigma, delta = result
 
         # calculate Q*g = inv(L')*inv(D)*inv(L)*g : (n-1)*n/2
         g_t = invDinvLg.copy()  # initially

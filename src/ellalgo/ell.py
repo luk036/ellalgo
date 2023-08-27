@@ -131,11 +131,11 @@ class Ell(SearchSpace, SearchSpaceQ):
         omega = grad.dot(grad_t)  # n multiplications
         self._tsq = self._kappa * omega
 
-        status, rho, sigma, delta = cut_strategy(beta, self._tsq)
-
-        if status != CutStatus.Success:
+        status, result = cut_strategy(beta, self._tsq)
+        if result is None:
             return status
 
+        rho, sigma, delta = result
         self._xc -= (rho / omega) * grad_t
         self._mq -= (sigma / omega) * np.outer(grad_t, grad_t)
         self._kappa *= delta
