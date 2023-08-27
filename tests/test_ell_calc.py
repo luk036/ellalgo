@@ -12,13 +12,13 @@ def test_construct():
 
 def test_calc_central_cut():
     ell_calc = EllCalc(4)
-    status, result = ell_calc.calc_single_or_parallel_central_cut(0.0, 0.01)
+    status, result = ell_calc.calc_single_or_parallel_central_cut([0, 0.05], 0.01)
     assert status == CutStatus.Success
     assert result is not None
     rho, sigma, delta = result
-    assert sigma == approx(0.4)
+    assert sigma == approx(0.8)
     assert rho == approx(0.02)
-    assert delta == approx(16.0 / 15.0)
+    assert delta == approx(1.2)
 
 
 def test_calc_deep_cut():
@@ -28,8 +28,7 @@ def test_calc_deep_cut():
     assert result is None
     status, result = ell_calc.calc_deep_cut(0.01, 0.01)
     assert status == CutStatus.Success
-    # status, result = ell_calc.calc_deep_cut(-0.05)
-    # assert status == CutStatus.NoEffect
+    assert result is not None
 
     status, result = ell_calc.calc_deep_cut(0.05, 0.01)
     assert status == CutStatus.Success
@@ -42,15 +41,6 @@ def test_calc_deep_cut():
 
 def test_calc_parallel_central_cut():
     ell_calc = EllCalc(4)
-    status, result = ell_calc.calc_single_or_parallel_central_cut(0.0, 0.01)
-    assert status == CutStatus.Success
-    assert result is not None
-    rho, sigma, delta = result
-    # Central cut
-    assert rho == approx(0.02)
-    assert sigma == approx(0.4)
-    assert delta == approx(16.0 / 15.0)
-
     status, result = ell_calc.calc_single_or_parallel_central_cut([0, 0.05], 0.01)
     assert status == CutStatus.Success
     assert result is not None

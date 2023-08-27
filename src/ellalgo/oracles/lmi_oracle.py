@@ -19,24 +19,25 @@ class LMIOracle(OracleFeas):
     """
 
     def __init__(self, F, B):
-        """Construct a new lmi oracle object
-
-        Arguments:
-            F (List[np.ndarray]): [description]
-            B (np.ndarray): [description]
+        """
+        The function initializes a new lmi oracle object with given arguments.
+        
+        :param F: A list of numpy arrays. It is not clear what these arrays represent without further
+        context
+        :param B: B is a numpy array
         """
         self.F = F
         self.F0 = B
         self.Q = LDLTMgr(len(B))
 
     def assess_feas(self, x: np.ndarray) -> Optional[Cut]:
-        """[summary]
-
-        Arguments:
-            x (np.ndarray): [description]
-
-        Returns:
-            Optional[Cut]: [description]
+        """
+        The `assess_feas` function assesses the feasibility of a given input and returns a cut if it is not
+        feasible.
+        
+        :param x: An input array of type `np.ndarray`
+        :type x: np.ndarray
+        :return: The function `assess_feas` returns an optional `Cut` object.
         """
 
         def get_elem(i, j):

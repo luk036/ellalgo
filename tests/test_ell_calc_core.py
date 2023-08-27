@@ -36,11 +36,20 @@ def test_calc_parallel_central_cut():
     assert rho == approx(0.4)
     assert sigma == approx(0.8)
     assert delta == approx(1.2)
+    rho, sigma, delta = ell_calc_core.calc_parallel_central_cut_old(1.0, 4.0)
+    assert rho == approx(0.4)
+    assert sigma == approx(0.8)
+    assert delta == approx(1.2)
 
 
 def test_calc_parallel():
     ell_calc_core = EllCalcCore(4)
     rho, sigma, delta = ell_calc_core.calc_parallel_deep_cut(0.0, 0.05, 0.01)
+    assert sigma == approx(0.8)
+    assert rho == approx(0.02)
+    assert delta == approx(1.2)
+
+    rho, sigma, delta = ell_calc_core.calc_parallel_deep_cut_old(0.0, 0.05, 0.01)
     assert sigma == approx(0.8)
     assert rho == approx(0.02)
     assert delta == approx(1.2)
