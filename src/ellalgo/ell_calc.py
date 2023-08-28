@@ -112,7 +112,6 @@ class EllCalc:
         b1sq = beta1 * beta1
         if beta1 > 0.0 and tsq <= b1sq:
             return self.calc_deep_cut(beta0, tsq)
-        b0b1 = beta0 * beta1
         return (
             CutStatus.Success,
             self._helper.calc_parallel_deep_cut(beta0, beta1, tsq),
@@ -195,8 +194,6 @@ class EllCalc:
         """
         if beta1 < beta0:
             return (CutStatus.NoSoln, None)  # no sol'n
-        # if beta0 == 0.0:
-        #     return self.calc_parallel_central_cut(beta1)
         b1sq = beta1 * beta1
         if beta1 > 0.0 and tsq <= b1sq:
             return self.calc_deep_cut_q(beta0, tsq)

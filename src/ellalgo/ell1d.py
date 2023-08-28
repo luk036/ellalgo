@@ -1,6 +1,5 @@
 from typing import Tuple
 
-# from .cutting_plane import SearchSpace
 from .ell_config import CutStatus
 
 

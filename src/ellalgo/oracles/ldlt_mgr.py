@@ -18,11 +18,11 @@ class LDLTMgr:
 
     - LDL^T square-root-free version
     - Option allow semidefinite
-    - Cholesky–Banachiewicz style, row-based
+    - Cholesky-Banachiewicz style, row-based
     - Lazy evaluation
     - A matrix A in R^{m x m} is positive definite
                          iff v' A v > 0 for all v in R^n.
-    - O(p^3) per iteration, independent of N
+    - O(p^3) per iteration, independent of ndim
 
     Examples:
         >>> A = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
@@ -31,24 +31,24 @@ class LDLTMgr:
         True
     """
 
-    __slots__ = ("pos", "v", "_ndim", "_Temp", "allow_semidefinite")
+    __slots__ = ("pos", "v", "_ndim", "_storage", "allow_semidefinite")
 
-    def __init__(self, N: int):
+    def __init__(self, ndim: int):
         """
         The above function is the constructor for a LDLT Ext object, which initializes various attributes
         and pre-allocates storage.
 
-        :param N: The parameter N represents the dimension of the object. It is an integer value that
+        :param ndim: The parameter ndim represents the dimension of the object. It is an integer value that
         determines the size of the object being constructed
-        :type N: int
+        :type ndim: int
         """
         self.pos = (0, 0)
-        self.v: np.ndarray = np.zeros(N)
+        self.v: np.ndarray = np.zeros(ndim)
 
-        self._ndim: int = N
-        self._Temp: np.ndarray = np.zeros((N, N))  # pre-allocate storage
+        self._ndim: int = ndim
+        self._storage: np.ndarray = np.zeros((ndim, ndim))  # pre-allocate storage
 
-    def factorize(self, A: np.ndarray) -> bool:
+    def factorize(self, mat: np.ndarray) -> bool:
         """
         The function factorize performs LDLT Factorization on a symmetric matrix A and returns a boolean
         value indicating whether the factorization was successful.
@@ -63,12 +63,12 @@ class LDLTMgr:
         :return: the result of calling the `factor` method with a lambda function as an argument.
 
         Examples:
-            >>> A = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
+            >>> mat = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
             >>> ldl = LDLTMgr(3)
-            >>> ldl.factorize(A)
+            >>> ldl.factorize(mat)
             True
         """
-        return self.factor(lambda i, j: A[i, j])
+        return self.factor(lambda i, j: mat[i, j])
 
     def factor(self, get_elem: Callable[[int, int], float]) -> bool:
         """
@@ -82,24 +82,23 @@ class LDLTMgr:
         positive definite (SPD).
 
         Examples:
-            >>> A = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
+            >>> mat = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
             >>> ldl = LDLTMgr(3)
-            >>> ldl.factor(lambda i, j: A[i, j])
+            >>> ldl.factor(lambda i, j: mat[i, j])
             True
 
         """
         start = 0  # range start
         self.pos = (0, 0)
         for i in range(self._ndim):
-            # j = start
-            d = get_elem(i, start)
+            diag = get_elem(i, start)
             for j in range(start, i):
-                self._Temp[j, i] = d  # keep it for later use
-                self._Temp[i, j] = d / self._Temp[j, j]  # the L[i, j]
-                s = j + 1
-                d = get_elem(i, s) - self._Temp[i, start:s].dot(self._Temp[start:s, s])
-            self._Temp[i, i] = d
-            if d <= 0.0:
+                self._storage[j, i] = diag  # keep it for later use
+                self._storage[i, j] = diag / self._storage[j, j]  # the L[i, j]
+                stop = j + 1
+                diag = get_elem(i, stop) - self._storage[i, start:stop].dot(self._storage[start:stop, stop])
+            self._storage[i, i] = diag
+            if diag <= 0.0:
                 self.pos = start, i + 1
                 break
         return self.is_spd()
@@ -113,33 +112,32 @@ class LDLTMgr:
 
         :param get_elem: The `get_elem` parameter is a callable function that takes two integer arguments
         `i` and `j` and returns a float value. This function is used to access the elements of a symmetric
-        matrix `A`. The `factor_with_allow_semidefinite` method performs LDLT Factorization on
+        matrix `mat`. The `factor_with_allow_semidefinite` method performs LDLT Factorization on
         :type get_elem: Callable[[int, int], float]
         :return: The function `factor_with_allow_semidefinite` returns a boolean value indicating whether
         the matrix is symmetric positive definite (SPD).
 
         Examples:
-            >>> A = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
+            >>> mat = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
             >>> ldl = LDLTMgr(3)
-            >>> ldl.factor_with_allow_semidefinite(lambda i, j: A[i, j])
+            >>> ldl.factor_with_allow_semidefinite(lambda i, j: mat[i, j])
             True
 
         """
         start = 0  # range start
         self.pos = (0, 0)
         for i in range(self._ndim):
-            # j = start
-            d = get_elem(i, start)
+            diag = get_elem(i, start)
             for j in range(start, i):
-                self._Temp[j, i] = d  # keep it for later use
-                self._Temp[i, j] = d / self._Temp[j, j]  # the L[i, j]
-                s = j + 1
-                d = get_elem(i, s) - self._Temp[i, start:s].dot(self._Temp[start:s, s])
-            self._Temp[i, i] = d
-            if d < 0.0:
+                self._storage[j, i] = diag  # keep it for later use
+                self._storage[i, j] = diag / self._storage[j, j]  # the L[i, j]
+                stop = j + 1
+                diag = get_elem(i, stop) - self._storage[i, start:stop].dot(self._storage[start:stop, stop])
+            self._storage[i, i] = diag
+            if diag < 0.0:
                 self.pos = start, i + 1
                 break
-            elif d == 0:
+            elif diag == 0:
                 start = i + 1  # T[i, i] == 0 (very unlikely), restart at i+1
         return self.is_spd()
 
@@ -151,9 +149,9 @@ class LDLTMgr:
         False otherwise.
 
         Examples:
-            >>> A = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
+            >>> mat = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
             >>> ldl = LDLTMgr(3)
-            >>> ldl.factorize(A)
+            >>> ldl.factorize(mat)
             True
             >>> ldl.is_spd()
             True
@@ -174,9 +172,9 @@ class LDLTMgr:
             float: ep
 
         Examples:
-            >>> A = np.array([[1.0, 2.0, 3.0], [2.0, 3.5, 5.0], [3.0, 5.0, 6.0]])
+            >>> mat = np.array([[1.0, 2.0, 3.0], [2.0, 3.5, 5.0], [3.0, 5.0, 6.0]])
             >>> ldl = LDLTMgr(3)
-            >>> ldl.factorize(A)
+            >>> ldl.factorize(mat)
             False
             >>> ldl.witness()
             0.5
@@ -184,26 +182,26 @@ class LDLTMgr:
         """
         if self.is_spd():
             raise AssertionError()
-        start, n = self.pos
-        m = n - 1
+        start, ndim = self.pos
+        m = ndim - 1
         self.v[m] = 1.0
         for i in range(m, start, -1):
-            self.v[i - 1] = -self._Temp[i:n, i - 1].dot(self.v[i:n])
-        return -self._Temp[m, m]
+            self.v[i - 1] = -self._storage[i:ndim, i - 1].dot(self.v[i:ndim])
+        return -self._storage[m, m]
 
-    def sym_quad(self, A: np.ndarray):
+    def sym_quad(self, mat: np.ndarray):
         """
-        The `sym_quad` function calculates the quadratic form of a vector `v` with a symmetric matrix `A`.
+        The `sym_quad` function calculates the quadratic form of a vector `v` with a symmetric matrix `mat`.
 
-        :param A: A is a numpy array
-        :type A: np.ndarray
+        :param mat: mat is a numpy array
+        :type mat: np.ndarray
         :return: The function `sym_quad` returns the result of the dot product between `v` and the matrix
-        product of `A[s:n, s:n]` and `v`.
+        product of `mat[start:ndim, start:ndim]` and `v`.
 
         Examples:
-            >>> A = np.array([[1.0, 2.0, 3.0], [2.0, 3.5, 5.0], [3.0, 5.0, 6.0]])
+            >>> mat = np.array([[1.0, 2.0, 3.0], [2.0, 3.5, 5.0], [3.0, 5.0, 6.0]])
             >>> ldl = LDLTMgr(3)
-            >>> ldl.factorize(A)
+            >>> ldl.factorize(mat)
             False
             >>> ldl.pos
             (0, 2)
@@ -211,14 +209,14 @@ class LDLTMgr:
             0.5
             >>> ldl.v
             array([-2.,  1.,  0.])
-            >>> B = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
-            >>> ldl.sym_quad(B)
+            >>> mat_b = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
+            >>> ldl.sym_quad(mat_b)
             3.25
 
         """
-        s, n = self.pos
-        v = self.v[s:n]
-        return v.dot(A[s:n, s:n] @ v)
+        start, ndim = self.pos
+        v = self.v[start:ndim]
+        return v.dot(mat[start:ndim, start:ndim] @ v)
 
     def sqrt(self) -> np.ndarray:
         """Return upper triangular matrix R where A = R' * R
@@ -230,9 +228,9 @@ class LDLTMgr:
             np.ndarray: [description]
 
         Examples:
-            >>> A = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
+            >>> mat = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
             >>> ldl = LDLTMgr(3)
-            >>> ldl.factorize(A)
+            >>> ldl.factorize(mat)
             True
             >>> ldl.sqrt()
             array([[1. , 0.5, 0.5],
@@ -244,11 +242,7 @@ class LDLTMgr:
             raise AssertionError()
         R = np.zeros((self._ndim, self._ndim))
         for i in range(self._ndim):
-            R[i, i] = math.sqrt(self._Temp[i, i])
+            R[i, i] = math.sqrt(self._storage[i, i])
             for j in range(i + 1, self._ndim):
-                R[i, j] = self._Temp[j, i] * R[i, i]
+                R[i, j] = self._storage[j, i] * R[i, i]
         return R
-
-
-if __name__ == "__main__":
-    pass

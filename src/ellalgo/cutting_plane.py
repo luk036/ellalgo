@@ -161,7 +161,6 @@ def cutting_plane_optim_q(
         float: final best-so-far value
         int: number of iterations performed
     """
-    # x_last = space.xc()
     x_best = None
     retry = False
     for niter in range(options.max_iters):

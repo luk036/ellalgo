@@ -18,32 +18,31 @@ class LMIOldOracle(OracleFeas):
 
     """
 
-    def __init__(self, F, B):
-        """[summary]
-
-        Arguments:
-            F (List[np.ndarray]): [description]
-            B (np.ndarray): [description]
+    def __init__(self, mat_f, mat_b):
         """
-        self.F = F
-        self.F0 = B
-        # self.A = np.zeros(B.shape)
-        self.Q = LDLTMgr(len(B))
+        The function initializes the class with two matrices and creates an instance of the LDLTMgr class.
+        
+        :param mat_f: A list of numpy arrays representing the matrix F
+        :param mat_b: A numpy array representing the matrix B
+        """
+        self.mat_f = mat_f
+        self.mat_f0 = mat_b
+        self.Q = LDLTMgr(len(mat_b))
 
     def assess_feas(self, x: np.ndarray) -> Optional[Cut]:
-        """[summary]
-
-        Arguments:
-            x (np.ndarray): [description]
-
-        Returns:
-            Optional[Cut]: [description]
+        """
+        The `assess_feas` function assesses the feasibility of a given input array `x` and returns a `Cut`
+        object if the feasibility is violated, otherwise it returns `None`.
+        
+        :param x: An array of values that will be used in the calculation
+        :type x: np.ndarray
+        :return: The function `assess_feas` returns an `Optional[Cut]`.
         """
         n = len(x)
-        A = self.F0.copy()
-        A -= sum(self.F[k] * x[k] for k in range(n))
+        A = self.mat_f0.copy()
+        A -= sum(self.mat_f[k] * x[k] for k in range(n))
         if not self.Q.factorize(A):
             ep = self.Q.witness()
-            g = np.array([self.Q.sym_quad(self.F[i]) for i in range(n)])
+            g = np.array([self.Q.sym_quad(self.mat_f[i]) for i in range(n)])
             return g, ep
         return None

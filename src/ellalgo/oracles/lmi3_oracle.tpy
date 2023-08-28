@@ -8,24 +8,24 @@ Cut = Tuple[np.ndarray, float]
 
 class lmi3_oracle:
     """Oracle for Linear Matrix Inequality constraint
-            B <= F * x
+            mat_b <= F * x
         Or
-            (F * x - B) must be a semidefinte matrix
+            (F * x - mat_b) must be a semidefinte matrix
     """
 
-    def __init__(self, F, B):
-        self.F = F
-        self.F0 = -B
-        self.A = np.zeros(B.shape)
-        self.Q = LDLTMgr(len(B))
+    def __init__(self, mat_f, mat_b):
+        self.mat_f = mat_f
+        self.mat_f0 = -mat_b
+        self.A = np.zeros(mat_b.shape)
+        self.Q = LDLTMgr(len(mat_b))
 
     def assess_feas(self, x: np.ndarray) -> Optional[Cut]:
-        # A = self.F0.copy()
+        # A = self.mat_f0.copy()
         n = len(x)
 
         def get_elem(i, j):
-            self.A[i, j] = self.F0[i, j]
-            self.A[i, j] += sum(self.F[k][i, j] * x[k]
+            self.A[i, j] = self.mat_f0[i, j]
+            self.A[i, j] += sum(self.mat_f[k][i, j] * x[k]
                                 for k in range(n))
             return self.A[i, j]
 
@@ -33,8 +33,8 @@ class lmi3_oracle:
             return None
         f = self.Q.witness()
         # p = len(v)
-        # g = np.array([v.dot(self.F[i][:p, :p].dot(v))
+        # g = np.array([v.dot(self.mat_f[i][:p, :p].dot(v))
         #               for i in range(n)])
-        g = np.array([-self.Q.sym_quad(self.F[i])
+        g = np.array([-self.Q.sym_quad(self.mat_f[i])
                       for i in range(n)])
         return g, f

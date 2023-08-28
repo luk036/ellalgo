@@ -155,32 +155,27 @@ class EllStable(SearchSpace, SearchSpaceQ):
         g, beta = cut
 
         # calculate inv(L)*g: (n-1)*n/2 multiplications
-        invLg = g.copy()  # initially
+        inv_lower_g = g.copy()  # initially
 
         for j in range(self._ndim - 1):
             for i in range(j + 1, self._ndim):
-                self._mq[j, i] = self._mq[i, j] * invLg[j]
+                self._mq[j, i] = self._mq[i, j] * inv_lower_g[j]
                 # keep for rank-one update
-                invLg[i] -= self._mq[j, i]
+                inv_lower_g[i] -= self._mq[j, i]
 
         # calculate inv(D)*inv(L)*g: n
-        invDinvLg = invLg.copy()  # initially
+        inv_diag_inv_lower_g = inv_lower_g.copy()  # initially
         for i in range(self._ndim):
-            invDinvLg[i] *= self._mq[i, i]
+            inv_diag_inv_lower_g[i] *= self._mq[i, i]
 
-        # print(invDinvLg)
+        # print(inv_diag_inv_lower_g)
         # calculate omega: n
-        gg_t = invLg * invDinvLg
+        gg_t = inv_lower_g * inv_diag_inv_lower_g
         omega = sum(gg_t)
 
         self._tsq = self._kappa * omega  # need for helper
 
         status, result = cut_strategy(beta, self._tsq)
-
-        # if central_cut:
-        #     status = self._helper.calc_single_or_parallel_central_cut(beta)
-        # else:
-        #     status = self._helper.calc_single_or_parallel(beta)
 
         if result is None:
             return status
@@ -188,7 +183,7 @@ class EllStable(SearchSpace, SearchSpaceQ):
         rho, sigma, delta = result
 
         # calculate Q*g = inv(L')*inv(D)*inv(L)*g : (n-1)*n/2
-        g_t = invDinvLg.copy()  # initially
+        g_t = inv_diag_inv_lower_g.copy()  # initially
         for i in range(self._ndim - 1, 0, -1):
             for j in range(i, self._ndim):
                 g_t[i - 1] -= self._mq[j, i - 1] * g_t[j]  # TODO
@@ -204,13 +199,11 @@ class EllStable(SearchSpace, SearchSpaceQ):
         v = g.copy()
         for j in range(self._ndim):
             p = v[j]
-            # temp = p * self._mq[j, j]
-            temp = invDinvLg[j]
+            temp = inv_diag_inv_lower_g[j]
             newt = oldt + p * temp
             beta2 = temp / newt
             self._mq[j, j] *= oldt / newt  # update invD
             for k in range(j + 1, self._ndim):
-                # v[k] -= p * self._mq[k, j]
                 v[k] -= self._mq[j, k]
                 self._mq[k, j] += beta2 * v[k]
             oldt = newt

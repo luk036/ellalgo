@@ -14,21 +14,21 @@ class LMIOracle(OracleFeas):
     This oracle solves the following feasibility problem:
 
         find  x
-        s.t.  (B − F * x) ⪰ 0
+        s.t.  (mat_b − F * x) ⪰ 0
 
     """
 
-    def __init__(self, F, B):
+    def __init__(self, mat_f, mat_b):
         """
         The function initializes a new lmi oracle object with given arguments.
         
         :param F: A list of numpy arrays. It is not clear what these arrays represent without further
         context
-        :param B: B is a numpy array
+        :param mat_b: mat_b is a numpy array
         """
-        self.F = F
-        self.F0 = B
-        self.Q = LDLTMgr(len(B))
+        self.mat_f = mat_f
+        self.mat_f0 = mat_b
+        self.Q = LDLTMgr(len(mat_b))
 
     def assess_feas(self, x: np.ndarray) -> Optional[Cut]:
         """
@@ -41,10 +41,10 @@ class LMIOracle(OracleFeas):
         """
 
         def get_elem(i, j):
-            return self.F0[i, j] - sum(Fk[i, j] * xk for Fk, xk in zip(self.F, x))
+            return self.mat_f0[i, j] - sum(Fk[i, j] * xk for Fk, xk in zip(self.mat_f, x))
 
         if self.Q.factor(get_elem):
             return None
         ep = self.Q.witness()
-        g = np.array([self.Q.sym_quad(Fk) for Fk in self.F])
+        g = np.array([self.Q.sym_quad(Fk) for Fk in self.mat_f])
         return g, ep

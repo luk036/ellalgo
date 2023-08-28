@@ -12,8 +12,8 @@ class LMI2Oracle:
             0 <= F * x <= U
     """
 
-    def __init__(self, F, U):
-        self.F = F
+    def __init__(self, mat_f, U):
+        self.mat_f = mat_f
         self.U = U
         self.A = np.zeros(U.shape)
         self.S = np.zeros(U.shape)
@@ -25,14 +25,14 @@ class LMI2Oracle:
         n = len(x)
 
         def getS(i, j):
-            self.S[i, j] = sum(self.F[k][i, j] * x[k] for k in range(n))
+            self.S[i, j] = sum(self.mat_f[k][i, j] * x[k] for k in range(n))
             return self.S[i, j]
 
         def get_elem(i, j):
             # for k in range(n):
-            #     S[i, j] = self.F[k][i, j] * x[k]
+            #     S[i, j] = self.mat_f[k][i, j] * x[k]
             self.A[i, j] = self.U[i, j]
-            self.A[i, j] -= sum(self.F[k][i, j] * x[k] for k in range(n))
+            self.A[i, j] -= sum(self.mat_f[k][i, j] * x[k] for k in range(n))
             return self.A[i, j]
 
         if not self.Q.factor(get_elem):
@@ -40,12 +40,12 @@ class LMI2Oracle:
             # p = len(v)
             fj = f + self.Q.sym_quad(self.U)
             #fj = v @ S[:p, :p] @ v
-            g = np.array([self.Q.sym_quad(self.F[i]) for i in range(n)])
+            g = np.array([self.Q.sym_quad(self.mat_f[i]) for i in range(n)])
             return g, (f, fj)
 
         if not self.Q.factor(getS):
             f = self.Q.witness()
             # p = len(v)
             fj = f + self.Q.sym_quad(self.U)
-            g = np.array([-self.Q.sym_quad(self.F[i]) for i in range(n)])
+            g = np.array([-self.Q.sym_quad(self.mat_f[i]) for i in range(n)])
             return g, (f, fj)
