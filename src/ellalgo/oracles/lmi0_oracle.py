@@ -19,10 +19,10 @@ class LMI0Oracle:
         """[summary]
 
         Arguments:
-            F (List[np.ndarray]): [description]
+            mat_f (List[np.ndarray]): [description]
         """
         self.mat_f = mat_f
-        self.ldlt_mgr = LDLTMgr(len(F[0]))
+        self.ldlt_mgr = LDLTMgr(len(mat_f[0]))
 
     def assess_feas(self, x: np.ndarray) -> Optional[Cut]:
         """[summary]
