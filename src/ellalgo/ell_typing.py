@@ -23,7 +23,7 @@ class OracleFeas(ABC):
         """
         The `assess_feas` function assesses the feasibility of a given input and returns a cut if it is
         not feasible.
-        
+
         :param xc: An array of type ArrayType
         :type xc: ArrayType
         """
@@ -35,7 +35,7 @@ class OracleFeas2(OracleFeas):
     def update(self, target) -> None:
         """
         The `update` function updates a target object.
-        
+
         :param target: The `target` parameter is of type `Any`, which means it can accept any type of value.
         It is used as an argument to update the target object
         """
@@ -48,7 +48,7 @@ class OracleOptim(ABC):
         """
         The `assess_optim` function assesses the feasibility based on the given `xc` and `target`
         parameters.
-        
+
         :param xc: An array of values that represents the current solution or point in the optimization
         process
         :type xc: ArrayType
@@ -68,7 +68,7 @@ class OracleFeasQ(ABC):
 
         The function assess_feas_q assesses the feasibility of a given input and returns a tuple containing
         a cut, an array, and a boolean value.
-        
+
         :param xc: An array of some type. It represents a variable or a set of variables that need to be
         assessed for feasibility
         :type xc: ArrayType
@@ -87,7 +87,7 @@ class OracleOptimQ(ABC):
 
         The function `assess_optim_q` assesses the feasibility of a design variable and returns a tuple
         containing a cut, an array, an optional float, and a boolean value.
-        
+
         :param xc: An array or list representing the current solution or configuration being assessed for
         optimization
         :type xc: ArrayType
@@ -106,7 +106,7 @@ class OracleBS(ABC):
         """
         The `assess_bs` function is a binary search assessment function that takes a target value as input
         and returns a boolean value.
-        
+
         :param target: The target parameter is the value that we are searching for in the binary search
         """
         pass

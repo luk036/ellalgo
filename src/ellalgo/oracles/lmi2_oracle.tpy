@@ -17,7 +17,7 @@ class LMI2Oracle:
         self.U = U
         self.A = np.zeros(U.shape)
         self.S = np.zeros(U.shape)
-        self.Q = LDLTMgr(len(U))
+        self.ldlt_mgr = LDLTMgr(len(U))
 
     def assess_feas(self, x: np.ndarray) -> Optional[Cut]:
         #A = self.U.copy()
@@ -35,17 +35,17 @@ class LMI2Oracle:
             self.A[i, j] -= sum(self.mat_f[k][i, j] * x[k] for k in range(n))
             return self.A[i, j]
 
-        if not self.Q.factor(get_elem):
-            f = self.Q.witness()
+        if not self.ldlt_mgr.factor(get_elem):
+            f = self.ldlt_mgr.witness()
             # p = len(v)
-            fj = f + self.Q.sym_quad(self.U)
+            fj = f + self.ldlt_mgr.sym_quad(self.U)
             #fj = v @ S[:p, :p] @ v
-            g = np.array([self.Q.sym_quad(self.mat_f[i]) for i in range(n)])
+            g = np.array([self.ldlt_mgr.sym_quad(self.mat_f[i]) for i in range(n)])
             return g, (f, fj)
 
-        if not self.Q.factor(getS):
-            f = self.Q.witness()
+        if not self.ldlt_mgr.factor(getS):
+            f = self.ldlt_mgr.witness()
             # p = len(v)
-            fj = f + self.Q.sym_quad(self.U)
-            g = np.array([-self.Q.sym_quad(self.mat_f[i]) for i in range(n)])
+            fj = f + self.ldlt_mgr.sym_quad(self.U)
+            g = np.array([-self.ldlt_mgr.sym_quad(self.mat_f[i]) for i in range(n)])
             return g, (f, fj)

@@ -86,7 +86,6 @@ class LDLTMgr:
             >>> ldl = LDLTMgr(3)
             >>> ldl.factor(lambda i, j: mat[i, j])
             True
-
         """
         start = 0  # range start
         self.pos = (0, 0)
@@ -96,7 +95,9 @@ class LDLTMgr:
                 self._storage[j, i] = diag  # keep it for later use
                 self._storage[i, j] = diag / self._storage[j, j]  # the L[i, j]
                 stop = j + 1
-                diag = get_elem(i, stop) - self._storage[i, start:stop].dot(self._storage[start:stop, stop])
+                diag = get_elem(i, stop) - self._storage[i, start:stop].dot(
+                    self._storage[start:stop, stop]
+                )
             self._storage[i, i] = diag
             if diag <= 0.0:
                 self.pos = start, i + 1
@@ -122,7 +123,6 @@ class LDLTMgr:
             >>> ldl = LDLTMgr(3)
             >>> ldl.factor_with_allow_semidefinite(lambda i, j: mat[i, j])
             True
-
         """
         start = 0  # range start
         self.pos = (0, 0)
@@ -132,7 +132,9 @@ class LDLTMgr:
                 self._storage[j, i] = diag  # keep it for later use
                 self._storage[i, j] = diag / self._storage[j, j]  # the L[i, j]
                 stop = j + 1
-                diag = get_elem(i, stop) - self._storage[i, start:stop].dot(self._storage[start:stop, stop])
+                diag = get_elem(i, stop) - self._storage[i, start:stop].dot(
+                    self._storage[start:stop, stop]
+                )
             self._storage[i, i] = diag
             if diag < 0.0:
                 self.pos = start, i + 1
@@ -178,7 +180,6 @@ class LDLTMgr:
             False
             >>> ldl.witness()
             0.5
-
         """
         if self.is_spd():
             raise AssertionError()
@@ -212,7 +213,6 @@ class LDLTMgr:
             >>> mat_b = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
             >>> ldl.sym_quad(mat_b)
             3.25
-
         """
         start, ndim = self.pos
         v = self.v[start:ndim]
@@ -236,7 +236,6 @@ class LDLTMgr:
             array([[1. , 0.5, 0.5],
                    [0. , 1. , 0.5],
                    [0. , 0. , 1. ]])
-
         """
         if not self.is_spd():
             raise AssertionError()

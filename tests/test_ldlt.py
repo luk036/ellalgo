@@ -31,10 +31,10 @@ def test_ldlt1():
 #         [42.0, 62.0, 134.0, -106.0],
 #     ]
 #     m2 = np.array(l2)
-#     Q = LDLTMgr(len(m2))
-#     assert not Q.factorize(m2)
-#     Q.witness()
-#     assert Q.pos == (0, 2)
+#     ldlt_mgr = LDLTMgr(len(m2))
+#     assert not ldlt_mgr.factorize(m2)
+#     ldlt_mgr.witness()
+#     assert ldlt_mgr.pos == (0, 2)
 #     # assert ep == 1.0
 #
 #
@@ -42,11 +42,11 @@ def test_ldlt1():
 #     """[summary]"""
 #     l3 = [[0.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 11.0]]
 #     m3 = np.array(l3)
-#     Q = LDLTMgr(len(m3))
-#     assert not Q.factorize(m3)
-#     ep = Q.witness()
-#     assert Q.pos == (0, 1)
-#     assert Q.v[0] == 1.0
+#     ldlt_mgr = LDLTMgr(len(m3))
+#     assert not ldlt_mgr.factorize(m3)
+#     ep = ldlt_mgr.witness()
+#     assert ldlt_mgr.pos == (0, 1)
+#     assert ldlt_mgr.v[0] == 1.0
 #     assert ep == 0.0
 #
 #
@@ -68,11 +68,11 @@ def test_ldlt1():
 #         [42.0, 62.0, 134.0, -106.0],
 #     ]
 #     m2 = np.array(l2)
-#     Q = LDLTMgr(len(m2))
-#     Q.allow_semidefinite = True
-#     assert not Q.factorize(m2)
-#     Q.witness()
-#     assert Q.pos == (0, 2)
+#     ldlt_mgr = LDLTMgr(len(m2))
+#     ldlt_mgr.allow_semidefinite = True
+#     assert not ldlt_mgr.factorize(m2)
+#     ldlt_mgr.witness()
+#     assert ldlt_mgr.pos == (0, 2)
 #     # assert ep == 1.0
 #
 #
@@ -80,12 +80,12 @@ def test_ldlt1():
 #     """[summary]"""
 #     l3 = [[0.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 11.0]]
 #     m3 = np.array(l3)
-#     Q = LDLTMgr(len(m3))
-#     Q.allow_semidefinite = True
-#     assert Q.factorize(m3)
+#     ldlt_mgr = LDLTMgr(len(m3))
+#     ldlt_mgr.allow_semidefinite = True
+#     assert ldlt_mgr.factorize(m3)
 #
 #
-# #     [v, ep] = Q.witness2()
+# #     [v, ep] = ldlt_mgr.witness2()
 # #     assert len(v) == 1
 # #     assert v[0] == 1.0
 # #     assert ep == 0.0
@@ -95,10 +95,10 @@ def test_ldlt1():
 #     """[summary]"""
 #     l3 = [[0.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, -20.0]]
 #     m3 = np.array(l3)
-#     Q = LDLTMgr(len(m3))
-#     Q.allow_semidefinite = True
-#     assert not Q.factorize(m3)
-#     ep = Q.witness()
+#     ldlt_mgr = LDLTMgr(len(m3))
+#     ldlt_mgr.allow_semidefinite = True
+#     assert not ldlt_mgr.factorize(m3)
+#     ep = ldlt_mgr.witness()
 #     assert ep == 20.0
 #
 #
@@ -108,9 +108,9 @@ def test_ldlt1():
 #     """
 #     l3 = [[0.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 20.0]]
 #     m3 = np.array(l3)
-#     Q = LDLTMgr(len(m3))
-#     Q.allow_semidefinite = False
-#     assert not Q.factorize(m3)
+#     ldlt_mgr = LDLTMgr(len(m3))
+#     ldlt_mgr.allow_semidefinite = False
+#     assert not ldlt_mgr.factorize(m3)
 #
 #
 # def test_chol9():
@@ -119,4 +119,4 @@ def test_ldlt1():
 #     """
 #     l3 = [[0.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 20.0]]
 #     m3 = np.array(l3)
-#     Q = LDLTMgr(len(m3))
+#     ldlt_mgr = LDLTMgr(len(m3))

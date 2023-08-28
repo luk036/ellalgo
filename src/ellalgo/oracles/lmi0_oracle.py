@@ -22,7 +22,7 @@ class LMI0Oracle:
             F (List[np.ndarray]): [description]
         """
         self.mat_f = mat_f
-        self.Q = LDLTMgr(len(F[0]))
+        self.ldlt_mgr = LDLTMgr(len(F[0]))
 
     def assess_feas(self, x: np.ndarray) -> Optional[Cut]:
         """[summary]
@@ -38,8 +38,8 @@ class LMI0Oracle:
             n = len(x)
             return sum(self.mat_f[k][i, j] * x[k] for k in range(n))
 
-        if not self.Q.factor(get_elem):
-            ep = self.Q.witness()
-            g = np.array([-self.Q.sym_quad(Fk) for Fk in self.mat_f])
+        if not self.ldlt_mgr.factor(get_elem):
+            ep = self.ldlt_mgr.witness()
+            g = np.array([-self.ldlt_mgr.sym_quad(Fk) for Fk in self.mat_f])
             return g, ep
         return None
