@@ -198,12 +198,12 @@ class EllCalc:
         if beta1 > 0.0 and tsq <= b1sq:
             return self.calc_deep_cut_q(beta0, tsq)
         b0b1 = beta0 * beta1
-        if self._n_f * b0b1 <= -tsq:  # for discrete optimization
+        gamma = tsq + self._n_f * b0b1
+        if gamma <= 0.0:  # for discrete optimization
             return (CutStatus.NoEffect, None)  # no effect
-        # TODO: utilize the checking
         return (
             CutStatus.Success,
-            self._helper.calc_parallel_deep_cut(beta0, beta1, tsq),
+            self._helper.calc_parallel_deep_cut_fast(beta0, beta1, tsq, b0b1, gamma),
         )
 
     def calc_deep_cut_q(
@@ -237,10 +237,9 @@ class EllCalc:
         gamma = tau + self._n_f * beta
         if gamma <= 0.0:
             return (CutStatus.NoEffect, None)
-        # TODO: utilize gamma
         return (
             CutStatus.Success,
-            self._helper.calc_deep_cut(beta, tau),
+            self._helper.calc_deep_cut_fast(beta, tau, gamma),
         )
 
 

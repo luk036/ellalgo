@@ -100,6 +100,15 @@ class EllCalcCore:
     #                  ⎛ 2    ⎞    2
     #                  ⎝n  - 1⎠ ⋅ τ
     #
+    def calc_deep_cut_fast(
+        self, beta: float, tau: float, gamma: float
+    ) -> Tuple[float, float, float]:
+        alpha = beta / tau
+        rho = self._cst0 * gamma
+        sigma = self._cst2 * gamma / (tau + beta)
+        delta = self._cst1 * (1.0 - alpha) * (1 + alpha)
+        return (rho, sigma, delta)
+
     def calc_deep_cut(self, beta: float, tau: float) -> Tuple[float, float, float]:
         """Calculate Deep Cut
 
@@ -118,12 +127,7 @@ class EllCalcCore:
             >>> calc.calc_deep_cut(0.0, 2.0)
             (0.5, 0.5, 1.125)
         """
-        gamma = tau + self._n_f * beta
-        alpha = beta / tau
-        rho = self._cst0 * gamma
-        sigma = self._cst2 * gamma / (tau + beta)
-        delta = self._cst1 * (1.0 - alpha) * (1 + alpha)
-        return (rho, sigma, delta)
+        return self.calc_deep_cut_fast(beta, tau, tau + self._n_f * beta)
 
     def calc_parallel_central_cut(
         self, beta1: float, tsq: float
@@ -242,9 +246,17 @@ class EllCalcCore:
             (0.0, 0.8, 1.25)
         """
         b0b1 = beta0 * beta1
+        return self.calc_parallel_deep_cut_fast(
+            beta0, beta1, tsq, b0b1, tsq + self._n_f * b0b1
+        )
+
+    def calc_parallel_deep_cut_fast(
+        self, beta0: float, beta1: float, tsq: float, b0b1: float, gamma: float
+    ) -> Tuple[float, float, float]:
+        # b0b1 = beta0 * beta1
         bsum = beta0 + beta1
         bsumsq = bsum * bsum
-        gamma = tsq + self._n_f * b0b1
+        # gamma = tsq + self._n_f * b0b1
         h = tsq + b0b1 + self._half_n * bsumsq
         temp2 = h + sqrt(h * h - gamma * self._n_plus_1 * bsumsq)
         inv_mu_plus_2 = gamma / temp2

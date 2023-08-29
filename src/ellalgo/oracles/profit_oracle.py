@@ -45,7 +45,7 @@ class ProfitOracle(OracleOptim):
             price_out (Arr): output price
 
         Examples:
-            >>> ProfitOracle((0.1, 1.0, 10.0), np.array([0.1, 0.2]), np.array([1.0, 2.0]))
+            >>> oracle = ProfitOracle((0.1, 1.0, 10.0), np.array([0.1, 0.2]), np.array([1.0, 2.0]))
         """
         unit_price, scale, limit = params
         self.log_pA = math.log(unit_price * scale)
