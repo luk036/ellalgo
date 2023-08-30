@@ -4,16 +4,15 @@ import numpy as np
 
 from .ell_calc import EllCalc
 from .ell_config import CutStatus
-from .ell_typing import SearchSpace, SearchSpaceQ
+from .ell_typing import SearchSpace, SearchSpaceQ, ArrayType
 
 Matrix = np.ndarray
-ArrayType = np.ndarray
 CutChoice = Union[float, ArrayType]  # single or parallel
 Cut = Tuple[ArrayType, CutChoice]
 
 
 # The `EllStable` class represents an ellipsoidal search space with stability properties.
-class EllStable(SearchSpace, SearchSpaceQ):
+class EllStable(SearchSpace[ArrayType], SearchSpaceQ[ArrayType]):
     no_defer_trick: bool = False
 
     _mq: Matrix
