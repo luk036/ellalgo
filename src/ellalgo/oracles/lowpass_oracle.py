@@ -1,12 +1,9 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function
-
 from itertools import chain
-from typing import Tuple, Union
+from typing import Tuple
 
 import numpy as np
 
-Arr = Union[np.ndarray, float]
+Arr = np.ndarray
 Cut = Tuple[Arr, float]
 
 
@@ -17,13 +14,13 @@ class LowpassOracle:
         [type]: [description]
     """
 
-    more_alt = True
+    more_alt: bool = True
 
     # for round robin counters
-    i_Anr = 0
-    i_As = 0
-    i_Ap = 0
-    count = 0
+    i_Anr: int = 0
+    i_As: int = 0
+    i_Ap: int = 0
+    count: int = 0
 
     def __init__(self, Ap: Arr, As: Arr, Anr: Arr, Lpsq, Upsq):
         """[summary]
