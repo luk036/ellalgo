@@ -1,23 +1,16 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, MutableSequence, Optional, Tuple, Union
-
+from typing import MutableSequence, Optional, Tuple, Union
+from typing import Generic, TypeVar
+import numpy as np
 from .ell_config import CutStatus
 
-if TYPE_CHECKING:
-    import numpy as np
-
-    ArrayType = np.ndarray
-else:
-    from typing import Any
-
-    ArrayType = Any
-
+ArrayType = TypeVar("ArrayType", bound=np.ndarray)
 CutChoice = Union[float, MutableSequence]  # single or parallel
 Cut = Tuple[ArrayType, CutChoice]
 Num = Union[float, int]
 
 
-class OracleFeas(ABC):
+class OracleFeas(Generic[ArrayType]):
     @abstractmethod
     def assess_feas(self, xc: ArrayType) -> Optional[Cut]:
         """
@@ -30,7 +23,7 @@ class OracleFeas(ABC):
         pass
 
 
-class OracleFeas2(OracleFeas):
+class OracleFeas2(OracleFeas[ArrayType]):
     @abstractmethod
     def update(self, target) -> None:
         """
@@ -42,7 +35,7 @@ class OracleFeas2(OracleFeas):
         pass
 
 
-class OracleOptim(ABC):
+class OracleOptim(Generic[ArrayType]):
     @abstractmethod
     def assess_optim(self, xc: ArrayType, target) -> Tuple[Cut, Optional[float]]:
         """
@@ -59,7 +52,7 @@ class OracleOptim(ABC):
         pass
 
 
-class OracleFeasQ(ABC):
+class OracleFeasQ(Generic[ArrayType]):
     @abstractmethod
     def assess_feas_q(
         self, xc: ArrayType, retry: bool
@@ -78,7 +71,7 @@ class OracleFeasQ(ABC):
         pass
 
 
-class OracleOptimQ(ABC):
+class OracleOptimQ(Generic[ArrayType]):
     @abstractmethod
     def assess_optim_q(
         self, xc: ArrayType, target, retry: bool
@@ -114,7 +107,7 @@ class OracleBS(ABC):
 
 # The `SearchSpace` class is an abstract base class that defines methods for updating deep-cut and
 # central cut, as well as accessing the xc and tsq attributes.
-class SearchSpace(ABC):
+class SearchSpace(Generic[ArrayType]):
     @abstractmethod
     def update_deep_cut(self, cut: Cut) -> CutStatus:
         """update of deep-cut
@@ -148,7 +141,7 @@ class SearchSpace(ABC):
         pass
 
 
-class SearchSpaceQ(ABC):
+class SearchSpaceQ(Generic[ArrayType]):
     @abstractmethod
     def update_q(self, cut: Cut) -> CutStatus:
         """update of shadow cut (discrete)
@@ -170,7 +163,7 @@ class SearchSpaceQ(ABC):
         pass
 
 
-class SearchSpace2(SearchSpace):
+class SearchSpace2(SearchSpace[ArrayType]):
     @abstractmethod
     def set_xc(self, xc: ArrayType) -> None:
         pass

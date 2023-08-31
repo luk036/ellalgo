@@ -1,6 +1,6 @@
 import copy
-from abc import ABC
 from typing import Any, MutableSequence, Optional, Tuple, Union
+from typing import Generic
 
 from .ell_config import CutStatus, Options
 from .ell_typing import (
@@ -23,7 +23,7 @@ Num = Union[float, int]
 
 
 def cutting_plane_feas(
-    omega: OracleFeas, space: SearchSpace, options=Options()
+    omega: OracleFeas[ArrayType], space: SearchSpace[ArrayType], options=Options()
 ) -> Tuple[Optional[ArrayType], int]:
     """Find a point in a convex set (defined through a cutting-plane oracle).
 
@@ -83,7 +83,7 @@ def cutting_plane_feas(
 
 
 def cutting_plane_optim(
-    omega: OracleOptim, space: SearchSpace, target, options=Options()
+    omega: OracleOptim[ArrayType], space: SearchSpace[ArrayType], target, options=Options()
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for solving convex optimization problem
 
@@ -113,7 +113,7 @@ def cutting_plane_optim(
 
 
 def cutting_plane_feas_q(
-    omega: OracleFeasQ, space_q: SearchSpaceQ, options=Options()
+    omega: OracleFeasQ[ArrayType], space_q: SearchSpaceQ[ArrayType], options=Options()
 ) -> Tuple[Optional[ArrayType], int]:
     """Cutting-plane method for solving convex discrete optimization problem
 
@@ -146,7 +146,7 @@ def cutting_plane_feas_q(
 
 
 def cutting_plane_optim_q(
-    omega: OracleOptimQ, space_q: SearchSpaceQ, target, options=Options()
+    omega: OracleOptimQ[ArrayType], space_q: SearchSpaceQ[ArrayType], target, options=Options()
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for solving convex discrete optimization problem
 
@@ -212,7 +212,7 @@ def bsearch(
     return upper, options.max_iters
 
 
-class BSearchAdaptor(ABC):
+class BSearchAdaptor(Generic[ArrayType]):
     def __init__(
         self, omega: OracleFeas2, space: SearchSpace2, options=Options()
     ) -> None:

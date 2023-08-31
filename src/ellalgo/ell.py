@@ -1,19 +1,18 @@
-from typing import Callable, Tuple, Union, TypeVar
+from typing import Callable, Tuple, Union
 
 import numpy as np
 
 from .ell_calc import EllCalc
 from .ell_config import CutStatus
-from .ell_typing import SearchSpace, SearchSpaceQ
+from .ell_typing import ArrayType, SearchSpace, SearchSpaceQ
 
 Mat = np.ndarray
-ArrayType = TypeVar("ArrayType", bound=np.ndarray)
 CutChoice = Union[float, ArrayType]  # single or parallel
 Cut = Tuple[ArrayType, CutChoice]
 
 
 # The `Ell` class represents an ellipsoidal search space.
-class Ell(SearchSpace, SearchSpaceQ):
+class Ell(SearchSpace[ArrayType], SearchSpaceQ[ArrayType]):
     no_defer_trick: bool = False
 
     _mq: Mat
