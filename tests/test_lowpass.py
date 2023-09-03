@@ -29,25 +29,19 @@ def run_lowpass(use_parallel_cut: bool, duration=0.000001):
     options.tol = 1e-8
     h, _, num_iters = cutting_plane_optim(omega, ellip, Spsq, options)
     time.sleep(duration)
-    # h = spectral_fact(r)
     return num_iters, h is not None
 
 
-# def test_no_parallel_cut(benchmark):
-#     result, feasible = benchmark(run_lowpass, False)
-#     assert feasible
-#     assert result >= 13334
-
-# def test_w_parallel_cut(benchmark):
-#     result, feasible = benchmark(run_lowpass, True)
-#     assert feasible
-#     assert result <= 568
-
-
 def test_lowpass():
-    """[summary]"""
+    """ Test the lowpass case with parallel cut """
     result, feasible = run_lowpass(True)
     assert feasible
     assert result >= 1083
     assert result <= 1194
 
+
+def test_no_parallel_cut():
+    """ Test the lowpass case with no parallel cut """
+    result, feasible = run_lowpass(False)
+    assert feasible
+    assert result >= 16461
