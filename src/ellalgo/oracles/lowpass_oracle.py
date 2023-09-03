@@ -1,40 +1,62 @@
-from itertools import chain
 from typing import Tuple
 
 import numpy as np
+from math import floor
 
 Arr = np.ndarray
 Cut = Tuple[Arr, float]
 
 
+# Modified from CVX code by Almir Mutapcic in 2006.
+# Adapted in 2010 for impulse response peak-minimization by convex iteration
+# by Christine Law.
+#
+# "FIR Filter Design via Spectral Factorization and Convex Optimization"
+# by S.-P. Wu, S. Boyd, and L. Vandenberghe
+#
+# Designs an FIR lowpass filter using spectral factorization method with
+# constraint on maximum passband ripple and stopband attenuation:
+#
+#   minimize   max |H(w)|                      for w in stopband
+#       s.t.   1/delta <= |H(w)| <= delta      for w in passband
+#
+# We change variables via spectral factorization method and get:
+#
+#   minimize   max R(w)                          for w in stopband
+#       s.t.   (1/delta)**2 <= R(w) <= delta**2  for w in passband
+#              R(w) >= 0                         for all w
+#
+# where R(w) is squared magnitude frequency response
+# (and Fourier transform of autocorrelation coefficients r).
+# Variables are coeffients r and gra = hh' where h is impulse response.
+# delta is allowed passband ripple.
+# This is a convex problem (can be formulated as an SDP after sampling).
+
+# rand('twister',sum(100*clock))
+# randn('state',sum(100*clock))
+
+
+# *********************************************************************
+# filter specs (for a low-pass filter)
+# *********************************************************************
+# number of FIR coefficients (including zeroth)
 class LowpassOracle:
-    """[summary]
-
-    Returns:
-        [type]: [description]
-    """
-
     more_alt: bool = True
 
-    # for round robin counters
-    i_Anr: int = 0
-    i_As: int = 0
-    i_Ap: int = 0
-    count: int = 0
+    def __init__(self, N: int, wpass: float, wstop: float, Lpsq: float, Upsq: float):
+        # *********************************************************************
+        # optimization parameters
+        # *********************************************************************
+        # rule-of-thumb discretization (from Cheney's Approximation Theory)
+        m = 15 * N
+        w = np.linspace(0, np.pi, m)  # omega
 
-    def __init__(self, Ap: Arr, As: Arr, Anr: Arr, Lpsq, Upsq):
-        """[summary]
-
-        Arguments:
-            Ap ([type]): [description]
-            As ([type]): [description]
-            Anr ([type]): [description]
-            Lpsq ([type]): [description]
-            Upsq ([type]): [description]
-        """
-        self.Ap = Ap
-        self.As = As
-        self.Anr = Anr
+        # A is the matrix used to compute the power spectrum
+        # A(w,:) = [1 2*cos(w) 2*cos(2*w) ... 2*cos(N*w)]
+        An = 2 * np.cos(np.outer(w, np.arange(1, N)))
+        self.A = np.concatenate((np.ones((m, 1)), An), axis=1)
+        self.nwpass: int = floor(wpass * (m - 1)) + 1  # end of passband
+        self.nwstop: int = floor(wstop * (m - 1)) + 1  # end of stopband
         self.Lpsq = Lpsq
         self.Upsq = Upsq
 
@@ -54,40 +76,33 @@ class LowpassOracle:
 
         # case 2,
         # 2. passband constraints
-        N, n = self.Ap.shape
-        i_Ap = self.i_Ap
-        for k in chain(range(i_Ap, N), range(i_Ap)):
-            v = self.Ap[k, :] @ x
+        N, n = self.A.shape
+        for k in range(0, self.nwpass):
+            v = self.A[k, :].dot(x)
             if v > self.Upsq:
-                g = self.Ap[k, :]
+                g = self.A[k, :]
                 f = (v - self.Upsq, v - self.Lpsq)
-                self.i_Ap = k + 1
                 return (g, f), None
 
             if v < self.Lpsq:
-                g = -self.Ap[k, :]
+                g = -self.A[k, :]
                 f = (-v + self.Lpsq, -v + self.Upsq)
-                self.i_Ap = k + 1
                 return (g, f), None
 
         # case 3,
         # 3. stopband constraint
-        N = self.As.shape[0]
         fmax = float("-inf")
         imax = 0
-        i_As = self.i_As
-        for k in chain(range(i_As, N), range(i_As)):
-            v = self.As[k, :] @ x
+        for k in range(self.nwstop, N):
+            v = self.A[k, :].dot(x)
             if v > Spsq:
-                g = self.As[k, :]
+                g = self.A[k, :]
                 f = (v - Spsq, v)
-                self.i_As = k + 1
                 return (g, f), None
 
             if v < 0:
-                g = -self.As[k, :]
+                g = -self.A[k, :]
                 f = (-v, -v + Spsq)
-                self.i_As = k + 1
                 return (g, f), None
 
             if v > fmax:
@@ -96,15 +111,12 @@ class LowpassOracle:
 
         # case 4,
         # 1. nonnegative-real constraint on other frequences
-        N = self.Anr.shape[0]
-        i_Anr = self.i_Anr
-        for k in chain(range(i_Anr, N), range(i_Anr)):
-            v = self.Anr[k, :] @ x
+        for k in range(self.nwpass, self.nwstop):
+            v = self.A[k, :].dot(x)
             if v < 0:
                 f = -v
-                g = -self.Anr[k, :]
-                self.i_Anr = k + 1
-                return (g, f), None
+                g = -self.A[k, :]
+                return (g, f), None  # single cut
 
         self.more_alt = False
 
@@ -119,5 +131,53 @@ class LowpassOracle:
         Spsq = fmax
         f = (0.0, fmax)
         # f = 0.
-        g = self.As[imax, :]
+        g = self.A[imax, :]
         return (g, f), Spsq
+
+
+# *********************************************************************
+# filter specs (for a low-pass filter)
+# *********************************************************************
+# number of FIR coefficients (including zeroth)
+def create_lowpass_case(N=48):
+    """[summary]
+
+    Keyword Arguments:
+        N (int): [description] (default: {48})
+
+    Returns:
+        [type]: [description]
+    """
+    # wpass = 0.12 * np.pi  # end of passband
+    # wstop = 0.20 * np.pi  # start of stopband
+
+    delta0_wpass = 0.025
+    delta0_wstop = 0.125
+    # maximum passband ripple in dB (+/- around 0 dB)
+    delta1 = 20 * np.log10(1 + delta0_wpass)
+    # stopband attenuation desired in dB
+    delta2 = 20 * np.log10(delta0_wstop)
+
+    # passband 0 <= w <= w_pass
+    Lp = pow(10, -delta1 / 20)
+    Up = pow(10, +delta1 / 20)
+    Sp = pow(10, +delta2 / 20)
+
+    # ind_p = np.where(w <= wpass)[0]  # passband
+    # Ap = A[ind_p, :]
+
+    # # stopband (w_stop <= w)
+    # ind_s = np.where(wstop <= w)[0]  # stopband
+    # As = A[ind_s, :]
+
+    # # remove redundant contraints
+    # ind_beg = ind_p[-1]
+    # ind_end = ind_s[0]
+    # Anr = A[range(ind_beg + 1, ind_end), :]
+
+    Lpsq = Lp * Lp
+    Upsq = Up * Up
+    Spsq = Sp * Sp
+
+    omega = LowpassOracle(N, 0.12, 0.20, Lpsq, Upsq)
+    return omega, Spsq
