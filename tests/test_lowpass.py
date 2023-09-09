@@ -1,6 +1,7 @@
 import time
 
 import numpy as np
+
 from ellalgo.cutting_plane import Options, cutting_plane_optim
 from ellalgo.ell import Ell
 from ellalgo.oracles.lowpass_oracle import create_lowpass_case
@@ -33,7 +34,7 @@ def run_lowpass(use_parallel_cut: bool, duration=0.000001):
 
 
 def test_lowpass():
-    """ Test the lowpass case with parallel cut """
+    """Test the lowpass case with parallel cut"""
     result, feasible = run_lowpass(True)
     assert feasible
     assert result >= 1083
@@ -41,7 +42,7 @@ def test_lowpass():
 
 
 def test_no_parallel_cut():
-    """ Test the lowpass case with no parallel cut """
+    """Test the lowpass case with no parallel cut"""
     result, feasible = run_lowpass(False)
     assert feasible
     assert result >= 16461

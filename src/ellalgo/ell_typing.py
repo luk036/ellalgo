@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import MutableSequence, Optional, Tuple, Union
-from typing import Generic, TypeVar
+from typing import Generic, MutableSequence, Optional, Tuple, TypeVar, Union
+
 import numpy as np
+
 from .ell_config import CutStatus
 
 ArrayType = TypeVar("ArrayType", bound=np.ndarray)

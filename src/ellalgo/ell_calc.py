@@ -1,8 +1,8 @@
 from math import sqrt
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
-from .ell_config import CutStatus
 from .ell_calc_core import EllCalcCore
+from .ell_config import CutStatus
 
 
 class EllCalc:

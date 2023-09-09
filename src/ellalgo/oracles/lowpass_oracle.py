@@ -1,7 +1,7 @@
+from math import floor
 from typing import Tuple
 
 import numpy as np
-from math import floor
 
 Arr = np.ndarray
 Cut = Tuple[Arr, float]
@@ -40,7 +40,9 @@ Cut = Tuple[Arr, float]
 class LowpassOracle:
     more_alt: bool = True
 
-    def __init__(self, ndim: int, wpass: float, wstop: float, lp_sq: float, up_sq: float):
+    def __init__(
+        self, ndim: int, wpass: float, wstop: float, lp_sq: float, up_sq: float
+    ):
         # *********************************************************************
         # optimization parameters
         # *********************************************************************
@@ -110,8 +112,8 @@ class LowpassOracle:
 
         # case 1 (unlikely)
         if x[0] < 0:
-            grade = np.zeros(ndim)
-            grade[0] = -1.0
+            grad = np.zeros(ndim)
+            grad[0] = -1.0
             return (grad, -x[0]), None
 
         # Begin objective function
