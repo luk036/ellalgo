@@ -28,7 +28,6 @@ public:
         this->Lpsq = Lpsq;
         this->Upsq = Upsq;
         this->more_alt = true;
-        this->i_A = 0;
         this->count = 0;
     }
 
@@ -38,7 +37,7 @@ public:
 
         // case 2, passband constraints
         int N = A.size();
-        for (int k = 0; k < nwpass; k++) {
+        for (int k = 0; k < this->nwpass; k++) {
             double v = 0;
             for (int j = 0; j < n; j++) {
                 v += A[k][j] * x[j];
