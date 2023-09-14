@@ -27,7 +27,7 @@ A longer description of your project goes here...
 ## Used by
 
 - [netoptim](https://github.com/luk036/netoptim)
-- [lmi-solver](https://github.com/luk036/lmi-solver)
+- [corr-solver](https://github.com/luk036/corr-solver)
 - [multiplierless](https://github.com/luk036/multiplierless)
 
 <!-- pyscaffold-notes -->
