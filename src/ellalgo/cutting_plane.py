@@ -1,6 +1,5 @@
 import copy
-from typing import Any, MutableSequence, Optional, Tuple, Union
-from typing import Generic
+from typing import Any, Generic, MutableSequence, Optional, Tuple, Union
 
 from .ell_config import CutStatus, Options
 from .ell_typing import (
@@ -83,7 +82,10 @@ def cutting_plane_feas(
 
 
 def cutting_plane_optim(
-    omega: OracleOptim[ArrayType], space: SearchSpace[ArrayType], target, options=Options()
+    omega: OracleOptim[ArrayType],
+    space: SearchSpace[ArrayType],
+    target,
+    options=Options(),
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for solving convex optimization problem
 
@@ -146,7 +148,10 @@ def cutting_plane_feas_q(
 
 
 def cutting_plane_optim_q(
-    omega: OracleOptimQ[ArrayType], space_q: SearchSpaceQ[ArrayType], target, options=Options()
+    omega: OracleOptimQ[ArrayType],
+    space_q: SearchSpaceQ[ArrayType],
+    target,
+    options=Options(),
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for solving convex discrete optimization problem
 

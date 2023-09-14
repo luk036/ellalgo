@@ -4,7 +4,7 @@ import numpy as np
 
 from .ell_calc import EllCalc
 from .ell_config import CutStatus
-from .ell_typing import SearchSpace, SearchSpaceQ, ArrayType
+from .ell_typing import ArrayType, SearchSpace, SearchSpaceQ
 
 Matrix = np.ndarray
 CutChoice = Union[float, ArrayType]  # single or parallel
