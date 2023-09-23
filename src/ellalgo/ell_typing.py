@@ -111,27 +111,25 @@ class OracleBS(ABC):
 class SearchSpace(Generic[ArrayType]):
     @abstractmethod
     def update_deep_cut(self, cut: Cut) -> CutStatus:
-        """update of deep-cut
-
-        Args:
-            cut (Cut): _description_
-
-        Returns:
-            CutStatus: _description_
         """
-        pass
+        The `update_deep_cut` function is an abstract method that takes a `Cut` object as input and returns
+        a `CutStatus` object.
+        
+        :param cut: The `cut` parameter is an instance of the `Cut` class. It represents a deep-cut that
+        needs to be updated
+        :type cut: Cut
+        """
 
     @abstractmethod
     def update_central_cut(self, cut: Cut) -> CutStatus:
-        """update of central cut
-
-        Args:
-            cut (Cut): _description_
-
-        Returns:
-            CutStatus: _description_
         """
-        pass
+        The `update_central_cut` function is an abstract method that updates the central cut and returns the
+        status of the cut.
+        
+        :param cut: The "cut" parameter is an instance of the Cut class. It represents the central cut that
+        needs to be updated
+        :type cut: Cut
+        """
 
     @abstractmethod
     def xc(self) -> ArrayType:
@@ -145,13 +143,12 @@ class SearchSpace(Generic[ArrayType]):
 class SearchSpaceQ(Generic[ArrayType]):
     @abstractmethod
     def update_q(self, cut: Cut) -> CutStatus:
-        """update of shadow cut (discrete)
-
-        Args:
-            cut (Cut): _description_
-
-        Returns:
-            CutStatus: _description_
+        """
+        The `update_q` function is an abstract method that updates a shadow cut and returns a `CutStatus`
+        object.
+        
+        :param cut: The `cut` parameter is an object of type `Cut`
+        :type cut: Cut
         """
         pass
 

@@ -37,12 +37,18 @@ class ProfitOracle(OracleOptim):
     def __init__(
         self, params: Tuple[float, float, float], elasticities: Arr, price_out: Arr
     ) -> None:
-        """[summary]
-
-        Args:
-            params (Tuple[float, float, float]): unit_price, scale, limit
-            elasticities (Arr): the output elasticities
-            price_out (Arr): output price
+        """
+        The function initializes a ProfitOracle object with given parameters.
+        
+        :param params: The `params` parameter is a tuple containing three float values: `unit_price`,
+        `scale`, and `limit`. These values are used to calculate the logarithm of the unit price (`log_pA`)
+        and the logarithm of the limit (`log_k`)
+        :type params: Tuple[float, float, float]
+        :param elasticities: The `elasticities` parameter is an array that represents the output
+        elasticities. It contains the elasticity values for each output
+        :type elasticities: Arr
+        :param price_out: The `price_out` parameter is an array that represents the output prices
+        :type price_out: Arr
 
         Examples:
             >>> oracle = ProfitOracle((0.1, 1.0, 10.0), np.array([0.1, 0.2]), np.array([1.0, 2.0]))
@@ -54,14 +60,19 @@ class ProfitOracle(OracleOptim):
         self.elasticities = elasticities
 
     def assess_optim(self, y: Arr, target: float) -> Tuple[Cut, Optional[float]]:
-        """Make object callable for cutting_plane_optim()
-
-        Args:
-            y (Arr): input quantity (in log scale)
-            target (float): the best-so-far optimal value
-
-        Returns:
-            Tuple[Cut, float]: Cut and the updated best-so-far value
+        """
+        The `assess_optim` function takes in an input quantity `y` and a target value, and returns a tuple
+        containing a cut and an updated best-so-far value.
+        
+        :param y: The parameter `y` is an array representing the input quantity in log scale
+        :type y: Arr
+        :param target: The `target` parameter is the best-so-far optimal value. It represents the target
+        value that the optimization algorithm is trying to achieve or improve upon
+        :type target: float
+        :return: The function `assess_optim` returns a tuple containing a `Cut` object and an optional float
+        value. The `Cut` object represents a linear constraint in the form of a tuple `(g, fj)`, where `g`
+        is a numpy array representing the coefficients of the linear constraint and `fj` is a float
+        representing the right-hand side of the constraint. The optional float value
 
         See also:
             cutting_plane_optim
@@ -108,13 +119,21 @@ class ProfitRbOracle(OracleOptim):
         price_out: Arr,
         vparams: Tuple[float, float, float, float, float],
     ) -> None:
-        """[summary]
-
-        Args:
-            params (Tuple[float, float, float]): unit_price, scale, limit
-            elasticities (Arr): the output elasticities
-            price_out (Arr): output price
-            vparams (Tuple): parameters for uncertainty
+        """
+        The function initializes an object with given parameters and calculates the omega value using a
+        ProfitOracle object.
+        
+        :param params: The `params` parameter is a tuple of three floats: `unit_price`, `scale`, and
+        `limit`. These parameters are used to calculate `params_rb` in the code
+        :type params: Tuple[float, float, float]
+        :param elasticities: The elasticities parameter is a numpy array that represents the output
+        elasticities. It is used in the ProfitOracle function
+        :type elasticities: Arr
+        :param price_out: The `price_out` parameter is an array representing the output price
+        :type price_out: Arr
+        :param vparams: The `vparams` parameter is a tuple containing five float values: `e1`, `e2`, `e3`,
+        `e4`, and `e5`
+        :type vparams: Tuple[float, float, float, float, float]
         """
         e1, e2, e3, e4, e5 = vparams
         self.elasticities = elasticities
@@ -126,14 +145,17 @@ class ProfitRbOracle(OracleOptim):
         )
 
     def assess_optim(self, y: Arr, target: float) -> Tuple[Cut, Optional[float]]:
-        """Make object callable for cutting_plane_optim()
-
-        Args:
-            y (Arr): input quantity (in log scale)
-            target (float): the best-so-far optimal value
-
-        Returns:
-            Tuple[Cut, float]: Cut and the updated best-so-far value
+        """
+        The `assess_optim` function takes in an input quantity `y` and a target value, and returns a tuple
+        containing a cut and an updated best-so-far value.
+        
+        :param y: The parameter `y` is an array representing the input quantity in log scale
+        :type y: Arr
+        :param target: The `target` parameter is the best-so-far optimal value. It represents the current
+        best value that has been achieved in the optimization process
+        :type target: float
+        :return: The function `assess_optim` returns a tuple containing a `Cut` object and an optional float
+        value.
 
         See also:
             cutting_plane_optim
@@ -171,12 +193,15 @@ class ProfitQOracle(OracleOptimQ):
     yd: np.ndarray
 
     def __init__(self, params, elasticities, price_out) -> None:
-        """[summary]
-
-        Args:
-            params (Tuple[float, float, float]): unit_price, scale, limit
-            elasticities (Arr): the output elasticities
-            price_out (Arr): output price
+        """
+        The function initializes an instance of a class with given parameters and arrays.
+        
+        :param params: The `params` parameter is a tuple containing three float values: `unit_price`,
+        `scale`, and `limit`
+        :param elasticities: The elasticities parameter is an array that represents the output elasticities.
+        It contains the elasticity values for each output
+        :param price_out: The `price_out` parameter is an array that represents the output prices of the
+        goods or services. It contains the prices of different outputs
         """
         self.omega = ProfitOracle(params, elasticities, price_out)
         self.yd = np.array([0.0, 0.0])
@@ -184,18 +209,18 @@ class ProfitQOracle(OracleOptimQ):
     def assess_optim_q(
         self, y: Arr, target: float, retry: bool
     ) -> Tuple[Cut, Arr, Optional[float], bool]:
-        """Make object callable for cutting_plane_optim_q()
-
-        Args:
-            y (Arr): input quantity (in log scale)
-            target (float): the best-so-far optimal value
-            retry ([type]): unused
-
-        Raises:
-            AssertionError: [description]
-
-        Returns:
-            Tuple: Cut, target, and the actual evaluation point
+        """
+        The `assess_optim_q` function takes in an input quantity `y` in log scale, a target value, and a
+        retry flag, and returns a tuple containing a cut, the target value, and the evaluation point.
+        
+        :param y: An array representing the input quantity in log scale
+        :type y: Arr
+        :param target: The `target` parameter is the best-so-far optimal value. It represents the current
+        best value that the optimization algorithm has found
+        :type target: float
+        :param retry: A boolean flag indicating whether the optimization should be retried or not
+        :type retry: bool
+        :return: The function `assess_optim_q` returns a tuple containing the following elements:
 
         See also:
             cutting_plane_optim_q
