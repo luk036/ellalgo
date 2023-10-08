@@ -51,6 +51,19 @@ class EllCalcCore:
         self._cst2 = 2.0 * self._cst0
         self._cst3 = self._n_f * self._cst0
 
+    #
+    #       _.-'''''''-._--------- "-tau"
+    #     ,'             `.
+    #    /                 \
+    #   .                   .
+    #   |                   |
+    #   |         .         | ---- beta = 0
+    #   |                   | 
+    #    \                 / 
+    #     `._           _.' 
+    #        '-.......-'   
+    #                  ----------- tau
+    #
     #                  2
     #            σ = ─────
     #                n + 1
@@ -84,6 +97,19 @@ class EllCalcCore:
         delta = self._cst1
         return (rho, sigma, delta)
 
+    #
+    #       _.-'''''''-._--------- "-tau"
+    #     ,'             `.
+    #    /                 \
+    #   .                   .
+    #   |                   |
+    #   |         .         | ---- 0
+    #   |                   | ---- beta
+    #    \                 / 
+    #     `._           _.' 
+    #        '-.......-'   
+    #                  ----------- tau
+    #
     #             γ = τ + n ⋅ β
     #
     #                   γ
@@ -109,6 +135,19 @@ class EllCalcCore:
         delta = self._cst1 * (1.0 - alpha) * (1 + alpha)
         return (rho, sigma, delta)
 
+    #
+    #       _.-'''''''-._--------- "-tau"
+    #     ,'             `.
+    #    /                 \
+    #   .                   .
+    #   |                   |
+    #   |         .         | ---- 0
+    #   |                   | ---- beta
+    #    \                 / 
+    #     `._           _.' 
+    #        '-.......-'   
+    #                  ----------- tau
+    #
     def calc_deep_cut(self, beta: float, tau: float) -> Tuple[float, float, float]:
         """Calculate Deep Cut
 
@@ -129,6 +168,19 @@ class EllCalcCore:
         """
         return self.calc_deep_cut_fast(beta, tau, tau + self._n_f * beta)
 
+    #
+    #       _.-'''''''-._--------- "-tau"
+    #     ,'             `.
+    #    /                 \
+    #   .                   .
+    #   |                   |
+    #   |         .         | ---- beta0 = 0
+    #   |                   | 
+    #    \                 / 
+    #     `._           _.' ------ beta1
+    #        '-.......-'   
+    #                  ----------- tau
+    #
     def calc_parallel_central_cut(
         self, beta1: float, tsq: float
     ) -> Tuple[float, float, float]:
@@ -221,7 +273,20 @@ class EllCalcCore:
         rho = sigma * beta1 / 2.0
         delta = self._cst1 * (1.0 - a1sq / 2.0 + xi / self._n_f)
         return (rho, sigma, delta)
-
+                     
+    #
+    #       _.-'''''''-._--------- "-tau"
+    #     ,'             `.
+    #    /                 \
+    #   .                   .
+    #   |                   |
+    #   |         .         | ---- 0
+    #   |                   | ---- beta0
+    #    \                 / 
+    #     `._           _.' ------ beta1
+    #        '-.......-'   
+    #                  ----------- tau
+    #
     def calc_parallel_deep_cut(
         self, beta0: float, beta1: float, tsq: float
     ) -> Tuple[float, float, float]:
@@ -250,9 +315,46 @@ class EllCalcCore:
             beta0, beta1, tsq, b0b1, tsq + self._n_f * b0b1
         )
 
+    #
+    #       _.-'''''''-._--------- "-tau"
+    #     ,'             `.
+    #    /                 \
+    #   .                   .
+    #   |                   |
+    #   |         .         | ---- 0
+    #   |                   | ---- beta0
+    #    \                 / 
+    #     `._           _.' ------ beta1
+    #        '-.......-'   
+    #                  ----------- tau
+    #
     def calc_parallel_deep_cut_fast(
         self, beta0: float, beta1: float, tsq: float, b0b1: float, gamma: float
     ) -> Tuple[float, float, float]:
+        """Calculation Parallel Deep Cut
+
+        The `calc_parallel_deep_cut_fast` function calculates various values based on the input parameters and returns
+        them as a tuple.
+
+        :param beta0: The parameter `beta0` represents a float value
+        :type beta0: float
+        :param beta1: The parameter `beta1` represents a float value
+        :type beta1: float
+        :param tsq: tsq is a float representing the square of the value t
+        :type tsq: float
+        :param b0b1: The parameter `b0b1` represents a float value
+        :type b0b1: float
+        :param gamma: The parameter `gamma` represents a float value
+        :type gamma: float
+        :return: a tuple with three elements.
+
+        Examples:
+            >>> calc = EllCalcCore(4)
+            >>> calc.calc_parallel_deep_cut_fast(0.11, 0.01, 0.01, 0.0011, 0.0144)
+            (0.027228509068282114, 0.45380848447136857, 1.0443438549074862)
+            >>> calc.calc_parallel_deep_cut_fast(-0.25, 0.25, 1.0, -0.0625, 0.75)
+            (0.0, 0.8, 1.25)
+        """
         # b0b1 = beta0 * beta1
         bsum = beta0 + beta1
         bsumsq = bsum * bsum
@@ -286,7 +388,7 @@ class EllCalcCore:
     #                  n         ⎝      0    1    ⎠
     #            σ = ───── + ──────────────────────
     #                n + 1                       2
-    #                         (n + 1) ⋅ ⎛β  + β ⎞
+    #                         (n + 1) ⋅ ⎛β  + β ⎞   <---- Oop!!!
     #                                   ⎝ 0    1⎠
     #
     #                σ ⋅ ⎛β  + β ⎞
