@@ -52,17 +52,17 @@ class EllCalcCore:
         self._cst3 = self._n_f * self._cst0
 
     #
-    #       _.-'''''''-._--------- "-tau"
+    #       _.-'''''''-._--------- "tau"
     #     ,'             `.
     #    /                 \
     #   .                   .
     #   |                   |
-    #   |         .         | ---- beta = 0
-    #   |                   | 
-    #    \                 / 
-    #     `._           _.' 
-    #        '-.......-'   
-    #                  ----------- tau
+    #   |         .         | ---- "beta = 0"
+    #   |                   |
+    #    \                 /
+    #     `._           _.'
+    #        '-.......-'
+    #                  ----------- "-tau"
     #
     #                  2
     #            σ = ─────
@@ -98,17 +98,17 @@ class EllCalcCore:
         return (rho, sigma, delta)
 
     #
-    #       _.-'''''''-._--------- "-tau"
+    #       _.-'''''''-._--------- "tau"
     #     ,'             `.
     #    /                 \
     #   .                   .
     #   |                   |
     #   |         .         | ---- 0
-    #   |                   | ---- beta
-    #    \                 / 
-    #     `._           _.' 
-    #        '-.......-'   
-    #                  ----------- tau
+    #   |                   | ---- "-beta"
+    #    \                 /
+    #     `._           _.'
+    #        '-.......-'
+    #                  ----------- "-tau"
     #
     #             γ = τ + n ⋅ β
     #
@@ -136,17 +136,17 @@ class EllCalcCore:
         return (rho, sigma, delta)
 
     #
-    #       _.-'''''''-._--------- "-tau"
+    #       _.-'''''''-._--------- "tau"
     #     ,'             `.
     #    /                 \
     #   .                   .
     #   |                   |
     #   |         .         | ---- 0
-    #   |                   | ---- beta
-    #    \                 / 
-    #     `._           _.' 
-    #        '-.......-'   
-    #                  ----------- tau
+    #   |                   | ---- "-beta"
+    #    \                 /
+    #     `._           _.'
+    #        '-.......-'
+    #                  ----------- "-tau"
     #
     def calc_deep_cut(self, beta: float, tau: float) -> Tuple[float, float, float]:
         """Calculate Deep Cut
@@ -168,19 +168,20 @@ class EllCalcCore:
         """
         return self.calc_deep_cut_fast(beta, tau, tau + self._n_f * beta)
 
+    #    .. svgbob::
+    #       :align: center
     #
-    #       _.-'''''''-._--------- "-tau"
-    #     ,'             `.
-    #    /                 \
-    #   .                   .
-    #   |                   |
-    #   |         .         | ---- beta0 = 0
-    #   |                   | 
-    #    \                 / 
-    #     `._           _.' ------ beta1
-    #        '-.......-'   
-    #                  ----------- tau
-    #
+    #                _.-'''''''-._--------- "tau"
+    #              ,'             `.
+    #             /                 \
+    #            .                   .
+    #            |                   |
+    #            |         .         | ---- "beta0 = 0"
+    #            |                   |
+    #             \                 /
+    #              `._           _.' ------ "-beta1"
+    #                 '-.......-'
+    #                           ----------- "-tau"
     def calc_parallel_central_cut(
         self, beta1: float, tsq: float
     ) -> Tuple[float, float, float]:
@@ -273,7 +274,7 @@ class EllCalcCore:
         rho = sigma * beta1 / 2.0
         delta = self._cst1 * (1.0 - a1sq / 2.0 + xi / self._n_f)
         return (rho, sigma, delta)
-                     
+
     #
     #       _.-'''''''-._--------- "-tau"
     #     ,'             `.
@@ -281,11 +282,11 @@ class EllCalcCore:
     #   .                   .
     #   |                   |
     #   |         .         | ---- 0
-    #   |                   | ---- beta0
-    #    \                 / 
-    #     `._           _.' ------ beta1
-    #        '-.......-'   
-    #                  ----------- tau
+    #   |                   | ---- "-beta0"
+    #    \                 /
+    #     `._           _.' ------ "-beta1"
+    #        '-.......-'
+    #                  ----------- "-tau"
     #
     def calc_parallel_deep_cut(
         self, beta0: float, beta1: float, tsq: float
@@ -322,11 +323,11 @@ class EllCalcCore:
     #   .                   .
     #   |                   |
     #   |         .         | ---- 0
-    #   |                   | ---- beta0
-    #    \                 / 
-    #     `._           _.' ------ beta1
-    #        '-.......-'   
-    #                  ----------- tau
+    #   |                   | ---- "-beta0"
+    #    \                 /
+    #     `._           _.' ------ "-beta1"
+    #        '-.......-'
+    #                  ----------- "-tau"
     #
     def calc_parallel_deep_cut_fast(
         self, beta0: float, beta1: float, tsq: float, b0b1: float, gamma: float
