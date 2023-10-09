@@ -32,7 +32,7 @@ class EllCalc:
             >>> calc._n_f
             3.0
         """
-        assert n >= 2  # do not accept one-dimensional 
+        assert n >= 2  # do not accept one-dimensional
         self._n_f = float(n)
         self._helper = EllCalcCore(n)
 

@@ -39,7 +39,7 @@ class ProfitOracle(OracleOptim):
     ) -> None:
         """
         The function initializes a ProfitOracle object with given parameters.
-        
+
         :param params: The `params` parameter is a tuple containing three float values: `unit_price`,
         `scale`, and `limit`. These values are used to calculate the logarithm of the unit price (`log_pA`)
         and the logarithm of the limit (`log_k`)
@@ -63,7 +63,7 @@ class ProfitOracle(OracleOptim):
         """
         The `assess_optim` function takes in an input quantity `y` and a target value, and returns a tuple
         containing a cut and an updated best-so-far value.
-        
+
         :param y: The parameter `y` is an array representing the input quantity in log scale
         :type y: Arr
         :param target: The `target` parameter is the best-so-far optimal value. It represents the target
@@ -122,7 +122,7 @@ class ProfitRbOracle(OracleOptim):
         """
         The function initializes an object with given parameters and calculates the omega value using a
         ProfitOracle object.
-        
+
         :param params: The `params` parameter is a tuple of three floats: `unit_price`, `scale`, and
         `limit`. These parameters are used to calculate `params_rb` in the code
         :type params: Tuple[float, float, float]
@@ -148,7 +148,7 @@ class ProfitRbOracle(OracleOptim):
         """
         The `assess_optim` function takes in an input quantity `y` and a target value, and returns a tuple
         containing a cut and an updated best-so-far value.
-        
+
         :param y: The parameter `y` is an array representing the input quantity in log scale
         :type y: Arr
         :param target: The `target` parameter is the best-so-far optimal value. It represents the current
@@ -195,7 +195,7 @@ class ProfitQOracle(OracleOptimQ):
     def __init__(self, params, elasticities, price_out) -> None:
         """
         The function initializes an instance of a class with given parameters and arrays.
-        
+
         :param params: The `params` parameter is a tuple containing three float values: `unit_price`,
         `scale`, and `limit`
         :param elasticities: The elasticities parameter is an array that represents the output elasticities.
@@ -212,7 +212,7 @@ class ProfitQOracle(OracleOptimQ):
         """
         The `assess_optim_q` function takes in an input quantity `y` in log scale, a target value, and a
         retry flag, and returns a tuple containing a cut, the target value, and the evaluation point.
-        
+
         :param y: An array representing the input quantity in log scale
         :type y: Arr
         :param target: The `target` parameter is the best-so-far optimal value. It represents the current
