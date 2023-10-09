@@ -185,7 +185,7 @@ class EllCalcCore:
     def calc_parallel_central_cut(
         self, beta1: float, tsq: float
     ) -> Tuple[float, float, float]:
-        """Calculate Parallel Central Cut
+        r"""Calculate Parallel Central Cut
 
         The function `calc_parallel_central_cut` calculates the parallel central cut for given values of `beta1` and
         `tsq`.
@@ -197,6 +197,21 @@ class EllCalcCore:
         :type tsq: float
         :return: The function `calc_parallel_central_cut` returns a tuple of four values: `CutStatus`, `float`,
         `float`, `float`.
+
+        .. svgbob::
+           :align: center
+    
+                    _.-'''''''-._--------- tau
+                  ,'             `.
+                 /                 \
+                .                   .
+                |                   |
+                |         .         | ---- beta0 = 0
+                |                   |
+                 \                 /
+                  `._           _.' ------ -beta1
+                     '-.......-'
+                               ----------- -tau
 
         Examples:
             >>> calc = EllCalcCore(4)
