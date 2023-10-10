@@ -24,7 +24,7 @@ Num = Union[float, int]
 def cutting_plane_feas(
     omega: OracleFeas[ArrayType], space: SearchSpace[ArrayType], options=Options()
 ) -> Tuple[Optional[ArrayType], int]:
-    """Find a point in a convex set (defined through a cutting-plane oracle).
+    r"""Find a point in a convex set (defined through a cutting-plane oracle).
 
     Description:
         A function f(x) is *convex* if there always exist a g(x)
@@ -39,6 +39,9 @@ def cutting_plane_feas(
 
         A *separation oracle* asserts that an evalution point x0 is feasible,
         or provide a cut that separates the feasible region and x0.
+
+        .. svgbob::
+           :align: center
 
          ┌────────────┐    ┌───────────┐┌──────────┐
          │CuttingPlane│    │SearchSpace││OracleFeas│
@@ -71,6 +74,7 @@ def cutting_plane_feas(
         Optional[ArrayType]: feasible solution or None if no solution
         int: number of iterations performed
     """
+
     for niter in range(options.max_iters):
         cut = omega.assess_feas(space.xc())  # query the oracle at space.xc()
         if cut is None:  # feasible sol'n obtained

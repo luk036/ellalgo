@@ -200,7 +200,7 @@ class EllCalcCore:
 
         .. svgbob::
            :align: center
-    
+
                     _.-'''''''-._--------- tau
                   ,'             `.
                  /                 \
