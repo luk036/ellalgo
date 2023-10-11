@@ -183,11 +183,11 @@ class LDLTMgr:
         """
         if self.is_spd():
             raise AssertionError()
-        start, ndim = self.pos
-        m = ndim - 1
+        start, pos = self.pos
+        m = pos - 1
         self.v[m] = 1.0
         for i in range(m, start, -1):
-            self.v[i - 1] = -self._storage[i:ndim, i - 1].dot(self.v[i:ndim])
+            self.v[i - 1] = -self._storage[i:pos, i - 1].dot(self.v[i:pos])
         return -self._storage[m, m]
 
     def sym_quad(self, mat: np.ndarray):
