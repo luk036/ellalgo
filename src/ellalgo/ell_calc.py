@@ -199,12 +199,12 @@ class EllCalc:
         if beta1 > 0.0 and tsq <= b1sq:
             return self.calc_deep_cut_q(beta0, tsq)
         b0b1 = beta0 * beta1
-        gamma = tsq + self._n_f * b0b1
-        if gamma <= 0.0:  # for discrete optimization
+        eta = tsq + self._n_f * b0b1
+        if eta <= 0.0:  # for discrete optimization
             return (CutStatus.NoEffect, None)  # no effect
         return (
             CutStatus.Success,
-            self._helper.calc_parallel_deep_cut_fast(beta0, beta1, tsq, b0b1, gamma),
+            self._helper.calc_parallel_deep_cut_fast(beta0, beta1, tsq, b0b1, eta),
         )
 
     def calc_deep_cut_q(
@@ -235,12 +235,12 @@ class EllCalc:
         tau = sqrt(tsq)
         if tau < beta:
             return (CutStatus.NoSoln, None)  # no sol'n
-        gamma = tau + self._n_f * beta
-        if gamma <= 0.0:
+        eta = tau + self._n_f * beta
+        if eta <= 0.0:
             return (CutStatus.NoEffect, None)
         return (
             CutStatus.Success,
-            self._helper.calc_deep_cut_fast(beta, tau, gamma),
+            self._helper.calc_deep_cut_fast(beta, tau, eta),
         )
 
 
