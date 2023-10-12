@@ -67,21 +67,23 @@ class EllCalcCore:
                   ,'      |      `.
                  /        |        \
                 .         |         .
+                |                   |
+                |         .         |
+                |                   |
+                :\        |        /:
+                | `._     |     _.' |
+                |    '-.......-'    |
                 |         |         |
-            "-τ"|         |0        |+τ
-                |         |         |
-                 \        |        /
-                  `._     |     _.'
-                     '-.......-'
+               "-τ"       0        +τ
 
                       2
                 σ = ─────
                     n + 1
-    
+
                       τ
                 ϱ = ─────
                     n + 1
-    
+
                        2
                       n
                 δ = ──────
@@ -98,23 +100,6 @@ class EllCalcCore:
         delta = self._cst1
         return (rho, sigma, delta)
 
-    #
-    #             η = τ + n ⋅ β
-    #
-    #                   η
-    #             ϱ = ─────
-    #                 n + 1
-    #
-    #                 2 ⋅ ϱ
-    #             σ = ─────
-    #                 τ + β
-    #
-    #                  2   ⎛ 2    2⎞
-    #                 n  ⋅ ⎝τ  - β ⎠
-    #             δ = ──────────────
-    #                  ⎛ 2    ⎞    2
-    #                  ⎝n  - 1⎠ ⋅ τ
-    #
     def calc_deep_cut_fast(
         self, beta: float, tau: float, eta: float
     ) -> Tuple[float, float, float]:
@@ -130,19 +115,33 @@ class EllCalcCore:
 
         .. svgbob::
            :align: center
-              
+
                     _.-'''''''-._
                   ,'    |        `.
                  /      |          \
                 .       |           .
                 |       |           |
-                |       |           |
+                |       | .         |
                 |       |           |
                 :\      |          /:
                 | `._   |       _.' |
                 |    '-.......-'    |
                 |       |           |
                "-τ"     "-β"       +τ
+
+                      η
+                ϱ = ─────
+                    n + 1
+
+                    2 ⋅ ϱ
+                σ = ─────
+                    τ + β
+
+                     2   ⎛ 2    2⎞
+                    n  ⋅ ⎝τ  - β ⎠
+                δ = ──────────────
+                     ⎛ 2    ⎞    2
+                     ⎝n  - 1⎠ ⋅ τ
 
         Examples:
             >>> calc = EllCalcCore(3)
@@ -170,7 +169,7 @@ class EllCalcCore:
 
         .. svgbob::
            :align: center
-              
+
                     _.-'''''''-._
                   ,'   |         `.
                  /     |           \
@@ -183,6 +182,22 @@ class EllCalcCore:
                 |    '-.......-'    |
                 |      |            |
                "-τ"     "-β"       +τ
+
+                η = τ + n ⋅ β
+
+                      η
+                ϱ = ─────
+                    n + 1
+
+                    2 ⋅ ϱ
+                σ = ─────
+                    τ + β
+
+                     2   ⎛ 2    2⎞
+                    n  ⋅ ⎝τ  - β ⎠
+                δ = ──────────────
+                     ⎛ 2    ⎞    2
+                     ⎝n  - 1⎠ ⋅ τ
 
         Examples:
             >>> calc = EllCalcCore(3)
@@ -223,7 +238,7 @@ class EllCalcCore:
                 |   |'-.......-'    |
                 |   |     |         |
                "-τ" "-β"  0        +τ
-                      1    
+                      1
 
         Examples:
             >>> calc = EllCalcCore(4)
@@ -282,8 +297,7 @@ class EllCalcCore:
         :type beta1: float
         :param tsq: The parameter `tsq` represents the square of a value
         :type tsq: float
-        :return: The function `calc_parallel_central_cut` returns a tuple of four values: `CutStatus`, `float`,
-        `float`, `float`.
+        :return: The function `calc_parallel_central_cut` returns a tuple of four values: `CutStatus`, `float`, `float`, `float`.
 
         .. svgbob::
            :align: center
@@ -300,7 +314,35 @@ class EllCalcCore:
                 |   |'-.......-'    |
                 |   |     |         |
                "-τ" "-β"  0        +τ
-                      1    
+                      1
+                           __________________________
+                          ╱                         2
+                         ╱                  ⎛     2⎞
+                        ╱                   ⎜n ⋅ β ⎟
+                       ╱   ⎛ 2    2⎞    2   ⎜     1⎟
+                ξ =   ╱    ⎜τ  - β ⎟ ⋅ τ  + ⎜──────⎟
+                    ╲╱     ⎝      1⎠        ⎝   2  ⎠
+
+                                ⎛ 2    ⎞
+                      n     2 ⋅ ⎝τ  - ξ⎠
+                σ = ───── + ────────────
+                    n + 1              2
+                            (n + 1) ⋅ β
+                                       1
+
+                    σ ⋅ β
+                         1
+                ϱ = ──────
+                       2
+
+                         ⎛      2    ⎞
+                         ⎜     β     ⎟
+                     2   ⎜ 2    1   ξ⎟
+                    n  ⋅ ⎜τ  - ── + ─⎟
+                         ⎝      2   n⎠
+                δ = ──────────────────
+                       ⎛ 2    ⎞    2
+                       ⎝n  - 1⎠ ⋅ τ
 
         Examples:
             >>> calc = EllCalcCore(4)
@@ -472,7 +514,7 @@ class EllCalcCore:
 
         .. svgbob::
            :align: center
-              
+
                     _.-'''''''-._
                   ,'     |       `.
                  /  |    |         \
@@ -486,6 +528,42 @@ class EllCalcCore:
                 |   |    |          |
                "-τ" "-β" "-β"      +τ
                       1    0
+
+                      2    2
+                ζ  = τ  - β
+                 0         0
+
+                      2    2
+                ζ  = τ  - β
+                 1         1
+                           __________________________
+                          ╱                         2
+                         ╱           ⎛    ⎛ 2    2⎞⎞
+                        ╱            ⎜n ⋅ ⎜β  - β ⎟⎟
+                       ╱             ⎜    ⎝ 1    0⎠⎟
+                ξ =   ╱    ζ  ⋅ ζ  + ⎜─────────────⎟
+                    ╲╱      0    1   ⎝      2      ⎠
+
+                                ⎛ 2              ⎞
+                            2 ⋅ ⎜τ  + β  ⋅ β  - ξ⎟
+                      n         ⎝      0    1    ⎠
+                σ = ───── + ──────────────────────
+                    n + 1                       2
+                             (n + 1) ⋅ ⎛β  + β ⎞   <---- Oop!!!
+                                       ⎝ 0    1⎠
+
+                    σ ⋅ ⎛β  + β ⎞
+                        ⎝ 0    1⎠
+                ϱ = ─────────────
+                          2
+
+                         ⎛ζ  + ζ     ⎞
+                     2   ⎜ 0    1   ξ⎟
+                    n  ⋅ ⎜─────── + ─⎟
+                         ⎝   2      n⎠
+                δ = ──────────────────
+                       ⎛ 2    ⎞    2
+                       ⎝n  - 1⎠ ⋅ τ
 
         Examples:
             >>> calc = EllCalcCore(4)
