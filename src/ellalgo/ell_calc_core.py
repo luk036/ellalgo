@@ -244,11 +244,11 @@ class EllCalcCore:
             α  = β  / τ
 
                 n    2
-            h = ─ ⋅ α
+            k = ─ ⋅ α
                 2
-                       _____________
-                      ╱ 2          2
-            r = h + ╲╱ h  + 1.0 - α
+                               _____________
+                              ╱ 2          2
+            r = μ + 1 = k + ╲╱ k  + 1.0 - α
 
                   β
             ϱ = ─────
@@ -264,8 +264,8 @@ class EllCalcCore:
 
         Examples:
             >>> calc = EllCalcCore(4)
-            >>> calc.calc_parallel_central_cut(0.11, 0.01)
-            (0.01897790039191521, 0.3450527343984584, 1.0549907942519101)
+            >>> calc.calc_parallel_central_cut(0.09, 0.01)
+            (0.020941836487980856, 0.46537414417735234, 1.082031295477563)
         """
         b1sq = beta1 * beta1
         a1sq = b1sq / tsq
@@ -339,8 +339,8 @@ class EllCalcCore:
 
         Examples:
             >>> calc = EllCalcCore(4)
-            >>> calc.calc_parallel_central_cut_old(0.11, 0.01)
-            (0.018977900391915218, 0.3450527343984585, 1.0549907942519101)
+            >>> calc.calc_parallel_central_cut_old(0.09, 0.01)
+            (0.02094183648798086, 0.46537414417735246, 1.082031295477563)
         """
         b1sq = beta1 * beta1
         # if tsq < b1sq or not self.use_parallel_cut:
@@ -388,10 +388,12 @@ class EllCalcCore:
 
         Examples:
             >>> calc = EllCalcCore(4)
-            >>> calc.calc_parallel_deep_cut(0.11, 0.01, 0.01)
+            >>> calc.calc_parallel_deep_cut(0.01, 0.11, 0.01)
             (0.027228509068282114, 0.45380848447136857, 1.0443438549074862)
             >>> calc.calc_parallel_deep_cut(-0.25, 0.25, 1.0)
             (0.0, 0.8, 1.25)
+            >>> calc.calc_parallel_deep_cut(0.0, 0.09, 0.01)
+            (0.020941836487980856, 0.46537414417735234, 1.082031295477563)
         """
         b0b1 = beta0 * beta1
         return self.calc_parallel_deep_cut_fast(
@@ -435,6 +437,44 @@ class EllCalcCore:
                "-τ" "-β" "-β"      +τ
                       1    0
 
+                 2                            
+            η = τ  + n ⋅ β  ⋅ β               
+                          0    1              
+                                              
+            β = β  + β                        
+                 0    1                       
+                                              
+                 2             n    2         
+            h = τ  + β  ⋅ β  + ─ ⋅ β          
+                      0    1   2              
+                                              
+                       _____________________  
+                      ╱ 2                  2  
+            r = h + ╲╱ h  - (n + 1) ⋅ η ⋅ β   
+                                              
+                    r                         
+            μ + 2 = ─                         
+                    η                         
+                                              
+                1       η                     
+            b = ─ = ─────────                 
+                μ   r - 2 ⋅ η                 
+                                              
+                  β                           
+            ϱ = ─────                         
+                μ + 2                         
+                                              
+                  2                           
+            σ = ─────                         
+                μ + 2                         
+                                              
+                         ⎛  2                ⎞
+                     b   ⎜ β                 ⎟
+            δ = 1 + ── ⋅ ⎜───── - 2 ⋅ β  ⋅ β ⎟
+                     2   ⎝μ + 2        0    1⎠
+                    τ                         
+                                  
+
         Examples:
             >>> calc = EllCalcCore(4)
             >>> calc.calc_parallel_deep_cut_fast(0.11, 0.01, 0.01, 0.0011, 0.0144)
@@ -445,9 +485,9 @@ class EllCalcCore:
         bsum = beta0 + beta1
         bsumsq = bsum * bsum
         h = tsq + b0b1 + self._half_n * bsumsq
-        root = h + sqrt(h * h - eta * self._n_plus_1 * bsumsq)
-        inv_mu_plus_2 = eta / root
-        inv_mu = eta / (root - 2.0 * eta)
+        r = h + sqrt(h * h - eta * self._n_plus_1 * bsumsq)
+        inv_mu_plus_2 = eta / r
+        inv_mu = eta / (r - 2.0 * eta)
         rho = bsum * inv_mu_plus_2
         sigma = 2.0 * inv_mu_plus_2
         delta = 1.0 + (-2.0 * b0b1 + bsumsq * inv_mu_plus_2) * inv_mu / tsq
