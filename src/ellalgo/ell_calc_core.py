@@ -45,6 +45,7 @@ class EllCalcCore:
         self._n_f = n_f
         self._half_n = self._n_f / 2.0
         self._n_plus_1 = self._n_f + 1.0
+        self._inv_n = 1.0 / self._n_f
         self._n_sq = self._n_f * self._n_f
         self._cst0 = 1.0 / self._n_plus_1
         self._cst1 = self._n_sq / (self._n_sq - 1.0)
@@ -153,7 +154,7 @@ class EllCalcCore:
         alpha = beta / tau
         rho = self._cst0 * eta
         sigma = self._cst2 * eta / (tau + beta)
-        delta = self._cst1 * (1.0 - alpha) * (1 + alpha)
+        delta = self._cst1 * (1.0 - alpha) * (1.0 + alpha)
         return (rho, sigma, delta)
 
     def calc_deep_cut(self, beta: float, tau: float) -> Tuple[float, float, float]:
@@ -246,9 +247,9 @@ class EllCalcCore:
                 n    2
             k = ─ ⋅ α
                 2
-                               ___________
-                              ╱ 2        2
-            r = μ + 1 = k + ╲╱ k  + 1 - α
+                       ___________
+                      ╱ 2        2
+            r = k + ╲╱ k  + 1 - α
 
                   β
             ϱ = ─────
@@ -258,24 +259,21 @@ class EllCalcCore:
             σ = ─────
                 r + 1
 
-                  n ⋅ r
+                    r
             δ = ─────────
-                n ⋅ r - 1
+                r - 1 / n
 
         Examples:
             >>> calc = EllCalcCore(4)
             >>> calc.calc_parallel_central_cut(0.09, 0.01)
             (0.020941836487980856, 0.46537414417735234, 1.082031295477563)
         """
-        b1sq = beta1 * beta1
-        a1sq = b1sq / tsq
+        a1sq = beta1 * beta1 / tsq
         k = self._half_n * a1sq
-        mu_plus_1 = k + sqrt(1.0 - a1sq + k * k)
-        mu_plus_2 = mu_plus_1 + 1.0
-        rho = beta1 / mu_plus_2
-        sigma = 2.0 / mu_plus_2
-        temp2 = self._n_f * mu_plus_1
-        delta = temp2 / (temp2 - 1.0)
+        r = k + sqrt(1.0 - a1sq + k * k)
+        rho = beta1 / (r + 1.0)
+        sigma = 2.0 / (r + 1.0)
+        delta = r / (r - self._inv_n)
         return (rho, sigma, delta)
 
     def calc_parallel_central_cut_old(
@@ -387,38 +385,32 @@ class EllCalcCore:
                       1    0
                  2                            
             η = τ  + n ⋅ β  ⋅ β               
-                          0    1              
-                                              
-             2            2
-            β  = ⎛β  + β ⎞ 
-                 ⎝ 0    1⎠ 
-                                              
-                 2             n    2         
-            h = τ  + β  ⋅ β  + ─ ⋅ β          
-                      0    1   2              
-                       _____________________  
-                      ╱ 2                  2  
-            k = h + ╲╱ h  - (n + 1) ⋅ η ⋅ β   
-                                              
-                    k                         
-            μ + 2 = ─                         
-                    η                         
-                                              
-            1       η                     
-            ─ = ─────────                 
-            μ   k - 2 ⋅ η                 
-                                              
-                  β                           
-            ϱ = ─────                         
-                μ + 2                         
-                                              
-                  2                           
-            σ = ─────                         
-                μ + 2                         
-                              ⎛  2                ⎞
-                 2    2   1   ⎜ β                 ⎟
-            δ ⋅ τ  = τ  + ─ ⋅ ⎜───── - 2 ⋅ β  ⋅ β ⎟
-                          μ   ⎝μ + 2        0    1⎠
+                          0    1                
+                β  + β                            
+                 0    1                           
+            β = ───────                           
+                   2                              
+                                                  
+                1   ⎛ 2          ⎞        2       
+            h = ─ ⋅ ⎜τ  + β  ⋅ β ⎟ + n ⋅ β        
+                2   ⎝      0    1⎠                
+                       _____________________      
+                      ╱ 2                  2      
+            k = h + ╲╱ h  - (n + 1) ⋅ η ⋅ β       
+                                                  
+                  1     η                         
+            σ = ───── = ─                         
+                μ + 1   k                         
+                                                  
+            1     η                               
+            ─ = ─────                             
+            μ   k - η                             
+                                                  
+            ϱ = β ⋅ σ                            
+                                                  
+                 2    2   1   ⎛ 2              ⎞  
+            δ ⋅ τ  = τ  + ─ ⋅ ⎜β  ⋅ σ - β  ⋅ β ⎟  
+                          μ   ⎝          0    1⎠   
 
         Examples:
             >>> calc = EllCalcCore(4)
@@ -470,37 +462,32 @@ class EllCalcCore:
                 |   |    |          |
                "-τ" "-β" "-β"      +τ
                       1    0
-                                              
-             2            2
-            β  = ⎛β  + β ⎞ 
-                 ⎝ 0    1⎠ 
-                                              
-                 2             n    2         
-            h = τ  + β  ⋅ β  + ─ ⋅ β          
-                      0    1   2              
-                       _____________________  
-                      ╱ 2                  2  
-            k = h + ╲╱ h  - (n + 1) ⋅ η ⋅ β   
-                                              
-                    k                         
-            μ + 2 = ─                         
-                    η                         
-                                              
-            1       η                     
-            ─ = ─────────                 
-            μ   k - 2 ⋅ η                 
-                                              
-                  β                           
-            ϱ = ─────                         
-                μ + 2                         
-                                              
-                  2                           
-            σ = ─────                         
-                μ + 2                         
-                              ⎛  2                ⎞
-                 2    2   1   ⎜ β                 ⎟
-            δ ⋅ τ  = τ  + ─ ⋅ ⎜───── - 2 ⋅ β  ⋅ β ⎟
-                          μ   ⎝μ + 2        0    1⎠
+
+                β  + β                            
+                 0    1                           
+            β = ───────                           
+                   2                              
+                                                  
+                1   ⎛ 2          ⎞        2       
+            h = ─ ⋅ ⎜τ  + β  ⋅ β ⎟ + n ⋅ β        
+                2   ⎝      0    1⎠                
+                       _____________________      
+                      ╱ 2                  2      
+            k = h + ╲╱ h  - (n + 1) ⋅ η ⋅ β       
+                                                  
+                  1     η                         
+            σ = ───── = ─                         
+                μ + 1   k                         
+                                                  
+            1     η                               
+            ─ = ─────                             
+            μ   k - η                             
+                                                  
+            ϱ = β ⋅ σ                            
+                                                  
+                 2    2   1   ⎛ 2              ⎞  
+            δ ⋅ τ  = τ  + ─ ⋅ ⎜β  ⋅ σ - β  ⋅ β ⎟  
+                          μ   ⎝          0    1⎠   
 
         Examples:
             >>> calc = EllCalcCore(4)
@@ -509,15 +496,14 @@ class EllCalcCore:
             >>> calc.calc_parallel_deep_cut_fast(-0.25, 0.25, 1.0, -0.0625, 0.75)
             (0.0, 0.8, 1.25)
         """
-        bsum = beta0 + beta1
-        bsumsq = bsum * bsum
-        h = tsq + b0b1 + self._half_n * bsumsq
-        k = h + sqrt(h * h - eta * self._n_plus_1 * bsumsq)
-        inv_mu_plus_2 = eta / k
-        inv_mu = eta / (k - 2.0 * eta)
-        rho = bsum * inv_mu_plus_2
-        sigma = 2.0 * inv_mu_plus_2
-        delta = 1.0 + (-2.0 * b0b1 + bsumsq * inv_mu_plus_2) * inv_mu / tsq
+        bavg = 0.5 * (beta0 + beta1)
+        bavgsq = bavg * bavg
+        h = 0.5 * (tsq + b0b1) + self._n_f * bavgsq
+        k = h + sqrt(h * h - self._n_plus_1 * eta * bavgsq)
+        sigma = eta / k
+        inv_mu = eta / (k - eta)
+        rho = bavg * sigma
+        delta = (tsq + inv_mu * (bavgsq * sigma - b0b1)) / tsq
         return (rho, sigma, delta)
 
     def calc_parallel_deep_cut_old(
