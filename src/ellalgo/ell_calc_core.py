@@ -246,9 +246,9 @@ class EllCalcCore:
                 n    2
             k = ─ ⋅ α
                 2
-                               _____________
-                              ╱ 2          2
-            r = μ + 1 = k + ╲╱ k  + 1.0 - α
+                               ___________
+                              ╱ 2        2
+            r = μ + 1 = k + ╲╱ k  + 1 - α
 
                   β
             ϱ = ─────
@@ -269,8 +269,8 @@ class EllCalcCore:
         """
         b1sq = beta1 * beta1
         a1sq = b1sq / tsq
-        temp = self._half_n * a1sq
-        mu_plus_1 = temp + sqrt(1.0 - a1sq + temp * temp)
+        k = self._half_n * a1sq
+        mu_plus_1 = k + sqrt(1.0 - a1sq + k * k)
         mu_plus_2 = mu_plus_1 + 1.0
         rho = beta1 / mu_plus_2
         sigma = 2.0 / mu_plus_2
@@ -385,6 +385,40 @@ class EllCalcCore:
                 |   |    |          |
                "-τ" "-β" "-β"      +τ
                       1    0
+                 2                            
+            η = τ  + n ⋅ β  ⋅ β               
+                          0    1              
+                                              
+             2            2
+            β  = ⎛β  + β ⎞ 
+                 ⎝ 0    1⎠ 
+                                              
+                 2             n    2         
+            h = τ  + β  ⋅ β  + ─ ⋅ β          
+                      0    1   2              
+                       _____________________  
+                      ╱ 2                  2  
+            k = h + ╲╱ h  - (n + 1) ⋅ η ⋅ β   
+                                              
+                    k                         
+            μ + 2 = ─                         
+                    η                         
+                                              
+            1       η                     
+            ─ = ─────────                 
+            μ   k - 2 ⋅ η                 
+                                              
+                  β                           
+            ϱ = ─────                         
+                μ + 2                         
+                                              
+                  2                           
+            σ = ─────                         
+                μ + 2                         
+                              ⎛  2                ⎞
+                 2    2   1   ⎜ β                 ⎟
+            δ ⋅ τ  = τ  + ─ ⋅ ⎜───── - 2 ⋅ β  ⋅ β ⎟
+                          μ   ⎝μ + 2        0    1⎠
 
         Examples:
             >>> calc = EllCalcCore(4)
@@ -436,29 +470,25 @@ class EllCalcCore:
                 |   |    |          |
                "-τ" "-β" "-β"      +τ
                       1    0
-
-                 2                            
-            η = τ  + n ⋅ β  ⋅ β               
-                          0    1              
                                               
-            β = β  + β                        
-                 0    1                       
+             2            2
+            β  = ⎛β  + β ⎞ 
+                 ⎝ 0    1⎠ 
                                               
                  2             n    2         
             h = τ  + β  ⋅ β  + ─ ⋅ β          
                       0    1   2              
-                                              
                        _____________________  
                       ╱ 2                  2  
-            r = h + ╲╱ h  - (n + 1) ⋅ η ⋅ β   
+            k = h + ╲╱ h  - (n + 1) ⋅ η ⋅ β   
                                               
-                    r                         
+                    k                         
             μ + 2 = ─                         
                     η                         
                                               
-                1       η                     
-            b = ─ = ─────────                 
-                μ   r - 2 ⋅ η                 
+            1       η                     
+            ─ = ─────────                 
+            μ   k - 2 ⋅ η                 
                                               
                   β                           
             ϱ = ─────                         
@@ -467,13 +497,10 @@ class EllCalcCore:
                   2                           
             σ = ─────                         
                 μ + 2                         
-                                              
-                         ⎛  2                ⎞
-                     b   ⎜ β                 ⎟
-            δ = 1 + ── ⋅ ⎜───── - 2 ⋅ β  ⋅ β ⎟
-                     2   ⎝μ + 2        0    1⎠
-                    τ                         
-                                  
+                              ⎛  2                ⎞
+                 2    2   1   ⎜ β                 ⎟
+            δ ⋅ τ  = τ  + ─ ⋅ ⎜───── - 2 ⋅ β  ⋅ β ⎟
+                          μ   ⎝μ + 2        0    1⎠
 
         Examples:
             >>> calc = EllCalcCore(4)
@@ -485,9 +512,9 @@ class EllCalcCore:
         bsum = beta0 + beta1
         bsumsq = bsum * bsum
         h = tsq + b0b1 + self._half_n * bsumsq
-        r = h + sqrt(h * h - eta * self._n_plus_1 * bsumsq)
-        inv_mu_plus_2 = eta / r
-        inv_mu = eta / (r - 2.0 * eta)
+        k = h + sqrt(h * h - eta * self._n_plus_1 * bsumsq)
+        inv_mu_plus_2 = eta / k
+        inv_mu = eta / (k - 2.0 * eta)
         rho = bsum * inv_mu_plus_2
         sigma = 2.0 * inv_mu_plus_2
         delta = 1.0 + (-2.0 * b0b1 + bsumsq * inv_mu_plus_2) * inv_mu / tsq
