@@ -59,16 +59,16 @@ class ProfitOracle(OracleOptim):
         self.price_out = price_out
         self.elasticities = elasticities
 
-    def assess_optim(self, y: Arr, target: float) -> Tuple[Cut, Optional[float]]:
+    def assess_optim(self, y: Arr, gamma: float) -> Tuple[Cut, Optional[float]]:
         """
-        The `assess_optim` function takes in an input quantity `y` and a target value, and returns a tuple
+        The `assess_optim` function takes in an input quantity `y` and a gamma value, and returns a tuple
         containing a cut and an updated best-so-far value.
 
         :param y: The parameter `y` is an array representing the input quantity in log scale
         :type y: Arr
-        :param target: The `target` parameter is the best-so-far optimal value. It represents the target
+        :param gamma: The `gamma` parameter is the best-so-far optimal value. It represents the gamma
         value that the optimization algorithm is trying to achieve or improve upon
-        :type target: float
+        :type gamma: float
         :return: The function `assess_optim` returns a tuple containing a `Cut` object and an optional float
         value. The `Cut` object represents a linear constraint in the form of a tuple `(g, fj)`, where `g`
         is a numpy array representing the coefficients of the linear constraint and `fj` is a float
@@ -84,13 +84,13 @@ class ProfitOracle(OracleOptim):
         log_Cobb = self.log_pA + self.elasticities.dot(y)
         q = self.price_out * np.exp(y)
         vx = q[0] + q[1]
-        if (fj := math.log(target + vx) - log_Cobb) >= 0.0:
-            g = q / (target + vx) - self.elasticities
+        if (fj := math.log(gamma + vx) - log_Cobb) >= 0.0:
+            g = q / (gamma + vx) - self.elasticities
             return (g, fj), None
 
-        target = np.exp(log_Cobb) - vx
-        g = q / (target + vx) - self.elasticities
-        return (g, 0.0), target
+        gamma = np.exp(log_Cobb) - vx
+        g = q / (gamma + vx) - self.elasticities
+        return (g, 0.0), gamma
 
 
 class ProfitRbOracle(OracleOptim):
@@ -144,16 +144,16 @@ class ProfitRbOracle(OracleOptim):
             params_rb, elasticities, price_out + np.array([e5, e5])
         )
 
-    def assess_optim(self, y: Arr, target: float) -> Tuple[Cut, Optional[float]]:
+    def assess_optim(self, y: Arr, gamma: float) -> Tuple[Cut, Optional[float]]:
         """
-        The `assess_optim` function takes in an input quantity `y` and a target value, and returns a tuple
+        The `assess_optim` function takes in an input quantity `y` and a gamma value, and returns a tuple
         containing a cut and an updated best-so-far value.
 
         :param y: The parameter `y` is an array representing the input quantity in log scale
         :type y: Arr
-        :param target: The `target` parameter is the best-so-far optimal value. It represents the current
+        :param gamma: The `gamma` parameter is the best-so-far optimal value. It represents the current
         best value that has been achieved in the optimization process
-        :type target: float
+        :type gamma: float
         :return: The function `assess_optim` returns a tuple containing a `Cut` object and an optional float
         value.
 
@@ -164,7 +164,7 @@ class ProfitRbOracle(OracleOptim):
         for i in [0, 1]:
             a_rb[i] += -self.e[i] if y[i] > 0.0 else self.e[i]
         self.omega.elasticities = a_rb
-        return self.omega.assess_optim(y, target)
+        return self.omega.assess_optim(y, gamma)
 
 
 class ProfitQOracle(OracleOptimQ):
@@ -207,17 +207,17 @@ class ProfitQOracle(OracleOptimQ):
         self.yd = np.array([0.0, 0.0])
 
     def assess_optim_q(
-        self, y: Arr, target: float, retry: bool
+        self, y: Arr, gamma: float, retry: bool
     ) -> Tuple[Cut, Arr, Optional[float], bool]:
         """
-        The `assess_optim_q` function takes in an input quantity `y` in log scale, a target value, and a
-        retry flag, and returns a tuple containing a cut, the target value, and the evaluation point.
+        The `assess_optim_q` function takes in an input quantity `y` in log scale, a gamma value, and a
+        retry flag, and returns a tuple containing a cut, the gamma value, and the evaluation point.
 
         :param y: An array representing the input quantity in log scale
         :type y: Arr
-        :param target: The `target` parameter is the best-so-far optimal value. It represents the current
+        :param gamma: The `gamma` parameter is the best-so-far optimal value. It represents the current
         best value that the optimization algorithm has found
-        :type target: float
+        :type gamma: float
         :param retry: A boolean flag indicating whether the optimization should be retried or not
         :type retry: bool
         :return: The function `assess_optim_q` returns a tuple containing the following elements:
@@ -233,6 +233,6 @@ class ProfitQOracle(OracleOptimQ):
                 x[1] = 1.0
             self.yd = np.log(x)
 
-        (g, h), tnew = self.omega.assess_optim(self.yd, target)
+        (g, h), tnew = self.omega.assess_optim(self.yd, gamma)
         h += g.dot(self.yd - y)
         return (g, h), self.yd, tnew, False

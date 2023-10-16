@@ -71,7 +71,7 @@ class EllCalc:
 
         :param beta: The parameter `beta` is of type `_type_` and represents some value. The specific
         details of its purpose and usage are not provided in the code snippet
-        :param tsq: tsq is a float value representing the squared t-value
+        :param tsq: tsq is a float value representing the squared tau-value
         :type tsq: float
         :return: a tuple containing the following elements:
         1. CutStatus: The status of the cut calculation.

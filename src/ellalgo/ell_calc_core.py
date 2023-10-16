@@ -438,7 +438,7 @@ class EllCalcCore:
         :type beta0: float
         :param beta1: The parameter `beta1` represents a float value
         :type beta1: float
-        :param tsq: tsq is a float representing the square of the value t
+        :param tsq: tsq is a float representing the square of the value tau
         :type tsq: float
         :param b0b1: The parameter `b0b1` represents a float value
         :type b0b1: float
@@ -518,7 +518,7 @@ class EllCalcCore:
         :type beta0: float
         :param beta1: The parameter `beta1` represents a float value
         :type beta1: float
-        :param tsq: tsq is a float representing the square of the value t
+        :param tsq: tsq is a float representing the square of the value tau
         :type tsq: float
         :return: a tuple with three elements.
 

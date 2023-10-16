@@ -26,27 +26,27 @@ class OracleFeas(Generic[ArrayType]):
 
 class OracleFeas2(OracleFeas[ArrayType]):
     @abstractmethod
-    def update(self, target) -> None:
+    def update(self, gamma) -> None:
         """
-        The `update` function updates a target object.
+        The `update` function updates a gamma object.
 
-        :param target: The `target` parameter is of type `Any`, which means it can accept any type of value.
-        It is used as an argument to update the target object
+        :param gamma: The `gamma` parameter is of type `Any`, which means it can accept any type of value.
+        It is used as an argument to update the gamma object
         """
         pass
 
 
 class OracleOptim(Generic[ArrayType]):
     @abstractmethod
-    def assess_optim(self, xc: ArrayType, target) -> Tuple[Cut, Optional[float]]:
+    def assess_optim(self, xc: ArrayType, gamma) -> Tuple[Cut, Optional[float]]:
         """
-        The `assess_optim` function assesses the feasibility based on the given `xc` and `target`
+        The `assess_optim` function assesses the feasibility based on the given `xc` and `gamma`
         parameters.
 
         :param xc: An array of values that represents the current solution or point in the optimization
         process
         :type xc: ArrayType
-        :param target: The `target` parameter is the value that we are trying to optimize or minimize. It
+        :param gamma: The `gamma` parameter is the value that we are trying to optimize or minimize. It
         could be a numerical value, a function, or any other type of object that represents the optimization
         goal
         """
@@ -75,7 +75,7 @@ class OracleFeasQ(Generic[ArrayType]):
 class OracleOptimQ(Generic[ArrayType]):
     @abstractmethod
     def assess_optim_q(
-        self, xc: ArrayType, target, retry: bool
+        self, xc: ArrayType, gamma, retry: bool
     ) -> Tuple[Cut, ArrayType, Optional[float], bool]:
         """assessment of optimization (discrete)
 
@@ -85,7 +85,7 @@ class OracleOptimQ(Generic[ArrayType]):
         :param xc: An array or list representing the current solution or configuration being assessed for
         optimization
         :type xc: ArrayType
-        :param target: The `target` parameter is the desired value or condition that the optimization
+        :param gamma: The `gamma` parameter is the desired value or condition that the optimization
         algorithm is trying to achieve. It could be a specific value, a range of values, or a certain
         condition that needs to be satisfied
         :param retry: A boolean flag indicating whether to retry the optimization if it fails
@@ -96,12 +96,12 @@ class OracleOptimQ(Generic[ArrayType]):
 
 class OracleBS(ABC):
     @abstractmethod
-    def assess_bs(self, target) -> bool:
+    def assess_bs(self, gamma) -> bool:
         """
-        The `assess_bs` function is a binary search assessment function that takes a target value as input
+        The `assess_bs` function is a binary search assessment function that takes a gamma value as input
         and returns a boolean value.
 
-        :param target: The target parameter is the value that we are searching for in the binary search
+        :param gamma: The gamma parameter is the value that we are searching for in the binary search
         """
         pass
 

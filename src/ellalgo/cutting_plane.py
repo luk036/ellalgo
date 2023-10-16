@@ -88,7 +88,7 @@ def cutting_plane_feas(
 def cutting_plane_optim(
     omega: OracleOptim[ArrayType],
     space: SearchSpace[ArrayType],
-    target,
+    gamma,
     options=Options(),
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for solving convex optimization problem
@@ -96,7 +96,7 @@ def cutting_plane_optim(
     Arguments:
         omega (OracleOptim): perform assessment on xinit
         space (SearchSpace): Search Space containing x*
-        target (Any): initial best-so-far value
+        gamma (Any): initial best-so-far value
         options (Options, optional): _description_. Defaults to Options().
 
     Returns:
@@ -106,16 +106,16 @@ def cutting_plane_optim(
     """
     x_best = None
     for niter in range(options.max_iters):
-        cut, t1 = omega.assess_optim(space.xc(), target)
-        if t1 is not None:  # better t obtained
-            target = t1
+        cut, gamma1 = omega.assess_optim(space.xc(), gamma)
+        if gamma1 is not None:  # better gamma obtained
+            gamma = gamma1
             x_best = copy.copy(space.xc())
             status = space.update_central_cut(cut)
         else:
             status = space.update_deep_cut(cut)
         if status != CutStatus.Success or space.tsq() < options.tol:
-            return x_best, target, niter
-    return x_best, target, options.max_iters
+            return x_best, gamma, niter
+    return x_best, gamma, options.max_iters
 
 
 def cutting_plane_feas_q(
@@ -135,7 +135,7 @@ def cutting_plane_feas_q(
     retry = False
     for niter in range(options.max_iters):
         cut, x_q, more_alt = omega.assess_feas_q(space_q.xc(), retry)
-        if cut is None:  # better t obtained
+        if cut is None:  # better gamma obtained
             return x_q, niter
         status = space_q.update_q(cut)
         if status == CutStatus.Success:
@@ -154,7 +154,7 @@ def cutting_plane_feas_q(
 def cutting_plane_optim_q(
     omega: OracleOptimQ[ArrayType],
     space_q: SearchSpaceQ[ArrayType],
-    target,
+    gamma,
     options=Options(),
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for solving convex discrete optimization problem
@@ -162,7 +162,7 @@ def cutting_plane_optim_q(
     Arguments:
         omega (OracleOptimQ): perform assessment on xinit
         space ([type]): Search Space containing x*
-        target (Any): initial best-so-far value
+        gamma (Any): initial best-so-far value
         options (Options, optional): _description_. Defaults to Options().
 
     Returns:
@@ -173,22 +173,22 @@ def cutting_plane_optim_q(
     x_best = None
     retry = False
     for niter in range(options.max_iters):
-        cut, x_q, t1, more_alt = omega.assess_optim_q(space_q.xc(), target, retry)
-        if t1 is not None:  # better t obtained
-            target = t1
+        cut, x_q, gamma1, more_alt = omega.assess_optim_q(space_q.xc(), gamma, retry)
+        if gamma1 is not None:  # better gamma obtained
+            gamma = gamma1
             x_best = x_q
         status = space_q.update_q(cut)
         if status == CutStatus.Success:
             retry = False
         elif status == CutStatus.NoSoln:
-            return x_best, target, niter
+            return x_best, gamma, niter
         elif status == CutStatus.NoEffect:
             if not more_alt:  # no more alternative cut
-                return x_best, target, niter
+                return x_best, gamma, niter
             retry = True
         if space_q.tsq() < options.tol:
-            return x_best, target, niter
-    return x_best, target, options.max_iters
+            return x_best, gamma, niter
+    return x_best, gamma, options.max_iters
 
 
 def bsearch(
@@ -213,11 +213,11 @@ def bsearch(
         tau = (upper - lower) / 2
         if tau < options.tol:
             return upper, niter
-        target = T(lower + tau)
-        if omega.assess_bs(target):  # feasible sol'n obtained
-            upper = target
+        gamma = T(lower + tau)
+        if omega.assess_bs(gamma):  # feasible sol'n obtained
+            upper = gamma
         else:
-            lower = target
+            lower = gamma
     return upper, options.max_iters
 
 
@@ -245,17 +245,17 @@ class BSearchAdaptor(Generic[ArrayType]):
         """
         return self.space.xc()
 
-    def assess_bs(self, target: Num) -> bool:
+    def assess_bs(self, gamma: Num) -> bool:
         """[summary]
 
         Arguments:
-            target (float): the best-so-far optimal value
+            gamma (float): the best-so-far optimal value
 
         Returns:
             bool: [description]
         """
         space = copy.deepcopy(self.space)
-        self.omega.update(target)
+        self.omega.update(gamma)
         x_feas, _ = cutting_plane_feas(self.omega, space, self.options)
         if x_feas is not None:
             self.space.set_xc(x_feas)

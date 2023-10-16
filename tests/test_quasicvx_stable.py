@@ -11,12 +11,12 @@ from ellalgo.ell_stable import EllStable
 
 
 class MyQuasicvxOracle(OracleOptim):
-    def assess_optim(self, z, target: float):
+    def assess_optim(self, z, gamma: float):
         """[summary]
 
         Arguments:
             z ([type]): [description]
-            target (float): the best-so-far optimal value
+            gamma (float): the best-so-far optimal value
 
         Returns:
             [type]: [description]
@@ -33,11 +33,11 @@ class MyQuasicvxOracle(OracleOptim):
 
         # objective: minimize -sqrt(x) / y
         tmp2 = math.exp(ly)
-        tmp3 = target * tmp2
+        tmp3 = gamma * tmp2
         if (fj := -sqrtx + tmp3) >= 0.0:  # feasible
             return (np.array([-1.0, tmp3]), fj), None
-        target = sqrtx / tmp2
-        return (np.array([-1.0, sqrtx]), 0), target
+        gamma = sqrtx / tmp2
+        return (np.array([-1.0, sqrtx]), 0), gamma
 
 
 def test_case_feasible():
