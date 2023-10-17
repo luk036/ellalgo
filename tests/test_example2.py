@@ -9,6 +9,8 @@ from ellalgo.ell_typing import OracleFeas
 
 
 class MyOracle(OracleFeas):
+    idx = 0
+        
     def assess_feas(self, z):
         """[summary]
 
@@ -21,12 +23,30 @@ class MyOracle(OracleFeas):
         x, y = z
 
         # constraint 1: x + y <= 3
-        if (fj := x + y - 3) > 0:
-            return np.array([1.0, 1.0]), fj
+        def fn1():
+            return x + y - 3
 
         # constraint 2: x - y >= 1
-        if (fj := -x + y + 1) > 0:
-            return np.array([-1.0, 1.0]), fj
+        def fn2():
+            return -x + y + 1
+
+        def grad1():
+            return np.array([1.0, 1.0])
+
+        def grad2():
+            return np.array([-1.0, 1.0])
+
+        fns = (fn1, fn2)
+        grads = (grad1, grad2)
+
+        for _ in [0, 1]:
+            self.idx += 1
+            if self.idx == 2:
+                self.idx = 0  # round robin
+            if (fj := fns[self.idx]()) > 0:
+                return grads[self.idx](), fj
+        
+        return None
 
 
 def test_case_feasible():
