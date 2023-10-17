@@ -212,7 +212,7 @@ class EllCalcCore:
     def calc_parallel_central_cut(
         self, beta1: float, tsq: float
     ) -> Tuple[float, float, float]:
-        r"""Calculate Parallel Central Cut
+        r"""Calculate Parallel Central Cut (7 mul/div + 1 sqrt)
 
         The function `calc_parallel_central_cut` calculates the parallel central cut for given values of `beta1` and
         `tsq`.
@@ -354,7 +354,7 @@ class EllCalcCore:
     def calc_parallel_deep_cut(
         self, beta0: float, beta1: float, tsq: float
     ) -> Tuple[float, float, float]:
-        r"""Calculation Parallel Deep Cut
+        r"""Calculation Parallel Deep Cut (15 mul/div + 1 sqrt)
 
         The `calc_parallel_deep_cut` function calculates various values based on the input parameters and returns
         them as a tuple.
@@ -429,7 +429,7 @@ class EllCalcCore:
     def calc_parallel_deep_cut_fast(
         self, beta0: float, beta1: float, tsq: float, b0b1: float, eta: float
     ) -> Tuple[float, float, float]:
-        r"""Calculation Parallel Deep Cut
+        r"""Calculation Parallel Deep Cut (13 mul/div + 1 sqrt)
 
         The `calc_parallel_deep_cut_fast` function calculates various values based on the input parameters and returns
         them as a tuple.

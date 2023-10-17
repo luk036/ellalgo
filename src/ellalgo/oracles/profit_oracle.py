@@ -28,6 +28,10 @@ class ProfitOracle(OracleOptim):
       v: output price
       k: a given constant that restricts the quantity of x1
     """
+    idx: int = 0  # for round robin
+    log_Cobb: float
+    q: Arr
+    vx: float
 
     log_pA: float
     log_k: float
@@ -58,6 +62,23 @@ class ProfitOracle(OracleOptim):
         self.log_k = math.log(limit)
         self.price_out = price_out
         self.elasticities = elasticities
+        self.fns = (self.fn1, self.fn2)
+        self.grads = (self.grad1, self.grad2)
+
+    def fn1(self, y, _):
+        return y[0] - self.log_k  # constraint
+
+    def fn2(self, y, gamma):
+        self.log_Cobb = self.log_pA + self.elasticities.dot(y)
+        self.q = self.price_out * np.exp(y)
+        self.vx = self.q[0] + self.q[1]
+        return math.log(gamma + self.vx) - self.log_Cobb
+
+    def grad1(self, _):
+        return np.array([1.0, 0.0])
+
+    def grad2(self, gamma):
+        return self.q / (gamma + self.vx) - self.elasticities
 
     def assess_optim(self, y: Arr, gamma: float) -> Tuple[Cut, Optional[float]]:
         """
@@ -77,19 +98,15 @@ class ProfitOracle(OracleOptim):
         See also:
             cutting_plane_optim
         """
-        if (fj := y[0] - self.log_k) > 0.0:  # constraint
-            g = np.array([1.0, 0.0])
-            return (g, fj), None
+        for _ in [0, 1]:
+            self.idx += 1
+            if self.idx == 2:
+                self.idx = 0  # round robin
+            if (fj := self.fns[self.idx](y, gamma)) > 0:
+                return (self.grads[self.idx](gamma), fj), None
 
-        log_Cobb = self.log_pA + self.elasticities.dot(y)
-        q = self.price_out * np.exp(y)
-        vx = q[0] + q[1]
-        if (fj := math.log(gamma + vx) - log_Cobb) >= 0.0:
-            g = q / (gamma + vx) - self.elasticities
-            return (g, fj), None
-
-        gamma = np.exp(log_Cobb) - vx
-        g = q / (gamma + vx) - self.elasticities
+        gamma = np.exp(self.log_Cobb) - self.vx
+        g = self.q / (gamma + self.vx) - self.elasticities
         return (g, 0.0), gamma
 
 

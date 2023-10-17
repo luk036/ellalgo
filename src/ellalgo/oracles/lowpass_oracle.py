@@ -69,11 +69,8 @@ class LowpassOracle:
         Returns:
             [type]: [description]
         """
-        # 1. nonnegative-real constraint
         self.more_alt = True
 
-        # case 2,
-        # 2. passband constraints
         mdim, ndim = self.spectrum.shape
         for k in range(self.nwpass):
             col_k = self.spectrum[k, :]
@@ -85,8 +82,6 @@ class LowpassOracle:
                 f = (-v + self.lp_sq, -v + self.up_sq)
                 return (-col_k, f), None
 
-        # case 3,
-        # 3. stopband constraint
         fmax = float("-inf")
         kmax = 0
         for k in range(self.nwstop, mdim):
