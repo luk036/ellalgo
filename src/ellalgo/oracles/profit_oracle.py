@@ -243,13 +243,13 @@ class ProfitQOracle(OracleOptimQ):
             cutting_plane_optim_q
         """
         if not retry:
-            x = np.round(np.exp(y))
-            if x[0] == 0:
-                x[0] = 1.0  # nearest integer than 0
-            if x[1] == 0:
-                x[1] = 1.0
-            self.yd = np.log(x)
+            xd = np.round(np.exp(y))
+            if xd[0] == 0:
+                xd[0] = 1.0  # nearest integer than 0
+            if xd[1] == 0:
+                xd[1] = 1.0
+            self.yd = np.log(xd)
 
-        (g, h), tnew = self.omega.assess_optim(self.yd, gamma)
-        h += g.dot(self.yd - y)
-        return (g, h), self.yd, tnew, False
+        (grad, beta), gamma_new = self.omega.assess_optim(self.yd, gamma)
+        beta += grad.dot(self.yd - y)  # reference as y
+        return (grad, beta), self.yd, gamma_new, False
