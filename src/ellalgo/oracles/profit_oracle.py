@@ -265,8 +265,7 @@ class ProfitQOracle(OracleOptimQ):
         """
         if not retry:
             # try continous y first
-            cut = self.omega.assess_feas(y, gamma);
-            if cut is not None:
+            if cut := self.omega.assess_feas(y, gamma):
                 return cut, y, None, True 
 
             xd = np.round(np.exp(y))
@@ -278,4 +277,4 @@ class ProfitQOracle(OracleOptimQ):
 
         (grad, beta), gamma_new = self.omega.assess_optim(self.yd, gamma)
         beta += grad.dot(self.yd - y)  # reference as y
-        return (grad, beta), self.yd, gamma_new, False
+        return (grad, beta), self.yd, gamma_new, False 
