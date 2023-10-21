@@ -66,9 +66,9 @@ def test_profit_rb_ell_stable(benchmark):
 
 def test_profit_q_ell(benchmark):
     num_iters = benchmark(run_profit_q, Ell)
-    assert num_iters == 27
+    assert num_iters == 29
 
 
 def test_profit_q_ell_stable(benchmark):
     num_iters = benchmark(run_profit_q, EllStable)
-    assert num_iters == 27
+    assert num_iters == 29

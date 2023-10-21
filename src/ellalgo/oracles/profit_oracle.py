@@ -1,13 +1,13 @@
 import copy
 import math
-from typing import Optional, Tuple
+from typing import Optional, Tuple, TypeAlias
 
 import numpy as np
 
 from ellalgo.cutting_plane import OracleOptim, OracleOptimQ
 
-Arr = np.ndarray
-Cut = Tuple[Arr, float]
+Arr: TypeAlias = np.ndarray
+Cut: TypeAlias = Tuple[Arr, float]
 
 
 class ProfitOracle(OracleOptim):
@@ -65,20 +65,45 @@ class ProfitOracle(OracleOptim):
         self.fns = (self.fn1, self.fn2)
         self.grads = (self.grad1, self.grad2)
 
-    def fn1(self, y, _):
+    def fn1(self, y: Arr, _: float) -> float:
         return y[0] - self.log_k  # constraint
 
-    def fn2(self, y, gamma):
+    def fn2(self, y: Arr, gamma: float) -> float:
         self.log_Cobb = self.log_pA + self.elasticities.dot(y)
         self.q = self.price_out * np.exp(y)
         self.vx = self.q[0] + self.q[1]
         return math.log(gamma + self.vx) - self.log_Cobb
 
-    def grad1(self, _):
+    def grad1(self, _: float) -> Arr:
         return np.array([1.0, 0.0])
 
-    def grad2(self, gamma):
+    def grad2(self, gamma: float) -> Arr:
         return self.q / (gamma + self.vx) - self.elasticities
+
+    def assess_feas(self, y: Arr, gamma: float) -> Optional[Cut]:
+        """
+        The `assess_feas` function takes in an input quantity `y` and a gamma value, and an optional Cut.
+
+        :param y: The parameter `y` is an array representing the input quantity in log scale
+        :type y: Arr
+        :param gamma: The `gamma` parameter is the best-so-far optimal value. It represents the gamma
+        value that the optimization algorithm is trying to achieve or improve upon
+        :type gamma: float
+        :return: The function `assess_feas` returns an optional Cut. The `Cut` object represents a 
+        linear constraint in the form of a tuple `(grad, fj)`, where `grad`
+        is a numpy array representing the coefficients of the linear constraint and `fj` is a float
+        representing the right-hand side of the constraint.
+
+        See also:
+            cutting_plane_optim
+        """
+        for _ in [0, 1]:
+            self.idx += 1
+            if self.idx == 2:
+                self.idx = 0  # round robin
+            if (fj := self.fns[self.idx](y, gamma)) > 0:
+                return self.grads[self.idx](gamma), fj
+        return None
 
     def assess_optim(self, y: Arr, gamma: float) -> Tuple[Cut, Optional[float]]:
         """
@@ -93,21 +118,17 @@ class ProfitOracle(OracleOptim):
         :return: The function `assess_optim` returns a tuple containing a `Cut` object and an optional float
         value. The `Cut` object represents a linear constraint in the form of a tuple `(g, fj)`, where `g`
         is a numpy array representing the coefficients of the linear constraint and `fj` is a float
-        representing the right-hand side of the constraint. The optional float value
+        representing the right-hand side of the constraint.
 
         See also:
             cutting_plane_optim
         """
-        for _ in [0, 1]:
-            self.idx += 1
-            if self.idx == 2:
-                self.idx = 0  # round robin
-            if (fj := self.fns[self.idx](y, gamma)) > 0:
-                return (self.grads[self.idx](gamma), fj), None
-
+        cut = self.assess_feas(y, gamma);
+        if cut is not None:
+            return cut, None
         gamma = np.exp(self.log_Cobb) - self.vx
-        g = self.q / (gamma + self.vx) - self.elasticities
-        return (g, 0.0), gamma
+        grad = self.q / (gamma + self.vx) - self.elasticities
+        return (grad, 0.0), gamma
 
 
 class ProfitRbOracle(OracleOptim):
@@ -243,6 +264,11 @@ class ProfitQOracle(OracleOptimQ):
             cutting_plane_optim_q
         """
         if not retry:
+            # try continous y first
+            cut = self.omega.assess_feas(y, gamma);
+            if cut is not None:
+                return cut, y, None, True 
+
             xd = np.round(np.exp(y))
             if xd[0] == 0:
                 xd[0] = 1.0  # nearest integer than 0
