@@ -37,5 +37,5 @@ def test_lowpass():
     """Test the lowpass case with parallel cut"""
     result, feasible = run_lowpass(True)
     assert feasible
-    assert result >= 1083
+    assert result >= 1075
     assert result <= 1194

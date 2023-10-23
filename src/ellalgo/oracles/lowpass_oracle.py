@@ -1,10 +1,10 @@
 from math import floor
-from typing import Tuple
+from typing import Tuple, Optional
 
 import numpy as np
 
 Arr = np.ndarray
-Cut = Tuple[Arr, float]
+Cut = Tuple[Arr, float | Tuple[float, float]]
 
 
 # Modified from CVX code by Almir Mutapcic in 2006.
@@ -39,6 +39,7 @@ Cut = Tuple[Arr, float]
 # number of FIR coefficients (including zeroth)
 class LowpassOracle:
     more_alt: bool = True
+    idx1: int = 0;
 
     def __init__(
         self, ndim: int, wpass: float, wstop: float, lp_sq: float, up_sq: float
@@ -58,8 +59,13 @@ class LowpassOracle:
         self.nwstop: int = floor(wstop * (mdim - 1)) + 1  # end of stopband
         self.lp_sq = lp_sq
         self.up_sq = up_sq
+        self.idx1 = 0
+        self.idx2 = self.nwpass
+        self.idx3 = self.nwstop
+        self.fmax = float("-inf")
+        self.kmax = 0
 
-    def assess_optim(self, x: Arr, sp_sq: float):
+    def assess_feas(self, x: Arr, sp_sq: float) -> Optional[Cut]:
         """[summary]
 
         Arguments:
@@ -72,36 +78,45 @@ class LowpassOracle:
         self.more_alt = True
 
         mdim, ndim = self.spectrum.shape
-        for k in range(self.nwpass):
-            col_k = self.spectrum[k, :]
+        for _ in range(self.nwpass):
+            self.idx1 += 1
+            if self.idx1 == self.nwpass:
+                self.idx1 = 0  # round robin
+            col_k = self.spectrum[self.idx1, :]
             v = col_k.dot(x)
             if v > self.up_sq:
                 f = (v - self.up_sq, v - self.lp_sq)
-                return (col_k, f), None
+                return col_k, f
             if v < self.lp_sq:
                 f = (-v + self.lp_sq, -v + self.up_sq)
-                return (-col_k, f), None
+                return -col_k, f
 
-        fmax = float("-inf")
-        kmax = 0
-        for k in range(self.nwstop, mdim):
-            col_k = self.spectrum[k, :]
+        self.fmax = float("-inf")
+        self.kmax = 0
+        for _ in range(self.nwstop, mdim):
+            self.idx3 += 1
+            if self.idx3 == mdim:
+                self.idx3 = self.nwstop  # round robin
+            col_k = self.spectrum[self.idx3, :]
             v = col_k.dot(x)
             if v > sp_sq:
-                return (col_k, (v - sp_sq, v)), None
+                return col_k, (v - sp_sq, v)
             if v < 0:
-                return (-col_k, (-v, -v + sp_sq)), None
-            if v > fmax:
-                fmax = v
-                kmax = k
+                return -col_k, (-v, -v + sp_sq)
+            if v > self.fmax:
+                self.fmax = v
+                self.kmax = self.idx3
 
         # case 4,
         # 1. nonnegative-real constraint on other frequences
-        for k in range(self.nwpass, self.nwstop):
-            col_k = self.spectrum[k, :]
+        for _ in range(self.nwpass, self.nwstop):
+            self.idx2 += 1
+            if self.idx2 == self.nwstop:
+                self.idx2 = self.nwpass  # round robin
+            col_k = self.spectrum[self.idx2, :]
             v = col_k.dot(x)
             if v < 0:
-                return (-col_k, -v), None  # single cut
+                return -col_k, -v  # single cut
 
         self.more_alt = False
 
@@ -109,10 +124,25 @@ class LowpassOracle:
         if x[0] < 0:
             grad = np.zeros(ndim)
             grad[0] = -1.0
-            return (grad, -x[0]), None
+            return grad, -x[0]
 
+        return None
+
+
+    def assess_optim(self, x: Arr, sp_sq: float):
+        """[summary]
+
+        Arguments:
+            x (Arr): coefficients of autocorrelation
+            sp_sq (float): the best-so-far stop_pass^2
+
+        Returns:
+            [type]: [description]
+        """
+        if cut := self.assess_feas(x, sp_sq):
+            return cut, None
         # Begin objective function
-        return (self.spectrum[kmax, :], (0.0, fmax)), fmax
+        return (self.spectrum[self.kmax, :], (0.0, self.fmax)), self.fmax
 
 
 # *********************************************************************
