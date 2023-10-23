@@ -1,10 +1,10 @@
 from math import floor
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Union
 
 import numpy as np
 
 Arr = np.ndarray
-Cut = Tuple[Arr, float | Tuple[float, float]]
+Cut = Tuple[Arr, Union[float, Tuple[float, float]]]
 
 
 # Modified from CVX code by Almir Mutapcic in 2006.
