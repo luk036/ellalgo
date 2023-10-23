@@ -4,7 +4,6 @@ from __future__ import print_function
 import math
 
 import numpy as np
-from pytest import approx
 
 from ellalgo.cutting_plane import cutting_plane_optim
 from ellalgo.ell import Ell
