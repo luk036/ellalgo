@@ -10,7 +10,7 @@ from ellalgo.ell_typing import OracleFeas, OracleOptim
 
 class MyOracleFeas(OracleFeas):
     idx = 0
-        
+
     # constraint 1: x + y <= 3
     def fn1(self, x, y):
         return x + y - 3
@@ -76,7 +76,7 @@ class MyOracle(OracleOptim):
 
 class MyOracleFeas2(OracleFeas):
     idx = 0
-        
+
     # constraint 1: x + y <= 3
     def fn1(self, x, y):
         return x + y - 3

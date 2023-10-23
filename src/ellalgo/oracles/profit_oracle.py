@@ -28,6 +28,7 @@ class ProfitOracle(OracleOptim):
       v: output price
       k: a given constant that restricts the quantity of x1
     """
+
     idx: int = 0  # for round robin
     log_Cobb: float
     q: Arr
@@ -89,7 +90,7 @@ class ProfitOracle(OracleOptim):
         :param gamma: The `gamma` parameter is the best-so-far optimal value. It represents the gamma
         value that the optimization algorithm is trying to achieve or improve upon
         :type gamma: float
-        :return: The function `assess_feas` returns an optional Cut. The `Cut` object represents a 
+        :return: The function `assess_feas` returns an optional Cut. The `Cut` object represents a
         linear constraint in the form of a tuple `(grad, fj)`, where `grad`
         is a numpy array representing the coefficients of the linear constraint and `fj` is a float
         representing the right-hand side of the constraint.
@@ -123,7 +124,7 @@ class ProfitOracle(OracleOptim):
         See also:
             cutting_plane_optim
         """
-        cut = self.assess_feas(y, gamma);
+        cut = self.assess_feas(y, gamma)
         if cut is not None:
             return cut, None
         gamma = np.exp(self.log_Cobb) - self.vx
@@ -266,7 +267,7 @@ class ProfitQOracle(OracleOptimQ):
         if not retry:
             # try continous y first
             if cut := self.omega.assess_feas(y, gamma):
-                return cut, y, None, True 
+                return cut, y, None, True
 
             xd = np.round(np.exp(y))
             if xd[0] == 0:
@@ -277,4 +278,4 @@ class ProfitQOracle(OracleOptimQ):
 
         (grad, beta), gamma_new = self.omega.assess_optim(self.yd, gamma)
         beta += grad.dot(self.yd - y)  # reference as y
-        return (grad, beta), self.yd, gamma_new, False 
+        return (grad, beta), self.yd, gamma_new, False

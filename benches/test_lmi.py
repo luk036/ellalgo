@@ -41,9 +41,7 @@ class MyOracle(OracleOptim):
         self.lmi1 = oracle(F1, B1)
         self.lmi2 = oracle(F2, B2)
 
-    def assess_optim(
-        self, xc: np.ndarray, gamma: float
-    ) -> Tuple[Cut, Optional[float]]:
+    def assess_optim(self, xc: np.ndarray, gamma: float) -> Tuple[Cut, Optional[float]]:
         """[summary]
 
         Arguments:

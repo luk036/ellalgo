@@ -10,7 +10,7 @@ from ellalgo.ell_typing import OracleFeas
 
 class MyOracle(OracleFeas):
     idx = 0
-        
+
     # constraint 1: x + y <= 3
     def fn1(self, x, y):
         return x + y - 3
@@ -47,7 +47,6 @@ class MyOracle(OracleFeas):
             if (fj := self.fns[self.idx](x, y)) > 0:
                 return self.grads[self.idx](), fj
         return None
-
 
 
 def test_case_feasible():
