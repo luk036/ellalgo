@@ -1,13 +1,13 @@
 import copy
 import math
-from typing import Optional, Tuple, TypeAlias
+from typing import Optional, Tuple
 
 import numpy as np
 
 from ellalgo.cutting_plane import OracleOptim, OracleOptimQ
 
-Arr: TypeAlias = np.ndarray
-Cut: TypeAlias = Tuple[Arr, float]
+Arr = np.ndarray
+Cut = Tuple[Arr, float]
 
 
 class ProfitOracle(OracleOptim):
