@@ -278,4 +278,4 @@ class ProfitQOracle(OracleOptimQ):
 
         (grad, beta), gamma_new = self.omega.assess_optim(self.yd, gamma)
         beta += grad.dot(self.yd - y)  # reference as y
-        return (grad, beta), self.yd, gamma_new, False
+        return (grad, beta), self.yd, gamma_new, not retry
