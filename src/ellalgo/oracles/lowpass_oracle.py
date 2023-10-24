@@ -39,7 +39,7 @@ Cut = Tuple[Arr, Union[float, Tuple[float, float]]]
 # number of FIR coefficients (including zeroth)
 class LowpassOracle:
     more_alt: bool = True
-    idx1: int = 0;
+    idx1: int = 0
 
     def __init__(
         self, ndim: int, wpass: float, wstop: float, lp_sq: float, up_sq: float
@@ -127,7 +127,6 @@ class LowpassOracle:
             return grad, -x[0]
 
         return None
-
 
     def assess_optim(self, x: Arr, sp_sq: float):
         """[summary]
