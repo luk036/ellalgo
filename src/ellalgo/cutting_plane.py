@@ -199,8 +199,7 @@ def cutting_plane_optim_q(
     x_best = None
     retry = False
     for niter in range(options.max_iters):
-        cut, x_q, gamma1, more_alt = omega.assess_optim_q(
-            space_q.xc(), gamma, retry)
+        cut, x_q, gamma1, more_alt = omega.assess_optim_q(space_q.xc(), gamma, retry)
         if gamma1 is not None:  # better gamma obtained
             gamma = gamma1
             x_best = x_q
