@@ -40,6 +40,7 @@ class LDLTMgr:
 
         :param ndim: The parameter ndim represents the dimension of the object. It is an integer value that
         determines the size of the object being constructed
+
         :type ndim: int
         """
         self.pos = (0, 0)
@@ -77,7 +78,9 @@ class LDLTMgr:
         :param get_elem: The `get_elem` parameter is a callable function that is used to access the elements
         of a symmetric matrix. It takes two integer arguments `i` and `j` and returns the value of the
         element at the `(i, j)` position in the matrix
+
         :type get_elem: Callable[[int, int], float]
+
         :return: The function `factor` returns a boolean value indicating whether the matrix is symmetric
         positive definite (SPD).
 
@@ -114,7 +117,9 @@ class LDLTMgr:
         :param get_elem: The `get_elem` parameter is a callable function that takes two integer arguments
         `i` and `j` and returns a float value. This function is used to access the elements of a symmetric
         matrix `mat`. The `factor_with_allow_semidefinite` method performs LDLT Factorization on
+
         :type get_elem: Callable[[int, int], float]
+
         :return: The function `factor_with_allow_semidefinite` returns a boolean value indicating whether
         the matrix is symmetric positive definite (SPD).
 
@@ -147,6 +152,7 @@ class LDLTMgr:
         """
         The function `is_spd` checks if a matrix `A` is symmetric positive definite (spd) and returns `True`
         if it is.
+
         :return: a boolean value. It returns True if the matrix A is symmetric positive definite (spd), and
         False otherwise.
 
@@ -195,7 +201,9 @@ class LDLTMgr:
         The `sym_quad` function calculates the quadratic form of a vector `v` with a symmetric matrix `mat`.
 
         :param mat: mat is a numpy array
+
         :type mat: np.ndarray
+
         :return: The function `sym_quad` returns the result of the dot product between `v` and the matrix
         product of `mat[start:ndim, start:ndim]` and `v`.
 

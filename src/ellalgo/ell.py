@@ -28,9 +28,11 @@ class Ell(SearchSpace[ArrayType], SearchSpaceQ[ArrayType]):
         :param val: The parameter `val` can be either an integer, a float, or a list of numbers. If it
         is an integer or a float, it represents the value of kappa. If it is a list of numbers, it
         represents the diagonal elements of a matrix, mq
+
         :param xc: The parameter `xc` is of type `ArrayType`, which suggests that it is an array-like
         object. It is used to store the values of `xc` in the `__init__` method. The length of `xc` is
         calculated using `len(xc)` and stored in the variable
+
         :type xc: ArrayType
         """
         ndim = len(xc)
@@ -106,8 +108,7 @@ class Ell(SearchSpace[ArrayType], SearchSpaceQ[ArrayType]):
         The function `update_q` is an implementation of the `SearchSpaceQ` interface that updates the
         ellipsoid based on a given non-central cut (deep or shallow).
 
-        :param cut: The `cut` parameter is of type `_type_` and it represents the cut that needs to be
-        updated
+        :param cut: The `cut` parameter is of type `_type_` and it represents the cut that needs to be updated
         :return: a `CutStatus` object.
 
         Examples:
@@ -127,10 +128,13 @@ class Ell(SearchSpace[ArrayType], SearchSpaceQ[ArrayType]):
 
         :param cut: The `cut` parameter is of type `_type_` and represents the cut to be applied to the
         ellipsoid. The specific type of `_type_` is not specified in the code snippet provided
+
         :param cut_strategy: The `cut_strategy` parameter is a callable object that represents the
         strategy for determining the cut status. It takes two arguments: `beta` and `tsq`. `beta` is a
-        scalar value and `tsq` is a scalar value representing the squared norm of the current cut. The `
+        scalar value and `tsq` is a scalar value representing the squared norm of the current cut.
+
         :type cut_strategy: Callable
+
         :return: a `CutStatus` object.
 
         Examples:

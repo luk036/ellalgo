@@ -45,7 +45,9 @@ class OracleOptim(Generic[ArrayType]):
 
         :param xc: An array of values that represents the current solution or point in the optimization
         process
+
         :type xc: ArrayType
+
         :param gamma: The `gamma` parameter is the value that we are trying to optimize or minimize. It
         could be a numerical value, a function, or any other type of object that represents the optimization
         goal
@@ -65,8 +67,11 @@ class OracleFeasQ(Generic[ArrayType]):
 
         :param xc: An array of some type. It represents a variable or a set of variables that need to be
         assessed for feasibility
+
         :type xc: ArrayType
+
         :param retry: A boolean flag indicating whether to retry the assessment if it fails initially
+
         :type retry: bool
         """
         pass
@@ -84,11 +89,15 @@ class OracleOptimQ(Generic[ArrayType]):
 
         :param xc: An array or list representing the current solution or configuration being assessed for
         optimization
+
         :type xc: ArrayType
+
         :param gamma: The `gamma` parameter is the desired value or condition that the optimization
         algorithm is trying to achieve. It could be a specific value, a range of values, or a certain
         condition that needs to be satisfied
+
         :param retry: A boolean flag indicating whether to retry the optimization if it fails
+
         :type retry: bool
         """
         pass
@@ -117,6 +126,7 @@ class SearchSpace(Generic[ArrayType]):
 
         :param cut: The `cut` parameter is an instance of the `Cut` class. It represents a deep-cut that
         needs to be updated
+
         :type cut: Cut
         """
 
@@ -128,6 +138,7 @@ class SearchSpace(Generic[ArrayType]):
 
         :param cut: The "cut" parameter is an instance of the Cut class. It represents the central cut that
         needs to be updated
+
         :type cut: Cut
         """
 

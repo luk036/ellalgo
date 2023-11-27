@@ -25,6 +25,7 @@ class EllCalcCore:
 
         :param n_f: The parameter `n_f` represents a floating point value. It is used to
         initialize the `EllCalcCore` object
+
         :type n_f: float
 
         Examples:
@@ -214,15 +215,13 @@ class EllCalcCore:
     ) -> Tuple[float, float, float]:
         r"""Calculate Parallel Central Cut (7 mul/div + 1 sqrt)
 
-        The function `calc_parallel_central_cut` calculates the parallel central cut for given values of `beta1` and
-        `tsq`.
+        The function `calc_parallel_central_cut` calculates the parallel central cut for given values of `beta1` and `tsq`.
 
         :param beta1: The parameter `beta1` represents a float value. It is used in the calculation of the central cut
         :type beta1: float
         :param tsq: The parameter `tsq` represents the square of a value
         :type tsq: float
-        :return: The function `calc_parallel_central_cut` returns a tuple of four values: `CutStatus`, `float`,
-        `float`, `float`.
+        :return: The function `calc_parallel_central_cut` returns a tuple of four values: `CutStatus`, `float`, `float`, `float`.
 
         .. svgbob::
            :align: center
@@ -281,8 +280,7 @@ class EllCalcCore:
     ) -> Tuple[float, float, float]:
         r"""Calculate Parallel Central Cut
 
-        The function `calc_parallel_central_cut` calculates the parallel central cut for given values of `beta1` and
-        `tsq`.
+        The function `calc_parallel_central_cut` calculates the parallel central cut for given values of `beta1` and `tsq`.
 
         :param beta1: The parameter `beta1` represents a float value. It is used in the calculation of the central cut
         :type beta1: float
@@ -431,8 +429,7 @@ class EllCalcCore:
     ) -> Tuple[float, float, float]:
         r"""Calculation Parallel Deep Cut (13 mul/div + 1 sqrt)
 
-        The `calc_parallel_deep_cut_fast` function calculates various values based on the input parameters and returns
-        them as a tuple.
+        The `calc_parallel_deep_cut_fast` function calculates various values based on the input parameters and returns them as a tuple.
 
         :param beta0: The parameter `beta0` represents a float value
         :type beta0: float
@@ -511,8 +508,7 @@ class EllCalcCore:
     ) -> Tuple[float, float, float]:
         r"""Calculation Parallel Deep Cut
 
-        The `calc_parallel_deep_cut` function calculates various values based on the input parameters and returns
-        them as a tuple.
+        The `calc_parallel_deep_cut` function calculates various values based on the input parameters and returns them as a tuple.
 
         :param beta0: The parameter `beta0` represents a float value
         :type beta0: float

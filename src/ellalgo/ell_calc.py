@@ -22,8 +22,7 @@ class EllCalc:
         """
         The function initializes several variables based on the input value.
 
-        :param n: The parameter `n` represents an integer value. It is used to initialize the `EllCalc`
-        object
+        :param n: The parameter `n` represents an integer value. It is used to initialize the `EllCalc` object
         :type n: int
 
         Examples:
@@ -45,10 +44,13 @@ class EllCalc:
         the input parameters.
 
         :param beta: The parameter `beta` can be of type `int`, `float`, or a list of two elements
+
         :param tsq: The `tsq` parameter is a floating-point number that represents the square of the
         tolerance for the ellipsoid algorithm. It is used in the calculations performed by the
         `calc_single_or_parallel` method
+
         :type tsq: float
+
         :return: The function `calc_single_or_parallel` returns a tuple containing the following elements:
 
         Examples:
@@ -71,8 +73,11 @@ class EllCalc:
 
         :param beta: The parameter `beta` is of type `_type_` and represents some value. The specific
         details of its purpose and usage are not provided in the code snippet
+
         :param tsq: tsq is a float value representing the squared tau-value
+
         :type tsq: float
+
         :return: a tuple containing the following elements:
         1. CutStatus: The status of the cut calculation.
         2. float: The calculated value.
@@ -159,12 +164,10 @@ class EllCalc:
         The function `calc_single_or_parallel_q` calculates the deep cut or parallel cut based on the input
         parameters `beta` and `tsq`.
 
-        :param beta: The parameter `beta` can be either a single value (int or float) or a list of two
-        values
+        :param beta: The parameter `beta` can be either a single value (int or float) or a list of two values
         :param tsq: tsq is a float value representing the square of the threshold value
         :type tsq: float
-        :return: The function `calc_single_or_parallel_q` returns a tuple containing four elements:
-        `CutStatus`, `float`, `float`, and `float`.
+        :return: The function `calc_single_or_parallel_q` returns a tuple containing four elements: `CutStatus`, `float`, `float`, and `float`.
         """
         if isinstance(beta, (int, float)):
             return self.calc_deep_cut_q(beta, tsq)
@@ -190,8 +193,7 @@ class EllCalc:
         :type beta1: float
         :param tsq: tsq is a float value that represents the square of a variable
         :type tsq: float
-        :return: The function `calc_parallel_q` returns a tuple of type `Tuple[CutStatus, float, float,
-        float]`.
+        :return: The function `calc_parallel_q` returns a tuple of type `Tuple[CutStatus, float, float, float]`.
         """
         if beta1 < beta0:
             return (CutStatus.NoSoln, None)  # no sol'n
@@ -219,8 +221,7 @@ class EllCalc:
         :param tsq: tsq is the square of the threshold value. It is a float value that represents the
         threshold squared
         :type tsq: float
-        :return: The function `calc_deep_cut_q` returns a tuple of four values: `CutStatus`, `float`, `float`,
-        `float`.
+        :return: The function `calc_deep_cut_q` returns a tuple of four values: `CutStatus`, `float`, `float`, `float`.
 
         Examples:
             >>> from ellalgo.ell_calc import EllCalc

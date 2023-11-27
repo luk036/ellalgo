@@ -15,6 +15,7 @@ class ell1d:
 
         :param interval: The `interval` parameter is a tuple of two floats representing the lower and
         upper bounds of a range
+
         :type interval: Tuple[float, float]
         """
         l, u = interval
@@ -64,10 +65,13 @@ class ell1d:
 
         :param cut: The `cut` parameter is a tuple containing two floats: `grad` and `beta`. `grad`
         represents the gradient, and `beta` represents the beta value
+
         :type cut: Tuple[float, float]
+
         :param central_cut: A boolean parameter that indicates whether the cut is a central cut or not.
         If it is set to True, the cut is a central cut. If it is set to False, the cut is not a central
         cut, defaults to False (optional)
+
         :return: a `CutStatus` enum value and the "volumn" of the ellipsoid (`tau`).
 
         Examples:

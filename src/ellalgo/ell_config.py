@@ -24,10 +24,13 @@ class CInfo:
         The function initializes a new CInfo object with the given feasibility and number of iterations.
 
         :param feasible: A boolean value indicating whether the solution is feasible or not
+
         :type feasible: bool
+
         :param num_iters: The `num_iters` parameter represents the number of iterations or steps taken
         in a process or algorithm. It is an integer value that indicates how many times a certain
         operation or calculation has been performed
+
         :type num_iters: int
         """
         self.feasible: bool = feasible
