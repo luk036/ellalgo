@@ -199,7 +199,8 @@ def cutting_plane_optim_q(
     x_best = None
     retry = False
     for niter in range(options.max_iters):
-        cut, x_q, gamma1, more_alt = omega.assess_optim_q(space_q.xc(), gamma, retry)
+        cut, x_q, gamma1, more_alt = omega.assess_optim_q(
+            space_q.xc(), gamma, retry)
         if gamma1 is not None:  # better gamma obtained
             gamma = gamma1
             x_best = x_q
@@ -226,17 +227,19 @@ def bsearch(
 
     :param omega: The parameter `omega` is an instance of the `OracleBS` class. It represents an oracle
     that provides information about the feasibility of a given solution. The `OracleBS` class likely has
-    a method called `assess_bs` that takes a solution as input and returns a boolean value indicating
-    whether
+    a method called `assess_bs` that takes a solution as input and returns a boolean value.
+
     :type omega: OracleBS
+
     :param intrvl: The `intrvl` parameter is a tuple representing the interval within which the binary
     search will be performed. It consists of two elements: the lower bound and the upper bound of the
-    interval
+    interval.
+
     :type intrvl: Tuple[Any, Any]
+
     :param options: The `options` parameter is an instance of the `Options` class. It is optional and
-    has default values if not provided. The `Options` class is not defined in the code snippet you
-    provided, so I cannot provide specific details about its attributes and methods. However, based on
-    the usage in
+    has default values if not provided.
+
     :return: The function `bsearch` returns a tuple containing three elements:
     """
     # assume monotone
