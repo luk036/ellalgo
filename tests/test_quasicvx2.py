@@ -51,9 +51,9 @@ def test_case_feasible():
     omega = MyQuasicvxOracle()
     xbest, fbest, _ = cutting_plane_optim(omega, ellip, 0.0)
     assert xbest is not None
-    assert fbest == approx(-0.4288673396685956)
-    assert xbest[0] == approx(0.5053830040042219)
-    assert xbest[1] == approx(1.6576289475891712)
+    assert fbest == approx(-0.42888194247600586)
+    assert xbest[0] == approx(0.5000004646814299)
+    assert xbest[1] == approx(1.6487220368468205)
 
 
 def test_case_infeasible1():

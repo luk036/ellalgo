@@ -22,12 +22,12 @@ def run_lowpass(use_parallel_cut: bool, duration=0.000001):
     N = 32
     r0 = np.zeros(N)  # initial xinit
     r0[0] = 0
-    ellip = Ell(4.0, r0)
+    ellip = Ell(40.0, r0)
     ellip._helper.use_parallel_cut = use_parallel_cut
     omega, Spsq = create_lowpass_case(N)
     options = Options()
-    options.max_iters = 20000
-    options.tol = 1e-8
+    options.max_iters = 50000
+    options.tol = 1e-14
     h, _, num_iters = cutting_plane_optim(omega, ellip, Spsq, options)
     time.sleep(duration)
     return num_iters, h is not None
@@ -37,5 +37,5 @@ def test_lowpass():
     """Test the lowpass case with parallel cut"""
     result, feasible = run_lowpass(True)
     assert feasible
-    assert result >= 1075
-    assert result <= 1194
+    assert result >= 23000
+    assert result <= 24000

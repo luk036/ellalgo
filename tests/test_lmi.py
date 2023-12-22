@@ -95,7 +95,7 @@ def test_lmi_lazy():
          ([type]): [description]
     """
     result = run_lmi(LMIOracle)
-    assert result == 112
+    assert result == 281
 
 
 def test_lmi_old():
@@ -105,4 +105,4 @@ def test_lmi_old():
          ([type]): [description]
     """
     result = run_lmi(LMIOldOracle)
-    assert result == 112
+    assert result == 281

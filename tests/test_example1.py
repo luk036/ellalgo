@@ -3,7 +3,7 @@ from __future__ import print_function
 
 import numpy as np
 
-from ellalgo.cutting_plane import cutting_plane_optim
+from ellalgo.cutting_plane import cutting_plane_optim, Options
 from ellalgo.ell import Ell
 from ellalgo.ell_typing import OracleFeas, OracleOptim
 
@@ -79,8 +79,10 @@ def test_case_feasible():
     """[summary]"""
     xinit = np.array([0.0, 0.0])  # initial xinit
     ellip = Ell(10.0, xinit)
+    options = Options()
+    options.tol = 1e-10
     omega = MyOracle()
-    xbest, _, _ = cutting_plane_optim(omega, ellip, float("-inf"))
+    xbest, _, _ = cutting_plane_optim(omega, ellip, float("-inf"), options)
     assert xbest is not None
     # fmt = '{:f} {} {} {}'
     # print(fmt.format(fbest, niter, feasible, status))

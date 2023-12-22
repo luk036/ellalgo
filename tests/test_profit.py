@@ -46,22 +46,22 @@ def run_profit_q(E):
 
 def test_profit_ell():
     num_iters = run_profit(Ell)
-    assert num_iters == 36
+    assert num_iters == 83
 
 
 def test_profit_ell_stable():
     num_iters = run_profit(EllStable)
-    assert num_iters == 36
+    assert num_iters == 83
 
 
 def test_profit_rb_ell():
     num_iters = run_profit_rb(Ell)
-    assert num_iters == 41
+    assert num_iters == 90
 
 
 def test_profit_rb_ell_stable():
     num_iters = run_profit_rb(EllStable)
-    assert num_iters == 41
+    assert num_iters == 90
 
 
 def test_profit_q_ell():

@@ -13,7 +13,7 @@ class CutStatus(Enum):
 # 1e-8 respectively.
 class Options:
     max_iters: int = 2000  # maximum number of iterations
-    tol: float = 1e-8  # error tolerance
+    tol: float = 1e-20  # error tolerance
 
 
 # The `CInfo` class represents information about a computation, including whether it is feasible and
