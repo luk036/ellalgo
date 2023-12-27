@@ -20,12 +20,12 @@ class EllCalcCore:
     _cst3: float
 
     def __init__(self, n_f: float) -> None:
-        """
-        The function initializes several variables based on the input value.
+        """Initialize EllCalcCore instance.
 
-        :param n_f: The parameter `n_f` represents a floating point value. It is used to
-        initialize the `EllCalcCore` object
+        The __init__ method initializes the EllCalcCore object with the provided
+        n_f parameter. This sets up internal variables used in calculations.
 
+        :param n_f: Float value to initialize the instance with.
         :type n_f: float
 
         Examples:
@@ -54,13 +54,15 @@ class EllCalcCore:
         self._cst3 = self._n_f * self._cst0
 
     def calc_central_cut(self, tau: float) -> Tuple[float, float, float]:
-        r"""Calculate Central Cut
-
-        The `calc_central_cut` function calculates the central cut values based on the given input.
-
-        :param tau: tau is a float representing the value of tau
+        r"""Calculate the central cut values.
+        
+        The `calc_central_cut` method calculates the central cut values ρ, σ, δ 
+        based on the input tau value.
+        
+        :param tau: The tau value  
         :type tau: float
-        :return: The function `calc_central_cut` returns a tuple containing the following elements:
+        :return: Tuple of (ρ, σ, δ) 
+        :rtype: Tuple[float, float, float]
 
         .. svgbob::
            :align: center
@@ -105,9 +107,14 @@ class EllCalcCore:
     def calc_deep_cut_fast(
         self, beta: float, tau: float, eta: float
     ) -> Tuple[float, float, float]:
-        r"""Calculate Deep Cut fast
-
-        The `calc_deep_cut_fast` function calculates the deep cut values based on the given input.
+        r"""Calculates the deep cut ellipsoid parameters using precomputed eta values.
+        
+        Given the beta, tau, and eta values, this method calculates the 
+        deep cut ellipsoid parameters rho, sigma, and delta using a precomputed eta value.
+        that avoids explicitly calculating the intermediate eta value.
+        This allows the deep cut to be computed faster.
+        
+        The rho, sigma, and delta values define the deep cut ellipsoid.
 
         :param beta: beta is a float representing the value of beta
         :type beta: float
@@ -159,10 +166,10 @@ class EllCalcCore:
         return (rho, sigma, delta)
 
     def calc_deep_cut(self, beta: float, tau: float) -> Tuple[float, float, float]:
-        r"""Calculate Deep Cut
-
-        The `calc_deep_cut` function calculates the deep cut values based on the given input.
-
+        r"""Calculate deep cut values.
+        
+        Calculates the deep cut values ρ, σ, δ for given β and τ.
+        
         :param beta: beta is a float representing the value of beta
         :type beta: float
         :param tau: tau is a float representing the value of tau

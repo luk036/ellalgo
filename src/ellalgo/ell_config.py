@@ -1,7 +1,14 @@
 from enum import Enum
 
 
-# The above class defines an enumeration for different cut statuses.
+# The CutStatus enum defines a set of constant values that represent different statuses that can result from a cut operation. A cut is likely some optimization operation that partitions or divides a problem into smaller pieces.
+#
+# This enum has four possible values:
+#
+# Success - Indicates the cut operation succeeded
+# NoSoln - Indicates the cut did not yield a valid solution
+# NoEffect - The cut had no effect on improving the optimization
+# Unknown - The status is unknown or unclear
 class CutStatus(Enum):
     Success = 0
     NoSoln = 1
@@ -20,18 +27,11 @@ class Options:
 # the number of iterations it took.
 class CInfo:
     def __init__(self, feasible: bool, num_iters: int) -> None:
-        """
-        The function initializes a new CInfo object with the given feasibility and number of iterations.
+        """Initializes a CInfo object.
 
-        :param feasible: A boolean value indicating whether the solution is feasible or not
-
-        :type feasible: bool
-
-        :param num_iters: The `num_iters` parameter represents the number of iterations or steps taken
-        in a process or algorithm. It is an integer value that indicates how many times a certain
-        operation or calculation has been performed
-
-        :type num_iters: int
+        Args:
+            feasible (bool): Whether the solution is feasible.
+            num_iters (int): Number of iterations performed.
         """
         self.feasible: bool = feasible
         self.num_iters: int = num_iters
