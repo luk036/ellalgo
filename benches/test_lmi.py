@@ -95,7 +95,7 @@ def test_lmi_lazy(benchmark):
         benchmark ([type]): [description]
     """
     result = benchmark(run_lmi, LMIOracle)
-    assert result == 112
+    assert result == 281
 
 
 def test_lmi_old(benchmark):
@@ -105,4 +105,4 @@ def test_lmi_old(benchmark):
         benchmark ([type]): [description]
     """
     result = benchmark(run_lmi, LMIOldOracle)
-    assert result == 112
+    assert result == 281

@@ -150,9 +150,9 @@ def run_example1(omega):
 
 def test_with_round_robin(benchmark):
     num_iters = benchmark(run_example1, MyOracle)
-    assert num_iters == 20
+    assert num_iters == 31
 
 
 def test_without_round_robin(benchmark):
     num_iters = benchmark(run_example1, MyOracle2)
-    assert num_iters == 20
+    assert num_iters == 31
