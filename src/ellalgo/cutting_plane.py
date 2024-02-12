@@ -66,26 +66,26 @@ def cutting_plane_feas(
          └────────────┘    └───────────┘└──────────┘
 
     :param omega: The parameter `omega` is an instance of the `OracleFeas` class, which is responsible
-    for performing assessments on a given point `xinit`. It provides information about the feasibility
-    of `xinit` and returns a cutting-plane (or a "cut") if `xinit` is not
+        for performing assessments on a given point `xinit`. It provides information about the feasibility
+        of `xinit` and returns a cutting-plane (or a "cut") if `xinit` is not
 
     :type omega: OracleFeas[ArrayType]
 
     :param space: The `space` parameter represents the search space in which the algorithm is looking
-    for a feasible solution. It is an instance of the `SearchSpace` class, which contains information
-    about the current state of the search space, such as the current evaluation point `xc()` and the
-    current trust region radius.
+        for a feasible solution. It is an instance of the `SearchSpace` class, which contains information
+        about the current state of the search space, such as the current evaluation point `xc()` and the
+        current trust region radius.
 
     :type space: SearchSpace[ArrayType]
 
     :param options: The `options` parameter is an instance of the `Options` class, which contains
-    various options for the cutting-plane feasibility algorithm. It is optional and has default values
-    if not provided
+        various options for the cutting-plane feasibility algorithm. It is optional and has default values
+        if not provided
 
     :return: The function `cutting_plane_feas` returns a tuple containing two elements:
-    1. An optional array (`Optional[ArrayType]`) representing a feasible solution. If no feasible
-    solution is found, it returns `None`.
-    2. An integer representing the number of iterations performed.
+        1. An optional array (`Optional[ArrayType]`) representing a feasible solution. If no feasible
+        solution is found, it returns `None`.
+        2. An integer representing the number of iterations performed.
     """
 
     for niter in range(options.max_iters):
@@ -107,23 +107,23 @@ def cutting_plane_optim(
     """Cutting-plane method for solving convex optimization problem
 
     :param omega: The `omega` parameter is an instance of the `OracleOptim` class, which is responsible
-    for performing assessments on the initial solution `xinit`
+        for performing assessments on the initial solution `xinit`
 
     :type omega: OracleOptim[ArrayType]
 
     :param space: The `space` parameter represents the search space for the optimization problem. It is
-    an instance of the `SearchSpace` class, which contains information about the feasible region and the
-    current solution
+        an instance of the `SearchSpace` class, which contains information about the feasible region and the
+        current solution
 
     :type space: SearchSpace[ArrayType]
 
     :param gamma: The parameter `gamma` represents the initial best-so-far value in the cutting-plane
-    optimization algorithm. It is used to keep track of the current best objective value found during
-    the optimization process
+        optimization algorithm. It is used to keep track of the current best objective value found during
+        the optimization process
 
     :param options: The `options` parameter is an instance of the `Options` class, which contains
-    various options for the cutting-plane optimization algorithm. It is optional and has default values
-    if not provided
+        various options for the cutting-plane optimization algorithm. It is optional and has default values
+        if not provided
 
     :return: The function `cutting_plane_optim` returns a tuple containing the following elements:
     """
@@ -147,24 +147,24 @@ def cutting_plane_feas_q(
     """Cutting-plane method for solving convex discrete optimization problem
 
     :param omega: The parameter "omega" is an instance of the OracleFeasQ class, which is used to
-    perform assessments on the initial solution "xinit"
+        perform assessments on the initial solution "xinit"
 
     :type omega: OracleFeasQ[ArrayType]
 
     :param space_q: The `space_q` parameter is an instance of the `SearchSpaceQ` class, which represents
-    the search space for the discrete optimization problem. It contains information about the current
-    solution candidate `x*` and provides methods for updating the search space based on the cutting
-    plane information
+        the search space for the discrete optimization problem. It contains information about the current
+        solution candidate `x*` and provides methods for updating the search space based on the cutting
+        plane information
 
     :type space_q: SearchSpaceQ[ArrayType]
 
     :param options: The `options` parameter is an instance of the `Options` class, which contains
-    various options for the cutting-plane method. It is optional and has default values if not provided
+        various options for the cutting-plane method. It is optional and has default values if not provided
 
     :return: a tuple containing two elements:
-    1. Optional[ArrayType]: A feasible solution to the convex discrete optimization problem. If no
-    feasible solution is found, it returns None.
-    2. int: The number of iterations performed by the cutting-plane method.
+        1. Optional[ArrayType]: A feasible solution to the convex discrete optimization problem. If no
+        feasible solution is found, it returns None.
+        2. int: The number of iterations performed by the cutting-plane method.
     """
     retry = False
     for niter in range(options.max_iters):
@@ -194,29 +194,29 @@ def cutting_plane_optim_q(
     """Cutting-plane method for solving convex discrete optimization problem
 
     :param omega: The `omega` parameter is an instance of the `OracleOptimQ` class, which is responsible
-    for performing assessments on the initial solution `xinit`
+        for performing assessments on the initial solution `xinit`
 
     :type omega: OracleOptimQ[ArrayType]
 
     :param space_q: The `space_q` parameter represents the search space for the discrete optimization
-    problem. It is an instance of the `SearchSpaceQ` class, which contains the necessary methods and
-    attributes to define and manipulate the search space
+        problem. It is an instance of the `SearchSpaceQ` class, which contains the necessary methods and
+        attributes to define and manipulate the search space
 
     :type space_q: SearchSpaceQ[ArrayType]
 
     :param gamma: The parameter `gamma` represents the initial best-so-far value in the cutting-plane
-    optimization algorithm. It is used to keep track of the current best solution found during the
-    iterations of the algorithm
+        optimization algorithm. It is used to keep track of the current best solution found during the
+        iterations of the algorithm
 
     :param options: The `options` parameter is an instance of the `Options` class, which contains
-    various settings for the cutting-plane optimization algorithm. It is optional and has default values
-    if not provided
+        various settings for the cutting-plane optimization algorithm. It is optional and has default values
+        if not provided
 
     :return: a tuple containing the following elements:
-    1. Optional[ArrayType]: The optimal solution to the convex discrete optimization problem. It can be
-    None if no solution is found.
-    2. float: The final best-so-far value.
-    3. int: The number of iterations performed.
+        1. Optional[ArrayType]: The optimal solution to the convex discrete optimization problem. It can be
+        None if no solution is found.
+        2. float: The final best-so-far value.
+        3. int: The number of iterations performed.
     """
     x_best = None
     retry = False
@@ -243,23 +243,22 @@ def bsearch(
     omega: OracleBS, intrvl: Tuple[Any, Any], options=Options()
 ) -> Tuple[Any, int]:
     """
-    The `bsearch` function performs a binary search to find the optimal solution within a given
-    interval.
+    The `bsearch` function performs a binary search to find the optimal solution within a given interval.
 
     :param omega: The parameter `omega` is an instance of the `OracleBS` class. It represents an oracle
-    that provides information about the feasibility of a given solution. The `OracleBS` class likely has
-    a method called `assess_bs` that takes a solution as input and returns a boolean value.
+        that provides information about the feasibility of a given solution. The `OracleBS` class likely has
+        a method called `assess_bs` that takes a solution as input and returns a boolean value.
 
     :type omega: OracleBS
 
     :param intrvl: The `intrvl` parameter is a tuple representing the interval within which the binary
-    search will be performed. It consists of two elements: the lower bound and the upper bound of the
-    interval.
+        search will be performed. It consists of two elements: the lower bound and the upper bound of the
+        interval.
 
     :type intrvl: Tuple[Any, Any]
 
     :param options: The `options` parameter is an instance of the `Options` class. It is optional and
-    has default values if not provided.
+        has default values if not provided.
 
     :return: The function `bsearch` returns a tuple containing three elements:
     """
@@ -286,18 +285,16 @@ class BSearchAdaptor(Generic[ArrayType]):
         This function initializes an object with an OracleFeas2 instance, a SearchSpace2 instance, and
         an Options instance.
 
-        :param omega: An instance of the OracleFeas2 class. It is used to perform feasibility checks on
-        candidate solutions
+        :param omega: An instance of the OracleFeas2 class. It is used to perform feasibility checks on candidate solutions
 
         :type omega: OracleFeas2
 
         :param space: The `space` parameter is an instance of the `SearchSpace2` class. It represents
-        the search space in which the optimization algorithm will search for the optimal solution
+            the search space in which the optimization algorithm will search for the optimal solution
 
         :type space: SearchSpace2
 
-        :param options: An instance of the Options class, which contains various options and settings
-        for the algorithm
+        :param options: An instance of the Options class, which contains various options and settings for the algorithm
         """
         self.omega = omega
         self.space = space
