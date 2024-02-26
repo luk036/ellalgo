@@ -14,7 +14,7 @@ class ell1d:
         interval.
 
         :param interval: The `interval` parameter is a tuple of two floats representing the lower and
-        upper bounds of a range
+            upper bounds of a range
 
         :type interval: Tuple[float, float]
         """
@@ -46,7 +46,7 @@ class ell1d:
         The function sets the value of the private variable `_xc` to the given float value `x`.
 
         :param x: The parameter `x` is a float value that represents the value to be assigned to the
-        `_xc` attribute
+            `_xc` attribute
         :type x: float
         """
         self._xc = x
@@ -64,13 +64,13 @@ class ell1d:
         The `update` function updates an ellipsoid core using a single cut.
 
         :param cut: The `cut` parameter is a tuple containing two floats: `grad` and `beta`. `grad`
-        represents the gradient, and `beta` represents the beta value
+            represents the gradient, and `beta` represents the beta value
 
         :type cut: Tuple[float, float]
 
         :param central_cut: A boolean parameter that indicates whether the cut is a central cut or not.
-        If it is set to True, the cut is a central cut. If it is set to False, the cut is not a central
-        cut, defaults to False (optional)
+            If it is set to True, the cut is a central cut. If it is set to False, the cut is not a central
+            cut, defaults to False (optional)
 
         :return: a `CutStatus` enum value and the "volumn" of the ellipsoid (`tau`).
 

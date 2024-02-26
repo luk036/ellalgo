@@ -31,7 +31,7 @@ class OracleFeas2(OracleFeas[ArrayType]):
         The `update` function updates a gamma object.
 
         :param gamma: The `gamma` parameter is of type `Any`, which means it can accept any type of value.
-        It is used as an argument to update the gamma object
+            It is used as an argument to update the gamma object
         """
         pass
 
@@ -44,13 +44,13 @@ class OracleOptim(Generic[ArrayType]):
         parameters.
 
         :param xc: An array of values that represents the current solution or point in the optimization
-        process
+            process
 
         :type xc: ArrayType
 
         :param gamma: The `gamma` parameter is the value that we are trying to optimize or minimize. It
-        could be a numerical value, a function, or any other type of object that represents the optimization
-        goal
+            could be a numerical value, a function, or any other type of object that represents the optimization
+            goal
         """
         pass
 
@@ -66,7 +66,7 @@ class OracleFeasQ(Generic[ArrayType]):
         a cut, an array, and a boolean value.
 
         :param xc: An array of some type. It represents a variable or a set of variables that need to be
-        assessed for feasibility
+            assessed for feasibility
 
         :type xc: ArrayType
 
@@ -88,13 +88,13 @@ class OracleOptimQ(Generic[ArrayType]):
         containing a cut, an array, an optional float, and a boolean value.
 
         :param xc: An array or list representing the current solution or configuration being assessed for
-        optimization
+            optimization
 
         :type xc: ArrayType
 
         :param gamma: The `gamma` parameter is the desired value or condition that the optimization
-        algorithm is trying to achieve. It could be a specific value, a range of values, or a certain
-        condition that needs to be satisfied
+            algorithm is trying to achieve. It could be a specific value, a range of values, or a certain
+            condition that needs to be satisfied
 
         :param retry: A boolean flag indicating whether to retry the optimization if it fails
 
@@ -125,7 +125,7 @@ class SearchSpace(Generic[ArrayType]):
         a `CutStatus` object.
 
         :param cut: The `cut` parameter is an instance of the `Cut` class. It represents a deep-cut that
-        needs to be updated
+            needs to be updated
 
         :type cut: Cut
         """
@@ -137,7 +137,7 @@ class SearchSpace(Generic[ArrayType]):
         status of the cut.
 
         :param cut: The "cut" parameter is an instance of the Cut class. It represents the central cut that
-        needs to be updated
+            needs to be updated
 
         :type cut: Cut
         """

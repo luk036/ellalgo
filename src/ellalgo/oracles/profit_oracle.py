@@ -95,14 +95,14 @@ class ProfitOracle(OracleOptim):
         :type y: Arr
 
         :param gamma: The `gamma` parameter is the best-so-far optimal value. It represents the gamma
-        value that the optimization algorithm is trying to achieve or improve upon
+            value that the optimization algorithm is trying to achieve or improve upon
 
         :type gamma: float
 
         :return: The function `assess_feas` returns an optional Cut. The `Cut` object represents a
-        linear constraint in the form of a tuple `(grad, fj)`, where `grad`
-        is a numpy array representing the coefficients of the linear constraint and `fj` is a float
-        representing the right-hand side of the constraint.
+            linear constraint in the form of a tuple `(grad, fj)`, where `grad`
+            is a numpy array representing the coefficients of the linear constraint and `fj` is a float
+            representing the right-hand side of the constraint.
 
         See also:
             cutting_plane_optim
@@ -125,14 +125,14 @@ class ProfitOracle(OracleOptim):
         :type y: Arr
 
         :param gamma: The `gamma` parameter is the best-so-far optimal value. It represents the gamma
-        value that the optimization algorithm is trying to achieve or improve upon
+            value that the optimization algorithm is trying to achieve or improve upon
 
         :type gamma: float
 
         :return: The function `assess_optim` returns a tuple containing a `Cut` object and an optional float
-        value. The `Cut` object represents a linear constraint in the form of a tuple `(g, fj)`, where `g`
-        is a numpy array representing the coefficients of the linear constraint and `fj` is a float
-        representing the right-hand side of the constraint.
+            value. The `Cut` object represents a linear constraint in the form of a tuple `(g, fj)`, where `g`
+            is a numpy array representing the coefficients of the linear constraint and `fj` is a float
+            representing the right-hand side of the constraint.
 
         See also:
             cutting_plane_optim
@@ -176,12 +176,12 @@ class ProfitRbOracle(OracleOptim):
         ProfitOracle object.
 
         :param params: The `params` parameter is a tuple of three floats: `unit_price`, `scale`, and
-        `limit`. These parameters are used to calculate `params_rb` in the code
+            `limit`. These parameters are used to calculate `params_rb` in the code
 
         :type params: Tuple[float, float, float]
 
         :param elasticities: The elasticities parameter is a numpy array that represents the output
-        elasticities. It is used in the ProfitOracle function
+            elasticities. It is used in the ProfitOracle function
 
         :type elasticities: Arr
 
@@ -190,7 +190,7 @@ class ProfitRbOracle(OracleOptim):
         :type price_out: Arr
 
         :param vparams: The `vparams` parameter is a tuple containing five float values: `e1`, `e2`, `e3`,
-        `e4`, and `e5`
+            `e4`, and `e5`
 
         :type vparams: Tuple[float, float, float, float, float]
         """
@@ -213,12 +213,12 @@ class ProfitRbOracle(OracleOptim):
         :type y: Arr
 
         :param gamma: The `gamma` parameter is the best-so-far optimal value. It represents the current
-        best value that has been achieved in the optimization process
+            best value that has been achieved in the optimization process
 
         :type gamma: float
 
         :return: The function `assess_optim` returns a tuple containing a `Cut` object and an optional float
-        value.
+            value.
 
         See also:
             cutting_plane_optim
@@ -260,13 +260,13 @@ class ProfitQOracle(OracleOptimQ):
         The function initializes an instance of a class with given parameters and arrays.
 
         :param params: The `params` parameter is a tuple containing three float values: `unit_price`,
-        `scale`, and `limit`
+            `scale`, and `limit`
 
         :param elasticities: The elasticities parameter is an array that represents the output elasticities.
-        It contains the elasticity values for each output
+            It contains the elasticity values for each output
 
         :param price_out: The `price_out` parameter is an array that represents the output prices of the
-        goods or services. It contains the prices of different outputs
+            goods or services. It contains the prices of different outputs
         """
         self.omega = ProfitOracle(params, elasticities, price_out)
         self.yd = np.array([0.0, 0.0])
@@ -283,7 +283,7 @@ class ProfitQOracle(OracleOptimQ):
         :type y: Arr
 
         :param gamma: The `gamma` parameter is the best-so-far optimal value. It represents the current
-        best value that the optimization algorithm has found
+            best value that the optimization algorithm has found
 
         :type gamma: float
 

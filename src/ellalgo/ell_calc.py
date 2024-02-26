@@ -46,8 +46,8 @@ class EllCalc:
         :param beta: The parameter `beta` can be of type `int`, `float`, or a list of two elements
 
         :param tsq: The `tsq` parameter is a floating-point number that represents the square of the
-        tolerance for the ellipsoid algorithm. It is used in the calculations performed by the
-        `calc_single_or_parallel` method
+            tolerance for the ellipsoid algorithm. It is used in the calculations performed by the
+            `calc_single_or_parallel` method
 
         :type tsq: float
 
@@ -72,17 +72,17 @@ class EllCalc:
         based on the input parameters.
 
         :param beta: The parameter `beta` is of type `_type_` and represents some value. The specific
-        details of its purpose and usage are not provided in the code snippet
+            details of its purpose and usage are not provided in the code snippet
 
         :param tsq: tsq is a float value representing the squared tau-value
 
         :type tsq: float
 
         :return: a tuple containing the following elements:
-        1. CutStatus: The status of the cut calculation.
-        2. float: The calculated value.
-        3. float: The calculated value.
-        4. float: The calculated value.
+            1. CutStatus: The status of the cut calculation.
+            2. float: The calculated value.
+            3. float: The calculated value.
+            4. float: The calculated value.
 
         Examples:
             >>> from ellalgo.ell_calc import EllCalc
@@ -219,7 +219,7 @@ class EllCalc:
         :param beta: The parameter `beta` represents a float value
         :type beta: float
         :param tsq: tsq is the square of the threshold value. It is a float value that represents the
-        threshold squared
+            threshold squared
         :type tsq: float
         :return: The function `calc_deep_cut_q` returns a tuple of four values: `CutStatus`, `float`, `float`, `float`.
 

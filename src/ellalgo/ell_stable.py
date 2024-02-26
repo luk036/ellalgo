@@ -111,7 +111,7 @@ class EllStable(SearchSpace[ArrayType], SearchSpaceQ[ArrayType]):
         cut status based on a given cut.
 
         :param cut: The `cut` parameter is of type `_type_` and it represents the cut that needs to be
-        updated
+            updated
         :return: a `CutStatus` object.
 
         Examples:

@@ -39,7 +39,7 @@ class LDLTMgr:
         and pre-allocates storage.
 
         :param ndim: The parameter ndim represents the dimension of the object. It is an integer value that
-        determines the size of the object being constructed
+            determines the size of the object being constructed
 
         :type ndim: int
         """
@@ -76,13 +76,13 @@ class LDLTMgr:
         The function performs LDLT Factorization on a symmetric matrix using lazy evaluation.
 
         :param get_elem: The `get_elem` parameter is a callable function that is used to access the elements
-        of a symmetric matrix. It takes two integer arguments `i` and `j` and returns the value of the
-        element at the `(i, j)` position in the matrix
+            of a symmetric matrix. It takes two integer arguments `i` and `j` and returns the value of the
+            element at the `(i, j)` position in the matrix
 
         :type get_elem: Callable[[int, int], float]
 
         :return: The function `factor` returns a boolean value indicating whether the matrix is symmetric
-        positive definite (SPD).
+            positive definite (SPD).
 
         Examples:
             >>> mat = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
@@ -115,13 +115,13 @@ class LDLTMgr:
         if the matrix is positive definite.
 
         :param get_elem: The `get_elem` parameter is a callable function that takes two integer arguments
-        `i` and `j` and returns a float value. This function is used to access the elements of a symmetric
-        matrix `mat`. The `factor_with_allow_semidefinite` method performs LDLT Factorization on
+            `i` and `j` and returns a float value. This function is used to access the elements of a symmetric
+            matrix `mat`. The `factor_with_allow_semidefinite` method performs LDLT Factorization on
 
         :type get_elem: Callable[[int, int], float]
 
         :return: The function `factor_with_allow_semidefinite` returns a boolean value indicating whether
-        the matrix is symmetric positive definite (SPD).
+            the matrix is symmetric positive definite (SPD).
 
         Examples:
             >>> mat = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
@@ -154,7 +154,7 @@ class LDLTMgr:
         if it is.
 
         :return: a boolean value. It returns True if the matrix A is symmetric positive definite (spd), and
-        False otherwise.
+            False otherwise.
 
         Examples:
             >>> mat = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
@@ -205,7 +205,7 @@ class LDLTMgr:
         :type mat: np.ndarray
 
         :return: The function `sym_quad` returns the result of the dot product between `v` and the matrix
-        product of `mat[start:ndim, start:ndim]` and `v`.
+            product of `mat[start:ndim, start:ndim]` and `v`.
 
         Examples:
             >>> mat = np.array([[1.0, 2.0, 3.0], [2.0, 3.5, 5.0], [3.0, 5.0, 6.0]])
