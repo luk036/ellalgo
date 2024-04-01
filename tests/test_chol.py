@@ -7,8 +7,8 @@ def test_chol1():
     """[summary]"""
     l1 = [[25.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 11.0]]
     m1 = np.array(l1)
-    Q1 = LDLTMgr(len(m1))
-    assert Q1.factorize(m1)
+    ldlt_mgr = LDLTMgr(len(m1))
+    assert ldlt_mgr.factorize(m1)
 
 
 def test_chol2():
@@ -94,8 +94,6 @@ def test_chol7():
 
 def test_chol8():
     """[summary]"""
-    """[summary]
-    """
     l3 = [[0.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 20.0]]
     m3 = np.array(l3)
     ldlt_mgr = LDLTMgr(len(m3))
@@ -105,8 +103,6 @@ def test_chol8():
 
 def test_chol9():
     """[summary]"""
-    """[summary]
-    """
     l3 = [[0.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 20.0]]
     m3 = np.array(l3)
     ldlt_mgr = LDLTMgr(len(m3))
@@ -117,7 +113,8 @@ def test_chol9():
 
 def test_ldlt_mgr_sqrt():
     A = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
-    ldlt_obj = LDLTMgr(3)
-    ldlt_obj.factor(lambda i, j: A[i, j])
-    R = ldlt_obj.sqrt()
+    ldlt_mgr = LDLTMgr(3)
+    ldlt_mgr.factor(lambda i, j: A[i, j])
+    assert ldlt_mgr.is_spd()
+    R = ldlt_mgr.sqrt()
     assert np.allclose(R, np.array([[1.0, 0.5, 0.5], [0.0, 1.0, 0.5], [0.0, 0.0, 1.0]]))

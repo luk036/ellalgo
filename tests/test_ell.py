@@ -10,6 +10,7 @@ def test_construct():
     assert ell._kappa == 0.01
     assert ell._mq == approx(np.eye(4))
     assert ell._xc == approx(np.zeros(4))
+    assert ell._tsq == 0.0
 
 
 def test_update_central_cut():
@@ -23,6 +24,7 @@ def test_update_central_cut():
     assert ell._xc == approx(-0.01 * np.ones(4))
     assert ell._mq == approx(np.eye(4) - 0.1 * np.ones((4, 4)))
     assert ell._kappa == approx(0.16 / 15.0)
+    assert ell._tsq == 0.01
 
 
 def test_update_deep_cut():
@@ -36,6 +38,7 @@ def test_update_deep_cut():
     assert ell._xc == approx(-0.03 * np.ones(4))
     assert ell._mq == approx(np.eye(4) - 0.2 * np.ones((4, 4)))
     assert ell._kappa == approx(0.008)
+    assert ell._tsq == 0.01
 
 
 def test_update_parallel_central_cut():
