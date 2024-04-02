@@ -1,5 +1,3 @@
-import time
-
 import numpy as np
 
 from ellalgo.cutting_plane import Options, cutting_plane_optim
@@ -7,7 +5,7 @@ from ellalgo.ell import Ell
 from ellalgo.oracles.lowpass_oracle import create_lowpass_case
 
 
-def run_lowpass(use_parallel_cut: bool, duration=0.000001):
+def run_lowpass(use_parallel_cut: bool):
     """[summary]
 
     Arguments:
@@ -27,15 +25,14 @@ def run_lowpass(use_parallel_cut: bool, duration=0.000001):
     omega, Spsq = create_lowpass_case(N)
     options = Options()
     options.max_iters = 50000
-    options.tol = 1e-14
+    options.tolerance = 1e-14
     h, _, num_iters = cutting_plane_optim(omega, ellip, Spsq, options)
-    time.sleep(duration)
-    return num_iters, h is not None
+    return h is not None, num_iters
 
 
 def test_lowpass():
     """Test the lowpass case with parallel cut"""
-    result, feasible = run_lowpass(True)
+    feasible, num_iters = run_lowpass(True)
     assert feasible
-    assert result >= 23000
-    assert result <= 24000
+    assert num_iters >= 23000
+    assert num_iters <= 24000

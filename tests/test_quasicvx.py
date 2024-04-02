@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-
+from pytest import approx
 import math
-
 import numpy as np
 
-from ellalgo.cutting_plane import cutting_plane_optim
+from ellalgo.cutting_plane import cutting_plane_optim, Options
 from ellalgo.ell import Ell
 from ellalgo.ell_typing import OracleOptim
 
@@ -62,13 +61,15 @@ def test_case_feasible():
     """[summary]"""
     xinit = np.array([0.0, 0.0])  # initial xinit
     ellip = Ell(10.0, xinit)
+    options = Options()
+    options.tolerance = 1e-8
     omega = MyQuasicvxOracle()
-    xbest, _, niters = cutting_plane_optim(omega, ellip, 0.0)
+    xbest, fbest, niters = cutting_plane_optim(omega, ellip, 0.0, options)
     assert xbest is not None
-    assert niters == 83
-    # assert fbest == approx(0.4288673396685956)
-    # assert xbest[0] * xbest[0] == approx(0.5029823096186075)
-    # assert math.exp(xbest[1]) == approx(1.6536872634520428)
+    assert niters == 35
+    assert fbest == approx(0.4288687202295896)
+    assert xbest[0] * xbest[0] == approx(0.4965439352179321)
+    assert math.exp(xbest[1]) == approx(1.6430639574974657)
 
 
 def test_case_infeasible1():

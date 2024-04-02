@@ -93,7 +93,7 @@ def cutting_plane_feas(
         if cut is None:  # feasible sol'n obtained
             return space.xc(), niter
         status = space.update_deep_cut(cut)  # update space
-        if status != CutStatus.Success or space.tsq() < options.tol:
+        if status != CutStatus.Success or space.tsq() < options.tolerance:
             return None, niter
     return None, options.max_iters
 
@@ -136,7 +136,7 @@ def cutting_plane_optim(
             status = space.update_central_cut(cut)
         else:
             status = space.update_deep_cut(cut)
-        if status != CutStatus.Success or space.tsq() < options.tol:
+        if status != CutStatus.Success or space.tsq() < options.tolerance:
             return x_best, gamma, niter
     return x_best, gamma, options.max_iters
 
@@ -180,7 +180,7 @@ def cutting_plane_feas_q(
             if not more_alt:  # no more alternative cut
                 return None, niter
             retry = True
-        if space_q.tsq() < options.tol:
+        if space_q.tsq() < options.tolerance:
             return None, niter
     return None, options.max_iters
 
@@ -234,7 +234,7 @@ def cutting_plane_optim_q(
             if not more_alt:  # no more alternative cut
                 return x_best, gamma, niter
             retry = True
-        if space_q.tsq() < options.tol:
+        if space_q.tsq() < options.tolerance:
             return x_best, gamma, niter
     return x_best, gamma, options.max_iters
 
@@ -267,7 +267,7 @@ def bsearch(
     T = type(upper)  # T could be `int`
     for niter in range(options.max_iters):
         tau = (upper - lower) / 2
-        if tau < options.tol:
+        if tau < options.tolerance:
             return upper, niter
         gamma = T(lower + tau)
         if omega.assess_bs(gamma):  # feasible sol'n obtained

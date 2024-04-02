@@ -8,6 +8,7 @@ import numpy as np
 
 from ellalgo.cutting_plane import OracleOptim, cutting_plane_optim
 from ellalgo.ell import Ell
+from ellalgo.ell_stable import EllStable
 from ellalgo.oracles.lmi_old_oracle import LMIOldOracle
 from ellalgo.oracles.lmi_oracle import LMIOracle
 
@@ -63,7 +64,7 @@ class MyOracle(OracleOptim):
         return (self.c, 0.0), f0
 
 
-def run_lmi(oracle):
+def run_lmi(oracle, Space):
     """[summary]
 
     Arguments:
@@ -76,7 +77,7 @@ def run_lmi(oracle):
         [type]: [description]
     """
     xinit = np.array([0.0, 0.0, 0.0])  # initial xinit
-    ellip = Ell(10.0, xinit)
+    ellip = Space(10.0, xinit)
     omega = MyOracle(oracle)
     xbest, _, num_iters = cutting_plane_optim(omega, ellip, float("inf"))
     # time.sleep(duration)
@@ -94,7 +95,7 @@ def test_lmi_lazy():
     Arguments:
          ([type]): [description]
     """
-    result = run_lmi(LMIOracle)
+    result = run_lmi(LMIOracle, Ell)
     assert result == 281
 
 
@@ -104,5 +105,25 @@ def test_lmi_old():
     Arguments:
          ([type]): [description]
     """
-    result = run_lmi(LMIOldOracle)
+    result = run_lmi(LMIOldOracle, Ell)
+    assert result == 281
+
+
+def test_lmi_lazy_stable():
+    """[summary]
+
+    Arguments:
+         ([type]): [description]
+    """
+    result = run_lmi(LMIOracle, EllStable)
+    assert result == 281
+
+
+def test_lmi_old_stable():
+    """[summary]
+
+    Arguments:
+         ([type]): [description]
+    """
+    result = run_lmi(LMIOldOracle, EllStable)
     assert result == 281

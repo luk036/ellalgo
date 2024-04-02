@@ -80,7 +80,7 @@ def test_case_feasible():
     xinit = np.array([0.0, 0.0])  # initial xinit
     ellip = Ell(10.0, xinit)
     options = Options()
-    options.tol = 1e-10
+    options.tolerance = 1e-10
     omega = MyOracle()
     xbest, _, _ = cutting_plane_optim(omega, ellip, float("-inf"), options)
     assert xbest is not None

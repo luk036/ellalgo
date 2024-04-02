@@ -21,7 +21,6 @@ class OracleFeas(Generic[ArrayType]):
         :param xc: An array of type ArrayType
         :type xc: ArrayType
         """
-        pass
 
 
 class OracleFeas2(OracleFeas[ArrayType]):
@@ -33,7 +32,6 @@ class OracleFeas2(OracleFeas[ArrayType]):
         :param gamma: The `gamma` parameter is of type `Any`, which means it can accept any type of value.
             It is used as an argument to update the gamma object
         """
-        pass
 
 
 class OracleOptim(Generic[ArrayType]):
@@ -52,7 +50,6 @@ class OracleOptim(Generic[ArrayType]):
             could be a numerical value, a function, or any other type of object that represents the optimization
             goal
         """
-        pass
 
 
 class OracleFeasQ(Generic[ArrayType]):
@@ -74,7 +71,6 @@ class OracleFeasQ(Generic[ArrayType]):
 
         :type retry: bool
         """
-        pass
 
 
 class OracleOptimQ(Generic[ArrayType]):
@@ -100,7 +96,6 @@ class OracleOptimQ(Generic[ArrayType]):
 
         :type retry: bool
         """
-        pass
 
 
 class OracleBS(ABC):
@@ -112,7 +107,6 @@ class OracleBS(ABC):
 
         :param gamma: The gamma parameter is the value that we are searching for in the binary search
         """
-        pass
 
 
 # The `SearchSpace` class is an abstract base class that defines methods for updating deep-cut and
@@ -161,7 +155,6 @@ class SearchSpaceQ(Generic[ArrayType]):
         :param cut: The `cut` parameter is an object of type `Cut`
         :type cut: Cut
         """
-        pass
 
     @abstractmethod
     def xc(self) -> ArrayType:

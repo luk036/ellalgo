@@ -16,11 +16,11 @@ class CutStatus(Enum):
     Unknown = 3
 
 
-# The class "Options" defines two attributes, "max_iters" and "tol", with default values of 2000 and
+# The class "Options" defines two attributes, "max_iters" and "tolerance", with default values of 2000 and
 # 1e-8 respectively.
 class Options:
     max_iters: int = 2000  # maximum number of iterations
-    tol: float = 1e-20  # error tolerance
+    tolerance: float = 1e-20  # error tolerance
 
 
 # The `CInfo` class represents information about a computation, including whether it is feasible and
