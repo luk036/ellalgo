@@ -35,7 +35,7 @@ def test_chol3():
     assert not ldlt_mgr.factorize(m3)
     ep = ldlt_mgr.witness()
     assert ldlt_mgr.pos == (0, 1)
-    assert ldlt_mgr.v[0] == 1.0
+    assert ldlt_mgr.wit[0] == 1.0
     assert ep == 0.0
 
 

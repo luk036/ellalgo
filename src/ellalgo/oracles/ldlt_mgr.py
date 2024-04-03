@@ -31,7 +31,7 @@ class LDLTMgr:
         True
     """
 
-    __slots__ = ("pos", "v", "_ndim", "_storage", "allow_semidefinite")
+    __slots__ = ("pos", "wit", "_ndim", "_storage", "allow_semidefinite")
 
     def __init__(self, ndim: int):
         """
@@ -44,7 +44,7 @@ class LDLTMgr:
         :type ndim: int
         """
         self.pos = (0, 0)
-        self.v: np.ndarray = np.zeros(ndim)
+        self.wit: np.ndarray = np.zeros(ndim)
 
         self._ndim: int = ndim
         self._storage: np.ndarray = np.zeros((ndim, ndim))  # pre-allocate storage
@@ -191,9 +191,9 @@ class LDLTMgr:
             raise AssertionError()
         start, pos = self.pos
         m = pos - 1
-        self.v[m] = 1.0
+        self.wit[m] = 1.0
         for i in range(m, start, -1):
-            self.v[i - 1] = -self._storage[i:pos, i - 1].dot(self.v[i:pos])
+            self.wit[i - 1] = -self._storage[i:pos, i - 1].dot(self.wit[i:pos])
         return -self._storage[m, m]
 
     def sym_quad(self, mat: np.ndarray):
@@ -223,8 +223,8 @@ class LDLTMgr:
             3.25
         """
         start, ndim = self.pos
-        v = self.v[start:ndim]
-        return v.dot(mat[start:ndim, start:ndim] @ v)
+        wit = self.wit[start:ndim]
+        return wit.dot(mat[start:ndim, start:ndim] @ wit)
 
     def sqrt(self) -> np.ndarray:
         """Return upper triangular matrix R where A = R' * R
