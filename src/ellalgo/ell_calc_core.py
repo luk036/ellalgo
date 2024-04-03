@@ -104,7 +104,7 @@ class EllCalcCore:
         delta = self._cst1
         return (rho, sigma, delta)
 
-    def calc_deep_cut_fast(
+    def calc_bias_cut_fast(
         self, beta: float, tau: float, eta: float
     ) -> Tuple[float, float, float]:
         r"""Calculates the deep cut ellipsoid parameters using precomputed eta values.
@@ -120,7 +120,7 @@ class EllCalcCore:
         :type beta: float
         :param tau: tau is a float representing the value of tau
         :type tau: float
-        :return: The function `calc_deep_cut` returns a tuple containing the following elements:
+        :return: The function `calc_bias_cut` returns a tuple containing the following elements:
 
         .. svgbob::
            :align: center
@@ -154,9 +154,9 @@ class EllCalcCore:
 
         Examples:
             >>> calc = EllCalcCore(3)
-            >>> calc.calc_deep_cut_fast(1.0, 2.0, 5.0)
+            >>> calc.calc_bias_cut_fast(1.0, 2.0, 5.0)
             (1.25, 0.8333333333333334, 0.84375)
-            >>> calc.calc_deep_cut_fast(0.0, 2.0, 2.0)
+            >>> calc.calc_bias_cut_fast(0.0, 2.0, 2.0)
             (0.5, 0.5, 1.125)
         """
         alpha = beta / tau
@@ -165,7 +165,7 @@ class EllCalcCore:
         delta = self._cst1 * (1.0 - alpha) * (1.0 + alpha)
         return (rho, sigma, delta)
 
-    def calc_deep_cut(self, beta: float, tau: float) -> Tuple[float, float, float]:
+    def calc_bias_cut(self, beta: float, tau: float) -> Tuple[float, float, float]:
         r"""Calculate deep cut values.
 
         Calculates the deep cut values ρ, σ, δ for given β and τ.
@@ -174,7 +174,7 @@ class EllCalcCore:
         :type beta: float
         :param tau: tau is a float representing the value of tau
         :type tau: float
-        :return: The function `calc_deep_cut` returns a tuple containing the following elements:
+        :return: The function `calc_bias_cut` returns a tuple containing the following elements:
 
         .. svgbob::
            :align: center
@@ -210,12 +210,12 @@ class EllCalcCore:
 
         Examples:
             >>> calc = EllCalcCore(3)
-            >>> calc.calc_deep_cut(1.0, 2.0)
+            >>> calc.calc_bias_cut(1.0, 2.0)
             (1.25, 0.8333333333333334, 0.84375)
-            >>> calc.calc_deep_cut(0.0, 2.0)
+            >>> calc.calc_bias_cut(0.0, 2.0)
             (0.5, 0.5, 1.125)
         """
-        return self.calc_deep_cut_fast(beta, tau, tau + self._n_f * beta)
+        return self.calc_bias_cut_fast(beta, tau, tau + self._n_f * beta)
 
     def calc_parallel_central_cut(
         self, beta1: float, tsq: float
@@ -356,12 +356,12 @@ class EllCalcCore:
         delta = self._cst1 * (1.0 - a1sq / 2.0 + xi / self._n_f)
         return (rho, sigma, delta)
 
-    def calc_parallel_deep_cut(
+    def calc_parallel_bias_cut(
         self, beta0: float, beta1: float, tsq: float
     ) -> Tuple[float, float, float]:
         r"""Calculation Parallel Deep Cut (15 mul/div + 1 sqrt)
 
-        The `calc_parallel_deep_cut` function calculates various values based on the input parameters and returns
+        The `calc_parallel_bias_cut` function calculates various values based on the input parameters and returns
         them as a tuple.
 
         :param beta0: The parameter `beta0` represents a float value
@@ -419,24 +419,24 @@ class EllCalcCore:
 
         Examples:
             >>> calc = EllCalcCore(4)
-            >>> calc.calc_parallel_deep_cut(0.01, 0.11, 0.01)
+            >>> calc.calc_parallel_bias_cut(0.01, 0.11, 0.01)
             (0.027228509068282114, 0.45380848447136857, 1.0443438549074862)
-            >>> calc.calc_parallel_deep_cut(-0.25, 0.25, 1.0)
+            >>> calc.calc_parallel_bias_cut(-0.25, 0.25, 1.0)
             (0.0, 0.8, 1.25)
-            >>> calc.calc_parallel_deep_cut(0.0, 0.09, 0.01)
+            >>> calc.calc_parallel_bias_cut(0.0, 0.09, 0.01)
             (0.020941836487980856, 0.46537414417735234, 1.082031295477563)
         """
         b0b1 = beta0 * beta1
-        return self.calc_parallel_deep_cut_fast(
+        return self.calc_parallel_bias_cut_fast(
             beta0, beta1, tsq, b0b1, tsq + self._n_f * b0b1
         )
 
-    def calc_parallel_deep_cut_fast(
+    def calc_parallel_bias_cut_fast(
         self, beta0: float, beta1: float, tsq: float, b0b1: float, eta: float
     ) -> Tuple[float, float, float]:
         r"""Calculation Parallel Deep Cut (13 mul/div + 1 sqrt)
 
-        The `calc_parallel_deep_cut_fast` function calculates various values based on the input parameters and returns them as a tuple.
+        The `calc_parallel_bias_cut_fast` function calculates various values based on the input parameters and returns them as a tuple.
 
         :param beta0: The parameter `beta0` represents a float value
         :type beta0: float
@@ -495,9 +495,9 @@ class EllCalcCore:
 
         Examples:
             >>> calc = EllCalcCore(4)
-            >>> calc.calc_parallel_deep_cut_fast(0.11, 0.01, 0.01, 0.0011, 0.0144)
+            >>> calc.calc_parallel_bias_cut_fast(0.11, 0.01, 0.01, 0.0011, 0.0144)
             (0.027228509068282114, 0.45380848447136857, 1.0443438549074862)
-            >>> calc.calc_parallel_deep_cut_fast(-0.25, 0.25, 1.0, -0.0625, 0.75)
+            >>> calc.calc_parallel_bias_cut_fast(-0.25, 0.25, 1.0, -0.0625, 0.75)
             (0.0, 0.8, 1.25)
         """
         bavg = 0.5 * (beta0 + beta1)
@@ -510,12 +510,12 @@ class EllCalcCore:
         delta = (tsq + inv_mu * (bavgsq * sigma - b0b1)) / tsq
         return (rho, sigma, delta)
 
-    def calc_parallel_deep_cut_old(
+    def calc_parallel_bias_cut_old(
         self, beta0: float, beta1: float, tsq: float
     ) -> Tuple[float, float, float]:
         r"""Calculation Parallel Deep Cut
 
-        The `calc_parallel_deep_cut` function calculates various values based on the input parameters and returns them as a tuple.
+        The `calc_parallel_bias_cut` function calculates various values based on the input parameters and returns them as a tuple.
 
         :param beta0: The parameter `beta0` represents a float value
         :type beta0: float
@@ -580,7 +580,7 @@ class EllCalcCore:
 
         Examples:
             >>> calc = EllCalcCore(4)
-            >>> calc.calc_parallel_deep_cut_old(0.11, 0.01, 0.01)
+            >>> calc.calc_parallel_bias_cut_old(0.11, 0.01, 0.01)
             (0.02722850906828212, 0.4538084844713687, 1.0443438549074862)
         """
         b0b1 = beta0 * beta1

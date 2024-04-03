@@ -92,7 +92,7 @@ def cutting_plane_feas(
         cut = omega.assess_feas(space.xc())  # query the oracle at space.xc()
         if cut is None:  # feasible sol'n obtained
             return space.xc(), niter
-        status = space.update_deep_cut(cut)  # update space
+        status = space.update_bias_cut(cut)  # update space
         if status != CutStatus.Success or space.tsq() < options.tolerance:
             return None, niter
     return None, options.max_iters
@@ -135,7 +135,7 @@ def cutting_plane_optim(
             x_best = copy.copy(space.xc())
             status = space.update_central_cut(cut)
         else:
-            status = space.update_deep_cut(cut)
+            status = space.update_bias_cut(cut)
         if status != CutStatus.Success or space.tsq() < options.tolerance:
             return x_best, gamma, niter
     return x_best, gamma, options.max_iters

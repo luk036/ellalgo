@@ -113,9 +113,9 @@ class OracleBS(ABC):
 # central cut, as well as accessing the xc and tsq attributes.
 class SearchSpace(Generic[ArrayType]):
     @abstractmethod
-    def update_deep_cut(self, cut: Cut) -> CutStatus:
+    def update_bias_cut(self, cut: Cut) -> CutStatus:
         """
-        The `update_deep_cut` function is an abstract method that takes a `Cut` object as input and returns
+        The `update_bias_cut` function is an abstract method that takes a `Cut` object as input and returns
         a `CutStatus` object.
 
         :param cut: The `cut` parameter is an instance of the `Cut` class. It represents a deep-cut that

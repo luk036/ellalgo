@@ -71,9 +71,9 @@ class EllCalc:
             >>> calc = EllCalc(3)
         """
         if isinstance(beta, (int, float)):
-            return self.calc_deep_cut(beta, tsq)
+            return self.calc_bias_cut(beta, tsq)
         elif len(beta) < 2 or not self.use_parallel_cut:  # unlikely
-            return self.calc_deep_cut(beta[0], tsq)
+            return self.calc_bias_cut(beta[0], tsq)
         return self.calc_parallel(beta[0], beta[1], tsq)
 
     def calc_single_or_parallel_central_cut(
@@ -121,7 +121,7 @@ class EllCalc:
         #     return self.calc_parallel_central_cut(beta1)
         b1sq = beta1 * beta1
         if beta1 > 0.0 and tsq < b1sq:
-            return self.calc_deep_cut(beta0, tsq)
+            return self.calc_bias_cut(beta0, tsq)
         b0b1 = beta0 * beta1
         return self.calc_parallel_core(beta0, beta1, b1sq, b0b1, tsq)
 
@@ -267,7 +267,7 @@ class EllCalc:
     #                  ⎛ 2    ⎞    2
     #                  ⎝n  - 1⎠ ⋅ τ
     #
-    def calc_deep_cut(self, beta: float, tsq: float) -> Tuple[CutStatus, float, float, float]:
+    def calc_bias_cut(self, beta: float, tsq: float) -> Tuple[CutStatus, float, float, float]:
         """
         The function calculates the deep cut based on the given beta and tsq values.
 
@@ -275,7 +275,7 @@ class EllCalc:
         :type beta: float
         :param tsq: tsq is the square of the value of tau
         :type tsq: float
-        :return: The function `calc_deep_cut` returns a tuple of four values: `CutStatus`, `float`, `float`,
+        :return: The function `calc_bias_cut` returns a tuple of four values: `CutStatus`, `float`, `float`,
         `float`.
 
         Returns:
@@ -287,7 +287,7 @@ class EllCalc:
             return (CutStatus.NoSoln, 0.0, 0.0, 0.0)  # no sol'n
         tau = sqrt(tsq)
         eta = tau + self._n_f * beta
-        return self.calc_deep_cut_core(beta, tau, eta)
+        return self.calc_bias_cut_core(beta, tau, eta)
 
     #             η = τ + n ⋅ β
     #
@@ -305,11 +305,11 @@ class EllCalc:
     #                  ⎛ 2    ⎞    2
     #                  ⎝n  - 1⎠ ⋅ τ
     #
-    def calc_deep_cut_core(
+    def calc_bias_cut_core(
         self, beta: float, tau: float, eta: float
     ) -> Tuple[CutStatus, float, float, float]:
         """
-        The `calc_deep_cut_core` function calculates the values of `rho`, `sigma`, and `delta` based on the
+        The `calc_bias_cut_core` function calculates the values of `rho`, `sigma`, and `delta` based on the
         given `beta`, `tau`, and `eta` parameters.
 
         :param beta: The parameter `beta` represents a value used in the calculation. It is a float
@@ -321,14 +321,14 @@ class EllCalc:
         :param eta: The parameter `eta` represents a scaling factor that is multiplied with the
         constant `_cst0` in the calculation
         :type eta: float
-        :return: The function `calc_deep_cut_core` returns a tuple containing the following elements:
+        :return: The function `calc_bias_cut_core` returns a tuple containing the following elements:
 
         Examples:
             >>> from ellalgo.ell_calc import EllCalc
             >>> calc = EllCalc(3)
-            >>> calc.calc_deep_cut_core(1.0, 2.0, 2.0 + 3 * 1.0)
+            >>> calc.calc_bias_cut_core(1.0, 2.0, 2.0 + 3 * 1.0)
             (<CutStatus.Success: 0>, 1.25, 0.8333333333333334, 0.84375)
-            >>> calc.calc_deep_cut_core(0.0, 2.0, 2.0)
+            >>> calc.calc_bias_cut_core(0.0, 2.0, 2.0)
             (<CutStatus.Success: 0>, 0.5, 0.5, 1.125)
         """
         rho = self._cst0 * eta
@@ -444,7 +444,7 @@ class EllCalc:
         eta = tau + self._n_f * beta
         if eta <= 0.0:
             return (CutStatus.NoEffect, 0.0, 0.0, 0.0)
-        return self.calc_deep_cut_core(beta, tau, eta)
+        return self.calc_bias_cut_core(beta, tau, eta)
 
 
 if __name__ == "__main__":

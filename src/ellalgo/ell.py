@@ -69,9 +69,9 @@ class Ell(SearchSpace[ArrayType], SearchSpaceQ[ArrayType]):
         """
         return self._tsq
 
-    def update_deep_cut(self, cut) -> CutStatus:
+    def update_bias_cut(self, cut) -> CutStatus:
         """
-        The function `update_deep_cut` is an implementation of the `SearchSpace` interface that updates the
+        The function `update_bias_cut` is an implementation of the `SearchSpace` interface that updates the
         ellipsoid based on a given deep-cut.
 
         :param cut: The `cut` parameter is of type `_type_` and it represents some kind of cut
@@ -80,7 +80,7 @@ class Ell(SearchSpace[ArrayType], SearchSpaceQ[ArrayType]):
         Examples:
             >>> ell = Ell(1.0, [1.0, 1.0, 1.0, 1.0])
             >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 1.0)
-            >>> status = ell.update_deep_cut(cut)
+            >>> status = ell.update_bias_cut(cut)
             >>> print(status)
             CutStatus.Success
         """

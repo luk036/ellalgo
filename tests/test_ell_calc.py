@@ -21,16 +21,16 @@ def test_calc_central_cut():
     assert delta == approx(1.2)
 
 
-def test_calc_deep_cut():
+def test_calc_bias_cut():
     ell_calc = EllCalc(4)
-    status, result = ell_calc.calc_deep_cut(0.11, 0.01)
+    status, result = ell_calc.calc_bias_cut(0.11, 0.01)
     assert status == CutStatus.NoSoln
     assert result is None
-    status, result = ell_calc.calc_deep_cut(0.01, 0.01)
+    status, result = ell_calc.calc_bias_cut(0.01, 0.01)
     assert status == CutStatus.Success
     assert result is not None
 
-    status, result = ell_calc.calc_deep_cut(0.05, 0.01)
+    status, result = ell_calc.calc_bias_cut(0.05, 0.01)
     assert status == CutStatus.Success
     assert result is not None
     rho, sigma, delta = result

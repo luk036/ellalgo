@@ -58,9 +58,9 @@ class EllCalc:
             >>> calc = EllCalc(3)
         """
         if isinstance(beta, (int, float)):
-            return self.calc_deep_cut(beta, tsq)
+            return self.calc_bias_cut(beta, tsq)
         elif len(beta) < 2 or not self.use_parallel_cut:  # unlikely
-            return self.calc_deep_cut(beta[0], tsq)
+            return self.calc_bias_cut(beta[0], tsq)
         return self.calc_parallel(beta[0], beta[1], tsq)
 
     def calc_single_or_parallel_central_cut(
@@ -117,13 +117,13 @@ class EllCalc:
             return (CutStatus.NoSoln, None)  # no sol'n
         b1sq = beta1 * beta1
         if beta1 > 0.0 and tsq <= b1sq:
-            return self.calc_deep_cut(beta0, tsq)
+            return self.calc_bias_cut(beta0, tsq)
         return (
             CutStatus.Success,
-            self._helper.calc_parallel_deep_cut(beta0, beta1, tsq),
+            self._helper.calc_parallel_bias_cut(beta0, beta1, tsq),
         )
 
-    def calc_deep_cut(
+    def calc_bias_cut(
         self, beta: float, tsq: float
     ) -> Tuple[CutStatus, Optional[Tuple[float, float, float]]]:
         """Deep Cut
@@ -134,16 +134,16 @@ class EllCalc:
         :type beta: float
         :param tsq: tsq is the square of the value of tau
         :type tsq: float
-        :return: The function `calc_deep_cut` returns a tuple of four values: `CutStatus`, `float`, `float`, `float`.
+        :return: The function `calc_bias_cut` returns a tuple of four values: `CutStatus`, `float`, `float`, `float`.
 
         Examples:
             >>> from ellalgo.ell_calc import EllCalc
             >>> calc = EllCalc(3)
-            >>> calc.calc_deep_cut(1.0, 4.0)
+            >>> calc.calc_bias_cut(1.0, 4.0)
             (<CutStatus.Success: 0>, (1.25, 0.8333333333333334, 0.84375))
-            >>> calc.calc_deep_cut(0.0, 4.0)
+            >>> calc.calc_bias_cut(0.0, 4.0)
             (<CutStatus.Success: 0>, (0.5, 0.5, 1.125))
-            >>> calc.calc_deep_cut(1.5, 2.0)
+            >>> calc.calc_bias_cut(1.5, 2.0)
             (<CutStatus.NoSoln: 1>, None)
         """
         assert beta >= 0.0
@@ -153,7 +153,7 @@ class EllCalc:
         tau = sqrt(tsq)
         return (
             CutStatus.Success,
-            self._helper.calc_deep_cut(beta, tau),
+            self._helper.calc_bias_cut(beta, tau),
         )
 
     def calc_single_or_parallel_q(
@@ -206,7 +206,7 @@ class EllCalc:
             return (CutStatus.NoEffect, None)  # no effect
         return (
             CutStatus.Success,
-            self._helper.calc_parallel_deep_cut_fast(beta0, beta1, tsq, b0b1, eta),
+            self._helper.calc_parallel_bias_cut_fast(beta0, beta1, tsq, b0b1, eta),
         )
 
     def calc_bias_cut_q(
@@ -241,7 +241,7 @@ class EllCalc:
             return (CutStatus.NoEffect, None)
         return (
             CutStatus.Success,
-            self._helper.calc_deep_cut_fast(beta, tau, eta),
+            self._helper.calc_bias_cut_fast(beta, tau, eta),
         )
 
 
