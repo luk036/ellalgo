@@ -76,7 +76,7 @@ def test_calc_parallel_noeffect():
     assert delta == approx(1.0)
 
 
-def test_calc_deep_cut_q():
+def test_calc_bias_cut_q():
     ell_calc_q = EllCalcCore(4)
     rho, sigma, delta = ell_calc_q.calc_deep_cut(0.05, 0.1)
     assert rho == approx(0.06)
@@ -84,7 +84,7 @@ def test_calc_deep_cut_q():
     assert delta == approx(0.8)
 
 
-def test_calc_parallel_deep_cut_q():
+def test_calc_parallel_bias_cut_q():
     ell_calc_core = EllCalcCore(4)
     rho, sigma, delta = ell_calc_core.calc_parallel_deep_cut(0.0, 0.05, 0.01)
     assert rho == approx(0.02)

@@ -170,9 +170,9 @@ class EllCalc:
         :return: The function `calc_single_or_parallel_q` returns a tuple containing four elements: `CutStatus`, `float`, `float`, and `float`.
         """
         if isinstance(beta, (int, float)):
-            return self.calc_deep_cut_q(beta, tsq)
+            return self.calc_bias_cut_q(beta, tsq)
         elif len(beta) < 2 or not self.use_parallel_cut:  # unlikely
-            return self.calc_deep_cut_q(beta[0], tsq)
+            return self.calc_bias_cut_q(beta[0], tsq)
         return self.calc_parallel_q(beta[0], beta[1], tsq)
 
     #
@@ -199,7 +199,7 @@ class EllCalc:
             return (CutStatus.NoSoln, None)  # no sol'n
         b1sq = beta1 * beta1
         if beta1 > 0.0 and tsq <= b1sq:
-            return self.calc_deep_cut_q(beta0, tsq)
+            return self.calc_bias_cut_q(beta0, tsq)
         b0b1 = beta0 * beta1
         eta = tsq + self._n_f * b0b1
         if eta <= 0.0:  # for discrete optimization
@@ -209,28 +209,28 @@ class EllCalc:
             self._helper.calc_parallel_deep_cut_fast(beta0, beta1, tsq, b0b1, eta),
         )
 
-    def calc_deep_cut_q(
+    def calc_bias_cut_q(
         self, beta: float, tsq: float
     ) -> Tuple[CutStatus, Optional[Tuple[float, float, float]]]:
         """Deep Cut (discrete)
 
-        The function `calc_deep_cut_q` calculates the deep cut for a given beta and tsq value.
+        The function `calc_bias_cut_q` calculates the deep cut for a given beta and tsq value.
 
         :param beta: The parameter `beta` represents a float value
         :type beta: float
         :param tsq: tsq is the square of the threshold value. It is a float value that represents the
             threshold squared
         :type tsq: float
-        :return: The function `calc_deep_cut_q` returns a tuple of four values: `CutStatus`, `float`, `float`, `float`.
+        :return: The function `calc_bias_cut_q` returns a tuple of four values: `CutStatus`, `float`, `float`, `float`.
 
         Examples:
             >>> from ellalgo.ell_calc import EllCalc
             >>> calc = EllCalc(3)
-            >>> calc.calc_deep_cut_q(0.0, 4.0)
+            >>> calc.calc_bias_cut_q(0.0, 4.0)
             (<CutStatus.Success: 0>, (0.5, 0.5, 1.125))
-            >>> calc.calc_deep_cut_q(1.5, 2.0)
+            >>> calc.calc_bias_cut_q(1.5, 2.0)
             (<CutStatus.NoSoln: 1>, None)
-            >>> calc.calc_deep_cut_q(-1.5, 4.0)
+            >>> calc.calc_bias_cut_q(-1.5, 4.0)
             (<CutStatus.NoEffect: 2>, None)
         """
         tau = sqrt(tsq)

@@ -384,9 +384,9 @@ class EllCalc:
         `CutStatus`, `float`, `float`, and `float`.
         """
         if isinstance(beta, (int, float)):
-            return self.calc_deep_cut_q(beta, tsq)
+            return self.calc_bias_cut_q(beta, tsq)
         elif len(beta) < 2 or not self.use_parallel_cut:  # unlikely
-            return self.calc_deep_cut_q(beta[0], tsq)
+            return self.calc_bias_cut_q(beta[0], tsq)
         return self.calc_parallel_q(beta[0], beta[1], tsq)
 
     #
@@ -416,26 +416,26 @@ class EllCalc:
         #     return self.calc_parallel_central_cut(beta1)
         b1sq = beta1 * beta1
         if beta1 > 0.0 and tsq < b1sq:
-            return self.calc_deep_cut_q(beta0, tsq)
+            return self.calc_bias_cut_q(beta0, tsq)
         b0b1 = beta0 * beta1
         if self._n_f * b0b1 < -tsq:  # for discrete optimization
             return (CutStatus.NoEffect, 0.0, 0.0, 0.0)  # no effect
         # TODO: check beta0 + beta1 == 0
         return self.calc_parallel_core(beta0, beta1, b1sq, b0b1, tsq)
 
-    def calc_deep_cut_q(
+    def calc_bias_cut_q(
         self, beta: float, tsq: float
     ) -> Tuple[CutStatus, float, float, float]:
         """Deep Cut (discrete)
 
-        The function `calc_deep_cut_q` calculates the deep cut for a given beta and tsq value.
+        The function `calc_bias_cut_q` calculates the deep cut for a given beta and tsq value.
 
         :param beta: The parameter `beta` represents a float value
         :type beta: float
         :param tsq: tsq is the square of the threshold value. It is a float value that represents the
         threshold squared
         :type tsq: float
-        :return: The function `calc_deep_cut_q` returns a tuple of four values: `CutStatus`, `float`, `float`,
+        :return: The function `calc_bias_cut_q` returns a tuple of four values: `CutStatus`, `float`, `float`,
         `float`.
         """
         tau = sqrt(tsq)

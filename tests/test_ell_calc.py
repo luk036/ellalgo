@@ -91,18 +91,18 @@ def test_calc_parallel():
 #     assert result is None
 
 
-def test_calc_deep_cut_q():
+def test_calc_bias_cut_q():
     ell_calc_q = EllCalc(4)
-    status, result = ell_calc_q.calc_deep_cut_q(0.11, 0.01)
+    status, result = ell_calc_q.calc_bias_cut_q(0.11, 0.01)
     assert status == CutStatus.NoSoln
     assert result is None
-    status, result = ell_calc_q.calc_deep_cut_q(0.01, 0.01)
+    status, result = ell_calc_q.calc_bias_cut_q(0.01, 0.01)
     assert status == CutStatus.Success
-    status, result = ell_calc_q.calc_deep_cut_q(-0.05, 0.01)
+    status, result = ell_calc_q.calc_bias_cut_q(-0.05, 0.01)
     assert status == CutStatus.NoEffect
     assert result is None
 
-    status, result = ell_calc_q.calc_deep_cut_q(0.05, 0.01)
+    status, result = ell_calc_q.calc_bias_cut_q(0.05, 0.01)
     assert status == CutStatus.Success
     assert result is not None
     rho, sigma, delta = result
