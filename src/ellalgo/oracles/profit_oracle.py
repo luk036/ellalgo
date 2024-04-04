@@ -196,7 +196,7 @@ class ProfitRbOracle(OracleOptim):
         """
         e1, e2, e3, e4, e5 = vparams
         self.elasticities = elasticities
-        self.e = [e1, e2]
+        self.uie = [e1, e2]
         unit_price, scale, limit = params
         params_rb = unit_price - e3, scale, limit - e4
         self.omega = ProfitOracle(
@@ -225,7 +225,7 @@ class ProfitRbOracle(OracleOptim):
         """
         a_rb = copy.copy(self.elasticities)
         for i in [0, 1]:
-            a_rb[i] += -self.e[i] if y[i] > 0.0 else self.e[i]
+            a_rb[i] += -self.uie[i] if y[i] > 0.0 else self.uie[i]
         self.omega.elasticities = a_rb
         return self.omega.assess_optim(y, gamma)
 

@@ -54,9 +54,9 @@ def test_case_feasible():
     xinit = np.array([0.0, 0.0])  # initial guess
     ellip = Ell(10.0, xinit)
     omega = MyOracle()
-    x_feas, num_iters = cutting_plane_feas(omega, ellip)
-    assert x_feas is not None
-    print(num_iters)
+    xfeas, num_iters = cutting_plane_feas(omega, ellip)
+    assert xfeas is not None
+    assert num_iters == 1
 
 
 def test_case_infeasible():
@@ -64,6 +64,6 @@ def test_case_infeasible():
     xinit = np.array([100.0, 100.0])  # wrong initial guess
     ellip = Ell(10.0, xinit)
     omega = MyOracle()
-    x_feas, num_iters = cutting_plane_feas(omega, ellip)
-    assert x_feas is None
-    print(num_iters)
+    xfeas, num_iters = cutting_plane_feas(omega, ellip)
+    assert xfeas is None
+    assert num_iters == 1
