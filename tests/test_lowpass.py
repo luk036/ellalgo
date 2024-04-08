@@ -22,10 +22,11 @@ def run_lowpass(use_parallel_cut: bool):
     r0[0] = 0
     ellip = Ell(40.0, r0)
     ellip._helper.use_parallel_cut = use_parallel_cut
-    omega, Spsq = create_lowpass_case(N)
+    omega = create_lowpass_case(N)
     options = Options()
     options.max_iters = 50000
     options.tolerance = 1e-14
+    Spsq = omega.sp_sq
     h, _, num_iters = cutting_plane_optim(omega, ellip, Spsq, options)
     return h is not None, num_iters
 

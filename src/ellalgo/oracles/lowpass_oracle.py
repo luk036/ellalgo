@@ -1,10 +1,11 @@
 from math import floor
 from typing import Optional, Tuple, Union
+from ellalgo.ell_typing import OracleOptim
 
 import numpy as np
 
 Arr = np.ndarray
-Cut = Tuple[Arr, Union[float, Tuple[float, float]]]
+ParallelCut = Tuple[Arr, Union[float, Tuple[float, float]]]
 
 
 # Modified from CVX code by Almir Mutapcic in 2006.
@@ -37,12 +38,12 @@ Cut = Tuple[Arr, Union[float, Tuple[float, float]]]
 # filter specs (for a low-pass filter)
 # *********************************************************************
 # number of FIR coefficients (including zeroth)
-class LowpassOracle:
+class LowpassOracle(OracleOptim):
     more_alt: bool = True
     idx1: int = 0
 
     def __init__(
-        self, ndim: int, wpass: float, wstop: float, lp_sq: float, up_sq: float
+        self, ndim: int, wpass: float, wstop: float, lp_sq: float, up_sq: float, sp_sq: float
     ):
         # *********************************************************************
         # optimization parameters
@@ -59,13 +60,14 @@ class LowpassOracle:
         self.nwstop: int = floor(wstop * (mdim - 1)) + 1  # end of stopband
         self.lp_sq = lp_sq
         self.up_sq = up_sq
+        self.sp_sq = sp_sq
         self.idx1 = 0
         self.idx2 = self.nwpass
         self.idx3 = self.nwstop
         self.fmax = float("-inf")
         self.kmax = 0
 
-    def assess_feas(self, x: Arr, sp_sq: float) -> Optional[Cut]:
+    def assess_feas(self, x: Arr) -> Optional[ParallelCut]:
         """[summary]
 
         Arguments:
@@ -99,10 +101,10 @@ class LowpassOracle:
                 self.idx3 = self.nwstop  # round robin
             col_k = self.spectrum[self.idx3, :]
             v = col_k.dot(x)
-            if v > sp_sq:
-                return col_k, (v - sp_sq, v)
+            if v > self.sp_sq:
+                return col_k, (v - self.sp_sq, v)
             if v < 0:
-                return -col_k, (-v, -v + sp_sq)
+                return -col_k, (-v, -v + self.sp_sq)
             if v > self.fmax:
                 self.fmax = v
                 self.kmax = self.idx3
@@ -138,7 +140,8 @@ class LowpassOracle:
         Returns:
             [type]: [description]
         """
-        if cut := self.assess_feas(x, sp_sq):
+        self.sp_sq = sp_sq
+        if cut := self.assess_feas(x):
             return cut, None
         # Begin objective function
         return (self.spectrum[self.kmax, :], (0.0, self.fmax)), self.fmax
@@ -173,5 +176,4 @@ def create_lowpass_case(ndim=48):
     up_sq = up_pass * up_pass
     sp_sq = stop_pass * stop_pass
 
-    omega = LowpassOracle(ndim, 0.12, 0.20, lp_sq, up_sq)
-    return omega, sp_sq
+    return LowpassOracle(ndim, 0.12, 0.20, lp_sq, up_sq, sp_sq)
