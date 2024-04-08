@@ -117,7 +117,9 @@ def test_calc_bias_cut_fast():
 
 def test_calc_parallel_bias_cut_fast():
     ell_calc_core = EllCalcCore(4)
-    rho, sigma, delta =  ell_calc_core.calc_parallel_bias_cut_fast(-0.25, 0.25, 1.0, -0.0625, 0.75)
+    rho, sigma, delta = ell_calc_core.calc_parallel_bias_cut_fast(
+        -0.25, 0.25, 1.0, -0.0625, 0.75
+    )
     assert rho == approx(0.0)
     assert sigma == approx(0.8)
     assert delta == approx(1.25)
