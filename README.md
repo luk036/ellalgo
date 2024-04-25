@@ -19,7 +19,7 @@
   <img src="./ellipsoid-method-for-convex-optimization.svg"/>
 </p>
 
-# 🏉 ellalgo
+# 🫒 ellalgo
 
 > Ellipsoid Method in Python
 
