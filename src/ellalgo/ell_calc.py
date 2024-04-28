@@ -94,10 +94,6 @@ class EllCalc:
             return (CutStatus.Success, self._helper.calc_central_cut(sqrt(tsq)))
         return (CutStatus.Success, self._helper.calc_parallel_central_cut(beta[1], tsq))
 
-    #
-    #             ⎛                      ╱     ╱    ⎞
-    #            -τ                0    β0    β1    +τ
-    #             ⎝                    ╱     ╱      ⎠
     def calc_parallel(
         self, beta0: float, beta1: float, tsq: float
     ) -> Tuple[CutStatus, Optional[Tuple[float, float, float]]]:
@@ -175,11 +171,6 @@ class EllCalc:
             return self.calc_bias_cut_q(beta[0], tsq)
         return self.calc_parallel_q(beta[0], beta[1], tsq)
 
-    #
-    #             ⎛                      ╱     ╱    ⎞
-    #            -τ                0    β0    β1    +τ
-    #             ⎝                    ╱     ╱      ⎠
-    #
     def calc_parallel_q(
         self, beta0: float, beta1: float, tsq: float
     ) -> Tuple[CutStatus, Optional[Tuple[float, float, float]]]:

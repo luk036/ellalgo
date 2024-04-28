@@ -138,11 +138,17 @@ class SearchSpace(Generic[ArrayType]):
 
     @abstractmethod
     def xc(self) -> ArrayType:
-        pass
+        """
+        The function `xc` returns the value of the `_xc` attribute.
+        :return: The method `xc` is returning the value of the attribute `_xc`.
+        """
 
     @abstractmethod
     def tsq(self) -> float:
-        pass
+        """
+        The function `tsq` returns the measure of the distance between `xc` and `x*`.
+        :return: The method is returning a float value, which represents the measure of the distance between xc and x*.
+        """
 
 
 class SearchSpaceQ(Generic[ArrayType]):
@@ -158,14 +164,25 @@ class SearchSpaceQ(Generic[ArrayType]):
 
     @abstractmethod
     def xc(self) -> ArrayType:
-        pass
+        """
+        The function `xc` returns the value of the `_xc` attribute.
+        :return: The method `xc` is returning the value of the attribute `_xc`.
+        """
 
     @abstractmethod
     def tsq(self) -> float:
-        pass
+        """
+        The function `tsq` returns the measure of the distance between `xc` and `x*`.
+        :return: The method is returning a float value, which represents the measure of the distance between xc and x*.
+        """
 
 
 class SearchSpace2(SearchSpace[ArrayType]):
     @abstractmethod
     def set_xc(self, xc: ArrayType) -> None:
-        pass
+        """
+        The function sets the value of the variable `_xc` to the input `x`.
+
+        :param x: The parameter `x` is of type `ArrayType`
+        :type x: ArrayType
+        """

@@ -21,17 +21,3 @@ class CutStatus(Enum):
 class Options:
     max_iters: int = 2000  # maximum number of iterations
     tolerance: float = 1e-20  # error tolerance
-
-
-# The `CInfo` class represents information about a computation, including whether it is feasible and
-# the number of iterations it took.
-class CInfo:
-    def __init__(self, feasible: bool, num_iters: int) -> None:
-        """Initializes a CInfo object.
-
-        Args:
-            feasible (bool): Whether the solution is feasible.
-            num_iters (int): Number of iterations performed.
-        """
-        self.feasible: bool = feasible
-        self.num_iters: int = num_iters
