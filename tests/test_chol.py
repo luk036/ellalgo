@@ -4,7 +4,6 @@ from ellalgo.oracles.ldlt_mgr import LDLTMgr
 
 
 def test_chol1():
-    """[summary]"""
     l1 = [[25.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 11.0]]
     m1 = np.array(l1)
     ldlt_mgr = LDLTMgr(len(m1))
@@ -12,7 +11,6 @@ def test_chol1():
 
 
 def test_chol2():
-    """[summary]"""
     l2 = [
         [18.0, 22.0, 54.0, 42.0],
         [22.0, -70.0, 86.0, 62.0],
@@ -28,7 +26,6 @@ def test_chol2():
 
 
 def test_chol3():
-    """[summary]"""
     l3 = [[0.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 11.0]]
     m3 = np.array(l3)
     ldlt_mgr = LDLTMgr(len(m3))
@@ -40,7 +37,6 @@ def test_chol3():
 
 
 def test_chol4():
-    """[summary]"""
     l1 = [[25.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 11.0]]
     m1 = np.array(l1)
     Q1 = LDLTMgr(len(m1))
@@ -49,7 +45,6 @@ def test_chol4():
 
 
 def test_chol5():
-    """[summary]"""
     l2 = [
         [18.0, 22.0, 54.0, 42.0],
         [22.0, -70.0, 86.0, 62.0],
@@ -66,7 +61,6 @@ def test_chol5():
 
 
 def test_chol6():
-    """[summary]"""
     l3 = [[0.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 11.0]]
     m3 = np.array(l3)
     ldlt_mgr = LDLTMgr(len(m3))
@@ -74,14 +68,7 @@ def test_chol6():
     assert ldlt_mgr.factor_with_allow_semidefinite(lambda i, j: m3[i, j])
 
 
-#     [v, ep] = ldlt_mgr.witness2()
-#     assert len(v) == 1
-#     assert v[0] == 1.0
-#     assert ep == 0.0
-
-
 def test_chol7():
-    """[summary]"""
     l3 = [[0.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, -20.0]]
     m3 = np.array(l3)
     ldlt_mgr = LDLTMgr(len(m3))
@@ -93,7 +80,6 @@ def test_chol7():
 
 
 def test_chol8():
-    """[summary]"""
     l3 = [[0.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 20.0]]
     m3 = np.array(l3)
     ldlt_mgr = LDLTMgr(len(m3))
@@ -102,7 +88,6 @@ def test_chol8():
 
 
 def test_chol9():
-    """[summary]"""
     l3 = [[0.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 20.0]]
     m3 = np.array(l3)
     ldlt_mgr = LDLTMgr(len(m3))

@@ -88,7 +88,7 @@ def run_lmi(oracle):
     return num_iters
 
 
-def test_lmi_lazy(benchmark):
+def test_bm_lmi_lazy(benchmark):
     """[summary]
 
     Arguments:
@@ -98,7 +98,7 @@ def test_lmi_lazy(benchmark):
     assert result == 281
 
 
-def test_lmi_old(benchmark):
+def test_bm_lmi_old(benchmark):
     """[summary]
 
     Arguments:

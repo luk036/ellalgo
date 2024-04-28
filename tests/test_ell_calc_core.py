@@ -54,14 +54,6 @@ def test_calc_parallel():
     assert sigma == approx(0.8)
     assert delta == approx(1.2)
 
-    # rho, sigma, delta = ell_calc_core.calc_parallel_bias_cut(0.05, 0.11, 0.01)
-    # assert sigma == approx(0.8)
-    # assert rho == approx(0.06)
-    # assert delta == approx(0.8)
-
-    # rho, sigma, delta = ell_calc_core.calc_parallel(-0.07, 0.07)
-    # assert status == CutStatus.NoEffect
-
     rho, sigma, delta = ell_calc_core.calc_parallel_bias_cut(0.01, 0.04, 0.01)
     assert rho == approx(0.0232)
     assert sigma == approx(0.928)
@@ -90,11 +82,6 @@ def test_calc_parallel_bias_cut_q():
     assert rho == approx(0.02)
     assert sigma == approx(0.8)
     assert delta == approx(1.2)
-
-    # rho, sigma, delta = ell_calc_core.calc_parallel_bias_cut(0.05, 0.11, 0.01)
-    # assert sigma == approx(0.8)
-    # assert rho == approx(0.06)
-    # assert delta == approx(0.8)
 
     rho, sigma, delta = ell_calc_core.calc_parallel_bias_cut(0.01, 0.04, 0.01)
     assert rho == approx(0.0232)

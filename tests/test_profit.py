@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function
-
 import numpy as np
 
 from ellalgo.cutting_plane import cutting_plane_optim, cutting_plane_optim_q

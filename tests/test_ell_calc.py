@@ -72,9 +72,6 @@ def test_calc_parallel():
     assert sigma == approx(0.8)
     assert delta == approx(0.8)
 
-    # status, result = ell_calc.calc_parallel(-0.07, 0.07)
-    # assert status == CutStatus.NoEffect
-
     status, result = ell_calc.calc_parallel(0.01, 0.04, 0.01)
     assert status == CutStatus.Success
     assert result is not None
@@ -82,13 +79,6 @@ def test_calc_parallel():
     assert rho == approx(0.0232)
     assert sigma == approx(0.928)
     assert delta == approx(1.232)
-
-
-# def test_calc_parallel_noeffect():
-#     ell_calc = EllCalc(4)
-#     status, result = ell_calc.calc_parallel_q(-0.04, 0.0625, 0.01)
-#     assert status == CutStatus.NoEffect
-#     assert result is None
 
 
 def test_calc_bias_cut_q():

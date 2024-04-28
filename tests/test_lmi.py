@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function
-
-# import time
 from typing import Optional, Tuple
 
 import numpy as np
@@ -17,11 +13,6 @@ Cut = Tuple[np.ndarray, float]
 
 class MyOracle(OracleOptim):
     def __init__(self, oracle):
-        """[summary]
-
-        Arguments:
-            oracle ([type]): [description]
-        """
         self.c = np.array([1.0, -1.0, 1.0])
         F1 = np.array(
             [
@@ -80,11 +71,6 @@ def run_lmi(oracle, Space):
     ellip = Space(10.0, xinit)
     omega = MyOracle(oracle)
     xbest, _, num_iters = cutting_plane_optim(omega, ellip, float("inf"))
-    # time.sleep(duration)
-
-    # fmt = '{:f} {} {} {}'
-    # print(fmt.format(fb, niter, feasible, status))
-    # print(xbest)
     assert xbest is not None
     return num_iters
 

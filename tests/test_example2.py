@@ -30,14 +30,6 @@ class MyOracle(OracleFeas):
         self.grads = (self.grad1, self.grad2)
 
     def assess_feas(self, z):
-        """[summary]
-
-        Arguments:
-            z ([type]): [description]
-
-        Returns:
-            [type]: [description]
-        """
         x, y = z
 
         for _ in [0, 1]:
@@ -50,7 +42,6 @@ class MyOracle(OracleFeas):
 
 
 def test_case_feasible():
-    """[summary]"""
     xinit = np.array([0.0, 0.0])  # initial guess
     ellip = Ell(10.0, xinit)
     omega = MyOracle()
@@ -60,7 +51,6 @@ def test_case_feasible():
 
 
 def test_case_infeasible():
-    """[summary]"""
     xinit = np.array([100.0, 100.0])  # wrong initial guess
     ellip = Ell(10.0, xinit)
     omega = MyOracle()
