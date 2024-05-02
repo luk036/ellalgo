@@ -216,7 +216,7 @@ class LDLTMgr:
             (0, 2)
             >>> ldl.witness() # call this before sym_quad()
             0.5
-            >>> ldl.v
+            >>> ldl.wit
             array([-2.,  1.,  0.])
             >>> mat_b = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
             >>> ldl.sym_quad(mat_b)
