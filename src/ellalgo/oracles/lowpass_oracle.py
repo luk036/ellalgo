@@ -43,7 +43,13 @@ class LowpassOracle(OracleOptim):
     idx1: int = 0
 
     def __init__(
-        self, ndim: int, wpass: float, wstop: float, lp_sq: float, up_sq: float, sp_sq: float
+        self,
+        ndim: int,
+        wpass: float,
+        wstop: float,
+        lp_sq: float,
+        up_sq: float,
+        sp_sq: float,
     ):
         # *********************************************************************
         # optimization parameters

@@ -61,4 +61,3 @@ def test_update_parallel_no_effect():
     assert status == CutStatus.NoEffect
     assert ell._xc == approx(np.zeros(4))
     assert ell._kappa == approx(0.01)
-
