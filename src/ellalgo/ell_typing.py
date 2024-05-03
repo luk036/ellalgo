@@ -52,25 +52,25 @@ class OracleOptim(Generic[ArrayType]):
         """
 
 
-class OracleFeasQ(Generic[ArrayType]):
-    @abstractmethod
-    def assess_feas_q(
-        self, xc: ArrayType, retry: bool
-    ) -> Tuple[Optional[Cut], Optional[ArrayType], bool]:
-        """assessment of feasibility (discrete)
-
-        The function assess_feas_q assesses the feasibility of a given input and returns a tuple containing
-        a cut, an array, and a boolean value.
-
-        :param xc: An array of some type. It represents a variable or a set of variables that need to be
-            assessed for feasibility
-
-        :type xc: ArrayType
-
-        :param retry: A boolean flag indicating whether to retry the assessment if it fails initially
-
-        :type retry: bool
-        """
+# class OracleFeasQ(Generic[ArrayType]):
+#     @abstractmethod
+#     def assess_feas_q(
+#         self, xc: ArrayType, retry: bool
+#     ) -> Tuple[Optional[Cut], Optional[ArrayType], bool]:
+#         """assessment of feasibility (discrete)
+#
+#         The function assess_feas_q assesses the feasibility of a given input and returns a tuple containing
+#         a cut, an array, and a boolean value.
+#
+#         :param xc: An array of some type. It represents a variable or a set of variables that need to be
+#             assessed for feasibility
+#
+#         :type xc: ArrayType
+#
+#         :param retry: A boolean flag indicating whether to retry the assessment if it fails initially
+#
+#         :type retry: bool
+#         """
 
 
 class OracleOptimQ(Generic[ArrayType]):

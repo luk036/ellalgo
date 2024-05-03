@@ -4,7 +4,7 @@ import numpy as np
 
 from .ell_calc import EllCalc
 from .ell_config import CutStatus
-from .ell_typing import ArrayType, SearchSpace, SearchSpaceQ
+from .ell_typing import ArrayType, SearchSpace2, SearchSpaceQ
 
 Mat = np.ndarray
 CutChoice = Union[float, ArrayType]  # single or parallel
@@ -12,7 +12,7 @@ Cut = Tuple[ArrayType, CutChoice]
 
 
 # The `Ell` class represents an ellipsoidal search space.
-class Ell(SearchSpace[ArrayType], SearchSpaceQ[ArrayType]):
+class Ell(SearchSpace2[ArrayType], SearchSpaceQ[ArrayType]):
     no_defer_trick: bool = False
 
     _mq: Mat
