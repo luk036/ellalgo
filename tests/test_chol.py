@@ -40,7 +40,7 @@ def test_chol4():
     l1 = [[25.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 11.0]]
     m1 = np.array(l1)
     Q1 = LDLTMgr(len(m1))
-    Q1.allow_semidefinite = True
+    # Q1.allow_semidefinite = True
     assert Q1.factorize(m1)
 
 
@@ -53,7 +53,7 @@ def test_chol5():
     ]
     m2 = np.array(l2)
     ldlt_mgr = LDLTMgr(len(m2))
-    ldlt_mgr.allow_semidefinite = True
+    # ldlt_mgr.allow_semidefinite = True
     assert not ldlt_mgr.factorize(m2)
     ldlt_mgr.witness()
     assert ldlt_mgr.pos == (0, 2)

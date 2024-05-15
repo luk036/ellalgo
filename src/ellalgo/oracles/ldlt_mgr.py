@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import math
-from typing import Callable
+from typing import Callable, Tuple
 
 import numpy as np
 
@@ -31,7 +31,8 @@ class LDLTMgr:
         True
     """
 
-    __slots__ = ("pos", "wit", "_ndim", "_storage", "allow_semidefinite")
+    __slots__ = ("pos", "wit", "_ndim", "_storage")
+
 
     def __init__(self, ndim: int):
         """
@@ -43,9 +44,8 @@ class LDLTMgr:
 
         :type ndim: int
         """
-        self.pos = (0, 0)
+        self.pos: Tuple[int, int] = (0, 0)
         self.wit: np.ndarray = np.zeros(ndim)
-
         self._ndim: int = ndim
         self._storage: np.ndarray = np.zeros((ndim, ndim))  # pre-allocate storage
 
@@ -90,7 +90,7 @@ class LDLTMgr:
             >>> ldl.factor(lambda i, j: mat[i, j])
             True
         """
-        start = 0  # range start
+        start: int = 0  # range start
         self.pos = (0, 0)
         for i in range(self._ndim):
             diag = get_elem(i, start)
@@ -129,7 +129,7 @@ class LDLTMgr:
             >>> ldl.factor_with_allow_semidefinite(lambda i, j: mat[i, j])
             True
         """
-        start = 0  # range start
+        start: int = 0  # range start
         self.pos = (0, 0)
         for i in range(self._ndim):
             diag = get_elem(i, start)

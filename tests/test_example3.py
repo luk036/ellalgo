@@ -24,7 +24,7 @@ class MyOracle3(OracleFeas2):
         return x + y - 1
 
     def fn4(self, x, y):
-        return 2*x - 3*y - self.target
+        return 2 * x - 3 * y - self.target
 
     def grad1(self):
         return np.array([-1.0, 0.0])
@@ -66,4 +66,3 @@ def test_case_feasible():
     xbest, num_iters = bsearch(adaptor, (-100.0, 100.0), options)
     assert xbest is not None
     assert num_iters == 34
-
