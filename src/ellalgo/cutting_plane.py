@@ -300,13 +300,13 @@ class BSearchAdaptor(OracleBS):
         self.space = space
         self.options = options
 
-    # @property
-    # def x_best(self) -> ArrayType:
-    #     """
-    #     The `x_best` property returns the current best solution in the `space` object.
-    #     :return: The `x_best` property returns an object of type `ArrayType`.
-    #     """
-    #     return self.space.xc()
+    @property
+    def x_best(self) -> ArrayType:
+        """
+        The `x_best` property returns the current best solution in the `space` object.
+        :return: The `x_best` property returns an object of type `ArrayType`.
+        """
+        return self.space.xc()
 
     def assess_bs(self, gamma: Num) -> bool:
         """
