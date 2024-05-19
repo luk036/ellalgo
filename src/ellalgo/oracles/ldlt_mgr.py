@@ -33,7 +33,6 @@ class LDLTMgr:
 
     __slots__ = ("pos", "wit", "_ndim", "_storage")
 
-
     def __init__(self, ndim: int):
         """
         The above function is the constructor for a LDLT Ext object, which initializes various attributes
