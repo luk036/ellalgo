@@ -29,7 +29,7 @@ class LMIOracle(OracleFeas):
         self.mat_f0 = mat_b
         self.ldlt_mgr = LDLTMgr(len(mat_b))
 
-    def assess_feas(self, x: np.ndarray) -> Optional[Cut]:
+    def assess_feas(self, xc: np.ndarray) -> Optional[Cut]:
         """
         The `assess_feas` function assesses the feasibility of a given input and returns a cut if it is not
         feasible.
@@ -41,7 +41,7 @@ class LMIOracle(OracleFeas):
 
         def get_elem(i, j):
             return self.mat_f0[i, j] - sum(
-                Fk[i, j] * xk for Fk, xk in zip(self.mat_f, x)
+                Fk[i, j] * xk for Fk, xk in zip(self.mat_f, xc)
             )
 
         if self.ldlt_mgr.factor(get_elem):
