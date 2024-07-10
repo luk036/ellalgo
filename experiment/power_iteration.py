@@ -13,114 +13,109 @@ def power_iteration(A: np.ndarray, x: np.ndarray, options):
     for niter in range(options.max_iters):
         x1 = A @ x
         x1 = x1 / math.sqrt(x1 @ x1)
-        eps = np.linalg.norm(x - x1, np.inf)
-        if eps <= options.tolerance:
-            break
-        eps = np.linalg.norm(x + x1, np.inf)
-        if eps <= options.tolerance:
-            break
+        if (
+            sum(np.abs(x - x1)) <= options.tolerance
+            or sum(np.abs(x + x1)) <= options.tolerance
+        ):
+            ld = x1 @ A @ x1
+            return x1, ld, niter
         x = x1
 
-    ld = x1 @ A @ x1
-    return x1, ld, niter, eps
+    ld = x @ A @ x
+    return x, ld, options.max_iters
 
 
-def calc_core2(A, x):
-    x /= math.sqrt(x @ x)
-    new = A @ x
-    ld = x @ new
-    return new, ld
+def power_iteration4(A: np.ndarray, x: np.ndarray, options):
+    """Power iteration method"""
+    x = x / sum(np.abs(x))
+    for niter in range(options.max_iters):
+        x1 = A @ x
+        x1 = x1 / sum(np.abs(x1))
+        if (
+            sum(np.abs(x - x1)) <= options.tolerance
+            or sum(np.abs(x + x1)) <= options.tolerance
+        ):
+            x1 = x1 / math.sqrt(x1 @ x1)
+            ld = x1 @ A @ x1
+            return x1, ld, niter
+        x = x1
+
+    x = x / math.sqrt(x @ x)
+    ld = x @ A @ x
+    return x, ld, options.max_iters
 
 
 def power_iteration2(A: np.ndarray, x: np.ndarray, options):
     """Power iteration method"""
-    new, ld = calc_core2(A, x)
+    x /= math.sqrt(x @ x)
+    new = A @ x
+    ld = x @ new
     for niter in range(options.max_iters):
         ld1 = ld
         x = new
-        new, ld = calc_core2(A, x)
-        eps = abs(ld1 - ld)
-        if eps <= options.tolerance:
-            break
-    return x, ld, niter, eps
-
-
-def calc_core3(A, x):
-    new = A @ x
-    dot = x @ x
-    ld = (x @ new) / dot
-    return new, dot, ld
+        x /= math.sqrt(x @ x)
+        new = A @ x
+        ld = x @ new
+        if abs(ld1 - ld) <= options.tolerance:
+            return x, ld, niter
+    return x, ld, options.max_iters
 
 
 def power_iteration3(A: np.ndarray, x: np.ndarray, options):
     """Power iteration method"""
 
-    new, dot, ld = calc_core3(A, x)
+    new = A @ x
+    dot = x @ x
+    ld = (x @ new) / dot
     for niter in range(options.max_iters):
         ld1 = ld
         x = new
-        xmax = max(x)
-        xmin = min(x)
-        if xmax >= 1e100 or xmin <= -1e100:
-            x /= 1e100
-        new, dot, ld = calc_core3(A, x)
-        eps = abs(ld1 - ld)
-        if eps <= options.tolerance:
-            break
-
+        dot = x @ x
+        if dot >= 1e150:
+            x /= math.sqrt(x @ x)
+            new = A @ x
+            ld = x @ new
+            if abs(ld1 - ld) <= options.tolerance:
+                return x, ld, niter
+        else:
+            new = A @ x
+            ld = (x @ new) / dot
+            if abs(ld1 - ld) <= options.tolerance:
+                x /= math.sqrt(x @ x)
+                return x, ld, niter
     x /= math.sqrt(dot)
-    return x, ld, niter, eps
-
-
-def power_iteration4(A: np.ndarray, x: np.ndarray, options):
-    """Power iteration method"""
-    x = x / max(np.abs(x))
-    for niter in range(options.max_iters):
-        x1 = A @ x
-        x1 = x1 / max(np.abs(x1))
-        eps = np.linalg.norm(x - x1, np.inf)
-        if eps <= options.tolerance:
-            break
-        eps = np.linalg.norm(x + x1, np.inf)
-        if eps <= options.tolerance:
-            break
-        x = x1
-
-    x1 = x1 / math.sqrt(x1 @ x1)
-    ld = x1 @ A @ x1
-    return x1, ld, niter, eps
+    return x, ld, options.max_iters
 
 
 if __name__ == "__main__":
-    A = np.array([[3.7, -4.5], [4.3, -5.9]])
-    x, ld, niter, eps = power_iteration(A, np.array([1.1, 0.0]), Options())
+    A = np.array([[3.7, -3.6, 0.7], [-3.6, 4.3, -2.8], [0.7, -2.8, 5.4]])
+    options = Options()
+    options.tolerance = 1e-7
+    x, ld, niter = power_iteration(A, np.array([0.3, 0.5, 0.4]), options)
 
     print("1-----------------------------")
     print(x)
     print(ld)
     print(niter)
-    print(eps)
-
-    print("2-----------------------------")
-
-    x, ld, niter, eps = power_iteration2(A, np.array([1.1, 0.0]), Options())
-    print(x)
-    print(ld)
-    print(niter)
-    print(eps)
-
-    print("3-----------------------------")
-
-    x, ld, niter, eps = power_iteration3(A, np.array([1.1, 0.0]), Options())
-    print(x)
-    print(ld)
-    print(niter)
-    print(eps)
 
     print("4-----------------------------")
 
-    x, ld, niter, eps = power_iteration4(A, np.array([1.1, 0.0]), Options())
+    x, ld, niter = power_iteration4(A, np.array([0.3, 0.5, 0.4]), options)
     print(x)
     print(ld)
     print(niter)
-    print(eps)
+
+    options.tolerance = 1e-14
+    print("2-----------------------------")
+
+    x, ld, niter = power_iteration2(A, np.array([0.3, 0.5, 0.4]), options)
+    print(x)
+    print(ld)
+    print(niter)
+
+    print("3-----------------------------")
+
+    x, ld, niter = power_iteration3(A, np.array([0.3, 0.5, 0.4]), options)
+    print(x)
+    print(ld)
+    print(niter)
