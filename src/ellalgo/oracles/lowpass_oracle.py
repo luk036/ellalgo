@@ -39,7 +39,7 @@ ParallelCut = Tuple[Arr, Union[float, Tuple[float, float]]]
 # *********************************************************************
 # number of FIR coefficients (including zeroth)
 class LowpassOracle(OracleOptim):
-    more_alt: bool = True
+    # more_alt: bool = True
     idx1: int = 0
 
     def __init__(
@@ -83,7 +83,7 @@ class LowpassOracle(OracleOptim):
         Returns:
             [type]: [description]
         """
-        self.more_alt = True
+        # self.more_alt = True
 
         mdim, ndim = self.spectrum.shape
         for _ in range(self.nwpass):
@@ -126,7 +126,7 @@ class LowpassOracle(OracleOptim):
             if v < 0:
                 return -col_k, -v  # single cut
 
-        self.more_alt = False
+        # self.more_alt = False
 
         # case 1 (unlikely)
         if x[0] < 0:
