@@ -10,17 +10,17 @@ from ellalgo.oracles.lowpass_oracle import create_lowpass_case
 # from ellalgo.tests.test_lowpass import create_lowpass_case
 
 
-# def create_csdlowpass_case(N=48, nnz=8):
+# def create_csdlowpass_case(ndim=48, nnz=8):
 #     """[summary]
 
 #     Keyword Arguments:
-#         N (int): [description] (default: {48})
+#         ndim (int): [description] (default: {48})
 #         nnz (int): [description] (default: {8})
 
 #     Returns:
 #         [type]: [description]
 #     """
-#     P, Spsq = create_lowpass_case(N)
+#     P, Spsq = create_lowpass_case(ndim)
 #     Pcsd = csdlowpass_oracle(nnz, P)
 #     return Pcsd, Spsq
 
@@ -112,17 +112,17 @@ def plot_lowpass_result(r, Spsq_new):
 # def test_lowpass():
 if __name__ == "__main__":
     # tic = time.time()
-    N = 48
-    r0 = np.zeros(N)  # initial x0
+    ndim = 48
+    r0 = np.zeros(ndim)  # initial x0
     r0[0] = 0
 
     # ********************************************************************
     # optimization
     # ********************************************************************
-    # Ae = diag(ones(N,1)) # initial ellipsoid (sphere)
+    # Ae = diag(ones(ndim,1)) # initial ellipsoid (sphere)
     E = Ell(40., r0)
     # E.use_parallel_cut = False
-    P, Spsq = create_lowpass_case(N)
+    P, Spsq = create_lowpass_case(ndim)
     options = Options()
     # options.max_it = 50000
     # options.tolerance = 1e-11

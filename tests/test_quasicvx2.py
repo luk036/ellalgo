@@ -1,4 +1,6 @@
-# -*- coding: utf-8 -*-
+"""
+Test Quasiconvex (without Round Robin)
+"""
 from __future__ import print_function
 
 import math
@@ -11,17 +13,27 @@ from ellalgo.ell import Ell
 
 
 class MyQuasicvxOracle(OracleOptim):
-    def assess_optim(self, z, gamma: float):
-        """[summary]
+    """
+    The `MyQuasicvxOracle` class in Python defines a function `assess_optim` that assesses the
+    optimality of a given point based on constraints and an objective function.
+    """
 
-        Arguments:
-            z ([type]): [description]
-            gamma (float): the best-so-far optimal value
-
-        Returns:
-            [type]: [description]
+    def assess_optim(self, xc, gamma: float):
         """
-        x, y = z
+        This Python function assesses the optimality of a given point based on constraints and an objective
+        function.
+        
+        :param xc: The `xc` parameter in the `assess_optim` function represents a tuple containing two
+        values, denoted as `x` and `y`. These values are used in the calculations and constraints within the
+        function to assess the optimality of a given solution
+        :param gamma: Gamma is a float value representing the best-so-far optimal value in the
+        `assess_optim` function
+        :type gamma: float
+        :return: The `assess_optim` function returns a tuple containing two elements. The first element is a
+        tuple containing the gradient vector and the constraint violation value. The second element is
+        either `None` or the value of the updated `gamma` parameter.
+        """
+        x, y = xc
 
         # constraint 1: exp(x) <= y
         tmp = math.exp(x)
@@ -45,7 +57,10 @@ class MyQuasicvxOracle(OracleOptim):
 
 
 def test_case_feasible():
-    """[summary]"""
+    """
+    The function `test_case_feasible` tests the feasibility of a specific optimization problem using
+    cutting plane optimization.
+    """
     xinit = np.array([1.0, 1.0])  # initial xinit
     ellip = Ell(10.0, xinit)
     omega = MyQuasicvxOracle()
@@ -57,7 +72,9 @@ def test_case_feasible():
 
 
 def test_case_infeasible1():
-    """[summary]"""
+    """
+    The function `test_case_infeasible1` tests for infeasibility in an optimization problem.
+    """
     xinit = np.array([100.0, 100.0])  # wrong initial guess,
     ellip = Ell(10.0, xinit)  # or ellipsoid is too small
     omega = MyQuasicvxOracle()
@@ -66,7 +83,9 @@ def test_case_infeasible1():
 
 
 def test_case_infeasible2():
-    """[summary]"""
+    """
+    The function `test_case_infeasible2` initializes variables and asserts that the result is None.
+    """
     xinit = np.array([1.0, 1.0])  # initial xinit
     ellip = Ell(10.0, xinit)
     omega = MyQuasicvxOracle()

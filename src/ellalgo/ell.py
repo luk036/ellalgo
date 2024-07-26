@@ -19,7 +19,7 @@ class Ell(SearchSpace2[ArrayType], SearchSpaceQ[ArrayType]):
     _xc: ArrayType
     _kappa: float
     _tsq: float
-    _helper: EllCalc
+    helper: EllCalc
 
     def __init__(self, val, xc: ArrayType) -> None:
         """
@@ -36,7 +36,7 @@ class Ell(SearchSpace2[ArrayType], SearchSpaceQ[ArrayType]):
         :type xc: ArrayType
         """
         ndim = len(xc)
-        self._helper = EllCalc(ndim)
+        self.helper = EllCalc(ndim)
         self._xc = xc
         self._tsq = 0.0
         if isinstance(val, (int, float)):
@@ -84,7 +84,7 @@ class Ell(SearchSpace2[ArrayType], SearchSpaceQ[ArrayType]):
             >>> print(status)
             CutStatus.Success
         """
-        return self._update_core(cut, self._helper.calc_single_or_parallel)
+        return self._update_core(cut, self.helper.calc_single_or_parallel)
 
     def update_central_cut(self, cut) -> CutStatus:
         """
@@ -101,7 +101,7 @@ class Ell(SearchSpace2[ArrayType], SearchSpaceQ[ArrayType]):
             >>> print(status)
             CutStatus.Success
         """
-        return self._update_core(cut, self._helper.calc_single_or_parallel_central_cut)
+        return self._update_core(cut, self.helper.calc_single_or_parallel_central_cut)
 
     def update_q(self, cut) -> CutStatus:
         """
@@ -118,7 +118,7 @@ class Ell(SearchSpace2[ArrayType], SearchSpaceQ[ArrayType]):
             >>> print(status)
             CutStatus.Success
         """
-        return self._update_core(cut, self._helper.calc_single_or_parallel_q)
+        return self._update_core(cut, self.helper.calc_single_or_parallel_q)
 
     # private:
 
@@ -140,13 +140,13 @@ class Ell(SearchSpace2[ArrayType], SearchSpaceQ[ArrayType]):
         Examples:
             >>> ell = Ell(1.0, [1.0, 1.0, 1.0, 1.0])
             >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 1.0)
-            >>> status = ell._update_core(cut, ell._helper.calc_single_or_parallel)
+            >>> status = ell._update_core(cut, ell.helper.calc_single_or_parallel)
             >>> print(status)
             CutStatus.Success
 
             >>> ell = Ell(1.0, [1.0, 1.0, 1.0, 1.0])
             >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 1.0)
-            >>> status = ell._update_core(cut, ell._helper.calc_single_or_parallel_central_cut)
+            >>> status = ell._update_core(cut, ell.helper.calc_single_or_parallel_central_cut)
             >>> print(status)
             CutStatus.Success
         """

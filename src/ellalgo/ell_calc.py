@@ -16,7 +16,7 @@ class EllCalc:
 
     use_parallel_cut: bool = True
     _n_f: float
-    _helper: EllCalcCore
+    helper: EllCalcCore
 
     def __init__(self, n: int) -> None:
         """
@@ -33,7 +33,7 @@ class EllCalc:
         """
         assert n >= 2  # do not accept one-dimensional
         self._n_f = float(n)
-        self._helper = EllCalcCore(n)
+        self.helper = EllCalcCore(n)
 
     def calc_single_or_parallel(
         self, beta, tsq: float
@@ -91,8 +91,8 @@ class EllCalc:
             (<CutStatus.Success: 0>, (0.01897790039191521, 0.3450527343984584, 1.0549907942519101))
         """
         if isinstance(beta, (int, float)) or len(beta) < 2 or not self.use_parallel_cut:
-            return (CutStatus.Success, self._helper.calc_central_cut(sqrt(tsq)))
-        return (CutStatus.Success, self._helper.calc_parallel_central_cut(beta[1], tsq))
+            return (CutStatus.Success, self.helper.calc_central_cut(sqrt(tsq)))
+        return (CutStatus.Success, self.helper.calc_parallel_central_cut(beta[1], tsq))
 
     def calc_parallel(
         self, beta0: float, beta1: float, tsq: float
@@ -116,7 +116,7 @@ class EllCalc:
             return self.calc_bias_cut(beta0, tsq)
         return (
             CutStatus.Success,
-            self._helper.calc_parallel_bias_cut(beta0, beta1, tsq),
+            self.helper.calc_parallel_bias_cut(beta0, beta1, tsq),
         )
 
     def calc_bias_cut(
@@ -149,7 +149,7 @@ class EllCalc:
         tau = sqrt(tsq)
         return (
             CutStatus.Success,
-            self._helper.calc_bias_cut(beta, tau),
+            self.helper.calc_bias_cut(beta, tau),
         )
 
     def calc_single_or_parallel_q(
@@ -197,7 +197,7 @@ class EllCalc:
             return (CutStatus.NoEffect, None)  # no effect
         return (
             CutStatus.Success,
-            self._helper.calc_parallel_bias_cut_fast(beta0, beta1, tsq, b0b1, eta),
+            self.helper.calc_parallel_bias_cut_fast(beta0, beta1, tsq, b0b1, eta),
         )
 
     def calc_bias_cut_q(
@@ -232,7 +232,7 @@ class EllCalc:
             return (CutStatus.NoEffect, None)
         return (
             CutStatus.Success,
-            self._helper.calc_bias_cut_fast(beta, tau, eta),
+            self.helper.calc_bias_cut_fast(beta, tau, eta),
         )
 
 

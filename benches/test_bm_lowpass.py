@@ -19,12 +19,12 @@ def run_lowpass(use_parallel_cut: bool, duration=0.000001):
     Returns:
         [type]: [description]
     """
-    N = 32
-    r0 = np.zeros(N)  # initial xinit
+    ndim = 32
+    r0 = np.zeros(ndim)  # initial xinit
     r0[0] = 0
     ellip = Ell(4.0, r0)
-    ellip._helper.use_parallel_cut = use_parallel_cut
-    omega = create_lowpass_case(N)
+    ellip.helper.use_parallel_cut = use_parallel_cut
+    omega = create_lowpass_case(ndim)
     Spsq = omega.sp_sq
     options = Options()
     options.max_iters = 50000

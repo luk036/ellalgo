@@ -1,3 +1,7 @@
+"""
+Test LMI
+"""
+
 from typing import Optional, Tuple
 
 import numpy as np
@@ -13,6 +17,14 @@ Cut = Tuple[np.ndarray, float]
 
 class MyOracle(OracleOptim):
     def __init__(self, oracle):
+        """
+        The function initializes arrays and matrices using numpy and assigns them to variables in the class
+        instance.
+
+        :param oracle: The `oracle` parameter in the `__init__` method is a function that takes two
+        arguments `F` and `B` and returns some value. In this code snippet, the `oracle` function is being
+        used to create two instances `lmi1` and `lmi2`
+        """
         self.c = np.array([1.0, -1.0, 1.0])
         F1 = np.array(
             [
@@ -34,14 +46,19 @@ class MyOracle(OracleOptim):
         self.lmi2 = oracle(F2, B2)
 
     def assess_optim(self, xc: np.ndarray, gamma: float) -> Tuple[Cut, Optional[float]]:
-        """[summary]
+        """
+        This function assesses the optimality of a solution based on given constraints and a target value.
 
-        Arguments:
-            xc (np.ndarray): [description]
-            gamma (float): the best-so-far optimal value
-
-        Returns:
-            Tuple[Cut, float]: [description]
+        :param xc: The parameter `xc` is a NumPy array representing a point in a multidimensional space. It
+        is used as input to assess the optimality of a solution in a mathematical optimization context
+        :type xc: np.ndarray
+        :param gamma: Gamma is the best-so-far optimal value that is passed as an argument to the
+        `assess_optim` method. It is a float value used in the optimization process to determine the
+        optimality of a solution
+        :type gamma: float
+        :return: The `assess_optim` method returns a tuple containing a `Cut` object and an optional float
+        value. The `Cut` object represents a cut in the optimization problem, while the float value
+        represents the optimality measure.
         """
         if cut := self.lmi1.assess_feas(xc):
             return cut, None
@@ -55,20 +72,22 @@ class MyOracle(OracleOptim):
         return (self.c, 0.0), f0
 
 
-def run_lmi(oracle, Space):
-    """[summary]
+def run_lmi(oracle, space):
+    """
+    The `run_lmi` function takes an oracle and a Space object as input, initializes variables, performs
+    optimization using cutting plane method, and returns the number of iterations.
 
-    Arguments:
-        oracle ([type]): [description]
-
-    Keyword Arguments:
-        duration (float): [description] (default: {0.000001})
-
-    Returns:
-        [type]: [description]
+    :param oracle: The `oracle` parameter in the `run_lmi` function is expected to be a type that is
+    used as an argument for the `MyOracle` class. It seems like the `MyOracle` class is used to wrap the
+    `oracle` parameter for some specific functionality within the `run_l
+    :param Space: The `Space` parameter in the `run_lmi` function seems to be a class or function that
+    takes two arguments - a float value `10.0` and an array `xinit`. It likely initializes some kind of
+    space or environment based on these inputs
+    :return: The function `run_lmi` returns the number of iterations (`num_iters`) after running the
+    cutting plane optimization algorithm.
     """
     xinit = np.array([0.0, 0.0, 0.0])  # initial xinit
-    ellip = Space(10.0, xinit)
+    ellip = space(10.0, xinit)
     omega = MyOracle(oracle)
     xbest, _, num_iters = cutting_plane_optim(omega, ellip, float("inf"))
     assert xbest is not None
@@ -76,40 +95,32 @@ def run_lmi(oracle, Space):
 
 
 def test_lmi_lazy():
-    """[summary]
-
-    Arguments:
-         ([type]): [description]
+    """
+    The function `test_lmi_lazy` runs a specific function and asserts that the result is equal to 281.
     """
     result = run_lmi(LMIOracle, Ell)
     assert result == 281
 
 
 def test_lmi_old():
-    """[summary]
-
-    Arguments:
-         ([type]): [description]
+    """
+    The function `test_lmi_old` runs a test using an old oracle and asserts the result to be 281.
     """
     result = run_lmi(LMIOldOracle, Ell)
     assert result == 281
 
 
 def test_lmi_lazy_stable():
-    """[summary]
-
-    Arguments:
-         ([type]): [description]
+    """
+    The function `test_lmi_lazy_stable` runs a specific test and asserts the result to be equal to 281.
     """
     result = run_lmi(LMIOracle, EllStable)
     assert result == 281
 
 
 def test_lmi_old_stable():
-    """[summary]
-
-    Arguments:
-         ([type]): [description]
+    """
+    The function `test_lmi_old_stable` runs a specific test and asserts the result to be equal to 281.
     """
     result = run_lmi(LMIOldOracle, EllStable)
     assert result == 281
