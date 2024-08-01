@@ -48,9 +48,7 @@ class MyQuasicvxOracle(OracleOptim):
         sqrtx, ly = z
 
         for _ in [0, 1]:
-            self.idx += 1
-            if self.idx == 2:
-                self.idx = 0  # round robin
+            self.idx = (self.idx + 1) % 2  # round robin
             if (fj := self.fns[self.idx](sqrtx, ly, gamma)) > 0:
                 return (self.grads[self.idx](sqrtx), fj), None
 

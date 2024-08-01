@@ -12,12 +12,12 @@ from ellalgo.oracles.lowpass_oracle import create_lowpass_case
 def run_lowpass(use_parallel_cut: bool):
     """
     This Python function runs a lowpass filter optimization using cutting plane method.
-    
+
     :param use_parallel_cut: The `use_parallel_cut` parameter is a boolean flag that determines whether
-    to use parallel cut or not in the `run_lowpass` function
+        to use parallel cut or not in the `run_lowpass` function
     :type use_parallel_cut: bool
     :return: The function `run_lowpass` returns a tuple containing a boolean value indicating whether
-    `h` is not None, and the number of iterations `num_iters`.
+        `h` is not None, and the number of iterations `num_iters`.
     """
     ndim = 32
     r0 = np.zeros(ndim)  # initial xinit

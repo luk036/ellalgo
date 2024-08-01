@@ -46,13 +46,13 @@ class ProfitOracle(OracleOptim):
         The function initializes a ProfitOracle object with given parameters.
 
         :param params: The `params` parameter is a tuple containing three float values: `unit_price`,
-        `scale`, and `limit`. These values are used to calculate the logarithm of the unit price (`log_pA`)
-        and the logarithm of the limit (`log_k`)
+            `scale`, and `limit`. These values are used to calculate the logarithm of the unit price (`log_pA`)
+            and the logarithm of the limit (`log_k`)
 
         :type params: Tuple[float, float, float]
 
         :param elasticities: The `elasticities` parameter is an array that represents the output
-        elasticities. It contains the elasticity values for each output
+            elasticities. It contains the elasticity values for each output
 
         :type elasticities: Arr
 

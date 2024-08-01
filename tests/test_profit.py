@@ -1,6 +1,7 @@
 """
 Test Maximum Profit
 """
+
 import numpy as np
 
 from ellalgo.cutting_plane import cutting_plane_optim, cutting_plane_optim_q
@@ -21,12 +22,12 @@ def run_profit(E):
     """
     The function `run_profit` calculates the number of iterations needed to optimize profit using
     cutting plane optimization.
-    
+
     :param E: It looks like the `run_profit` function is using several parameters, but the definition of
-    the `E` function is missing. Could you please provide the definition or description of the `E`
-    function so that I can better understand how it is being used in the `run_profit` function?
+        the `E` function is missing. Could you please provide the definition or description of the `E`
+        function so that I can better understand how it is being used in the `run_profit` function?
     :return: The function `run_profit` returns the number of iterations (`num_iters`) performed during
-    the optimization process.
+        the optimization process.
     """
     ellip = E(r, np.array([0.0, 0.0]))
     omega = ProfitOracle(params, a, v)
@@ -39,12 +40,12 @@ def run_profit_rb(E):
     """
     The function `run_profit_rb` calculates the number of iterations required to optimize a profit
     function using cutting-plane optimization.
-    
+
     :param E: It looks like the function `run_profit_rb` is missing the definition of the `E` parameter.
-    In order to provide you with the correct information, could you please provide the definition or
-    explanation of the `E` parameter that is required by the function `run_profit_rb`?
+        In order to provide you with the correct information, could you please provide the definition or
+        explanation of the `E` parameter that is required by the function `run_profit_rb`?
     :return: The function `run_profit_rb` returns the number of iterations `num_iters` after running the
-    cutting plane optimization algorithm with the given parameters and constraints.
+        cutting plane optimization algorithm with the given parameters and constraints.
     """
     e1 = 0.003
     e2 = 0.007
@@ -60,7 +61,7 @@ def run_profit_q(E):
     """
     The function `run_profit_q` optimizes a profit function using a cutting plane optimization
     algorithm.
-    
+
     :param E: It looks like the function `run_profit_q` is using some parameters such as `r`,
     `np.array([0.0, 0.0])`, `params`, `a`, and `v` without explicitly defining them in the function
     :return: The function `run_profit_q` returns the number of iterations (`num_iters`) performed during

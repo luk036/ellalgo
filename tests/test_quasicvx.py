@@ -1,6 +1,7 @@
 """
 Test Quasiconvex (with Round Robin)
 """
+
 from __future__ import print_function
 import math
 from pytest import approx
@@ -27,12 +28,12 @@ class MyQuasicvxOracle(OracleOptim):
     def fn1(self, sqrtx, ly, _):
         """
         The function calculates the difference between the square of a given value and another value.
-        
+
         :param sqrtx: The parameter `sqrtx` represents the square root of a value
         :param ly: The parameter `ly` represents the upper limit for the square of the square root of `x`
         :param _: The underscore symbol (_) is commonly used as a placeholder variable in Python to indicate
-        that the value is not going to be used in the function. In this context, it seems that the third
-        parameter is not used in the function `fn1`
+            that the value is not going to be used in the function. In this context, it seems that the third
+            parameter is not used in the function `fn1`
         :return: The function `fn1` is returning the value of `sqrtx * sqrtx - ly`.
         """
         return sqrtx * sqrtx - ly
@@ -40,7 +41,7 @@ class MyQuasicvxOracle(OracleOptim):
     def fn2(self, sqrtx, ly, gamma):
         """
         The function calculates the value of -sqrt(x) plus gamma times the exponential of y.
-        
+
         :param sqrtx: The `sqrtx` parameter represents the square root of a value
         :param ly: The parameter `ly` appears to represent the natural logarithm of `y`
         :param gamma: Gamma is a constant value used in the calculation within the function
@@ -53,23 +54,23 @@ class MyQuasicvxOracle(OracleOptim):
     def grad1(self, sqrtx):
         """
         The function `grad1` calculates the gradient of a function with respect to the input `sqrtx`.
-        
+
         :param sqrtx: The `sqrtx` parameter in the `grad1` function seems to represent the square root of a
-        variable `x`. The function calculates the gradient of a function with respect to `sqrtx` and returns
-        a numpy array with two elements: `2 * sqrtx` and `-1.0
+            variable `x`. The function calculates the gradient of a function with respect to `sqrtx` and returns
+            a numpy array with two elements: `2 * sqrtx` and `-1.0
         :return: The function `grad1` is returning a NumPy array with two elements. The first element is `2
-        * sqrtx` and the second element is `-1.0`.
+            * sqrtx` and the second element is `-1.0`.
         """
         return np.array([2 * sqrtx, -1.0])
 
     def grad2(self, _):
         """
         The `grad2` function returns a NumPy array with values -1.0 and the value of `self.tmp3`.
-        
+
         :param _: The parameter "_" is typically used as a placeholder when the value is not needed or not
-        relevant in the context of the function
+            relevant in the context of the function
         :return: The `grad2` function is returning a NumPy array with two elements: -1.0 and the value of
-        `self.tmp3`.
+            `self.tmp3`.
         """
         return np.array([-1.0, self.tmp3])
 
@@ -77,15 +78,15 @@ class MyQuasicvxOracle(OracleOptim):
         """
         The function assess_optim takes input parameters xc and gamma, iterates through a loop, and returns a
         tuple based on certain conditions.
-        
+
         :param xc: The `xc` parameter in the `assess_optim` method seems to be a tuple containing two
-        elements: `sqrtx` and `ly`. These values are then used in the method for further calculations
+            elements: `sqrtx` and `ly`. These values are then used in the method for further calculations
         :param gamma: Gamma is a float value representing the best-so-far optimal value. It is used in the
-        `assess_optim` method for calculations and comparisons
+            `assess_optim` method for calculations and comparisons
         :type gamma: float
         :return: The function `assess_optim` returns a tuple containing two elements. The first element is a
-        tuple containing an array and a float value, and the second element is either `None` or a float
-        value.
+            tuple containing an array and a float value, and the second element is either `None` or a float
+            value.
         """
         sqrtx, ly = xc
 

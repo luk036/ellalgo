@@ -48,9 +48,7 @@ class MyOracleFeas(OracleFeas):
         x, y = z
 
         for _ in range(3):
-            self.idx += 1
-            if self.idx == 3:
-                self.idx = 0  # round robin
+            self.idx = (self.idx + 1) % 3  # round robin
             if (fj := self.fns[self.idx](x, y)) > 0:
                 return self.grads[self.idx](), fj
         return None
