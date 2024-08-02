@@ -18,7 +18,7 @@ class MyOracle2(OracleFeas):
     gradients, with a method to assess feasibility based on function values.
     """
 
-    idx = 0  # for round robin
+    idx = -1  # for round robin
 
     def assess_feas(self, xc):
         """
@@ -34,6 +34,10 @@ class MyOracle2(OracleFeas):
         """
         x, y = xc
         for _ in range(num_constraints):
+            self.idx += 1
+            if self.idx == num_constraints:
+                self.idx = 0  # round robin                
+
             if self.idx == 0:
                 if (fj := x + y - 3.0) > 0.0:
                     return np.array([1.0, 1.0]), fj
@@ -43,9 +47,6 @@ class MyOracle2(OracleFeas):
             else:
                 raise ValueError("Unexpected index value")
 
-            self.idx += 1
-            if self.idx == num_constraints:
-                self.idx = 0  # round robin                
         return None
 
 

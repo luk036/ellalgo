@@ -17,7 +17,7 @@ class MyOracle3(OracleFeas2):
     assess feasibility based on positive function values and corresponding gradients.
     """
 
-    idx = 0
+    idx = -1
     target = -1e100
 
     def assess_feas(self, xc):
@@ -34,6 +34,10 @@ class MyOracle3(OracleFeas2):
         x, y = xc
 
         for _ in range(num_constraints):
+            self.idx += 1
+            if self.idx == num_constraints:
+                self.idx = 0  # round robin
+
             if self.idx == 0:
                 if (fj := -x - 1) > 0.0:
                     return np.array([-1.0, 0.0]), fj
@@ -48,10 +52,6 @@ class MyOracle3(OracleFeas2):
                     return np.array([2.0, -3.0]), fj
             else:
                 raise ValueError("Unexpected index value")
-
-            self.idx += 1
-            if self.idx == num_constraints:
-                self.idx = 0  # round robin
 
         return None
 

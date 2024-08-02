@@ -26,7 +26,7 @@ class MyOracle1(OracleOptim):
         >>> oracle = MyOracle()
         >>> assert oracle.idx == 0
         """
-        self.idx = 0
+        self.idx = -1
 
     def assess_optim(self, xc, gamma: float):
         """

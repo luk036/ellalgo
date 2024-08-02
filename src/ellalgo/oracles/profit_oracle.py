@@ -29,7 +29,7 @@ class ProfitOracle(OracleOptim):
       k: a given constant that restricts the quantity of x1
     """
 
-    idx: int = 0  # for round robin
+    idx: int = -1  # for round robin
     log_Cobb: float
     q: Arr
     vx: float

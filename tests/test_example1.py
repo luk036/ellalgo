@@ -16,7 +16,7 @@ class MyOracle1(OracleOptim):
     This Python class `MyOracle1` contains a method `assess_optim` that assesses optimization based on
     given parameters and returns specific values accordingly.
     """
-    idx = 0  # for round robin
+    idx = -1  # for round robin
     
     def assess_optim(self, xc, gamma: float):
         """
@@ -37,6 +37,10 @@ class MyOracle1(OracleOptim):
         f0 = x + y
 
         for _ in range(num_constraints):
+            self.idx += 1
+            if self.idx == num_constraints:
+                self.idx = 0  # round robin
+
             if self.idx == 0:
                 if (fj := f0 - 3.0) > 0.0:
                     return ((np.array([1.0, 1.0]), fj), None)
@@ -48,10 +52,6 @@ class MyOracle1(OracleOptim):
                     return ((np.array([-1.0, -1.0]), fj), None)
             else:
                 raise ValueError("Unexpected index value")
-
-            self.idx += 1
-            if self.idx == num_constraints:
-                self.idx = 0  # round robin
 
         return ((np.array([-1.0, -1.0]), 0.0), f0)
 

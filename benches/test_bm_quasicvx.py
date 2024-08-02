@@ -11,7 +11,7 @@ from ellalgo.ell_typing import OracleOptim
 
 
 class MyQuasicvxOracle(OracleOptim):
-    idx: int = 0  # for round robin
+    idx: int = -1  # for round robin
     tmp2: float
     tmp3: float
 
@@ -57,7 +57,7 @@ class MyQuasicvxOracle(OracleOptim):
 
 
 class MyQuasicvxOracle2(OracleOptim):
-    idx: int = 0  # for round robin
+    idx: int = -1  # for round robin
     tmp2: float
     tmp3: float
 
