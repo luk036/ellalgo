@@ -18,7 +18,7 @@ class MyQuasicvxOracle(OracleOptim):
     optimality of a given point based on constraints and an objective function.
     """
 
-    idx = 0
+    idx = 0  # for round robin
 
     def assess_optim(self, xc, gamma: float):
         """
@@ -37,9 +37,9 @@ class MyQuasicvxOracle(OracleOptim):
         """
         x, y = xc
 
-        for _ in range(4):
+        for _ in range(3):
             self.idx += 1
-            if self.idx == 4:
+            if self.idx == 3:
                 self.idx = 0
 
             if self.idx == 0:
@@ -55,14 +55,14 @@ class MyQuasicvxOracle(OracleOptim):
                 # constraint 3: x > 0
                 if x <= 0.0:
                     return (np.array([-1.0, 0.0]), -x), None
-            elif self.idx == 3:
-                # objective: minimize -sqrt(x) / y
-                tmp2 = math.sqrt(x)
-                if (fj := -tmp2 - gamma * y) > 0.0:  # infeasible
-                    return (np.array([-0.5 / tmp2, -gamma]), fj), None
+
+        # objective: minimize -sqrt(x) / y
+        tmp2 = math.sqrt(x)
+        if (fj := -tmp2 - gamma * y) > 0.0:  # infeasible
+            return (np.array([-0.5 / tmp2, -gamma]), fj), None
 
         gamma = -tmp2 / y
-        return (np.array([-0.5 / tmp2, -gamma]), 0), gamma
+        return (np.array([-0.5 / tmp2, -gamma]), 0.0), -tmp2 / y
 
 
 def test_case_feasible():
