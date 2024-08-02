@@ -10,6 +10,7 @@ from ellalgo.cutting_plane import cutting_plane_feas
 from ellalgo.ell import Ell
 from ellalgo.ell_typing import OracleFeas
 
+num_constraints = 2
 
 class MyOracle2(OracleFeas):
     """
@@ -17,7 +18,7 @@ class MyOracle2(OracleFeas):
     gradients, with a method to assess feasibility based on function values.
     """
 
-    idx = 0
+    idx = 0  # for round robin
 
     def assess_feas(self, xc):
         """
@@ -32,22 +33,19 @@ class MyOracle2(OracleFeas):
             conditions are met, it returns `None`.
         """
         x, y = xc
-
-        for _ in range(2):
-            self.idx = (self.idx + 1) % 2  # round robin
-
+        for _ in range(num_constraints):
             if self.idx == 0:
-                fj = x + y - 3.0
+                if (fj := x + y - 3.0) > 0.0:
+                    return np.array([1.0, 1.0]), fj
             elif self.idx == 1:
-                fj = -x + y + 1.0
+                if (fj := -x + y + 1.0) > 0.0:
+                    return np.array([-1.0, 1.0]), fj
             else:
                 raise ValueError("Unexpected index value")
 
-            if fj > 0.0:
-                if self.idx == 0:
-                    return np.array([1.0, 1.0]), fj
-                elif self.idx == 1:
-                    return np.array([-1.0, 1.0]), fj
+            self.idx += 1
+            if self.idx == num_constraints:
+                self.idx = 0  # round robin                
         return None
 
 
@@ -73,4 +71,4 @@ def test_case_infeasible():
     omega = MyOracle2()
     xfeas, num_iters = cutting_plane_feas(omega, ellip)
     assert xfeas is None
-    assert num_iters == 1
+    assert num_iters == 0

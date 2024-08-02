@@ -5,12 +5,12 @@ Test Quasiconvex (without Round Robin)
 from __future__ import print_function
 
 import math
-
 import numpy as np
 
 from ellalgo.cutting_plane import OracleOptim, cutting_plane_optim
 from ellalgo.ell import Ell
 
+num_constraints = 3
 
 class MyQuasicvxOracle(OracleOptim):
     """
@@ -37,11 +37,7 @@ class MyQuasicvxOracle(OracleOptim):
         """
         x, y = xc
 
-        for _ in range(3):
-            self.idx += 1
-            if self.idx == 3:
-                self.idx = 0
-
+        for _ in range(num_constraints):
             if self.idx == 0:
                 # constraint 1: exp(x) <= y
                 tmp = math.exp(x)
@@ -55,6 +51,12 @@ class MyQuasicvxOracle(OracleOptim):
                 # constraint 3: x > 0
                 if x <= 0.0:
                     return (np.array([-1.0, 0.0]), -x), None
+            else:
+                raise ValueError("Unexpected index value")
+
+            self.idx += 1
+            if self.idx == num_constraints:
+                self.idx = 0
 
         # objective: minimize -sqrt(x) / y
         tmp2 = math.sqrt(x)

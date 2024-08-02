@@ -9,6 +9,7 @@ from ellalgo.cutting_plane import BSearchAdaptor, Options, bsearch
 from ellalgo.ell import Ell
 from ellalgo.ell_typing import OracleFeas2
 
+num_constraints = 4
 
 class MyOracle3(OracleFeas2):
     """
@@ -18,93 +19,6 @@ class MyOracle3(OracleFeas2):
 
     idx = 0
     target = -1e100
-
-    def fn1(self, x, _):
-        """
-        The function fn1 returns the negation of x minus 1.
-
-        :param x: The parameter `x` represents a value that must be greater than or equal to -1, as per the
-        constraint provided in the code snippet
-        :param _: The underscore symbol "_" is commonly used as a placeholder for a variable that will not
-        be used in the function. In this case, it seems that the second parameter of the function `fn1` is
-        not being used in the calculation, so it is represented by "_"
-        :return: The function `fn1` is returning the value `-x - 1`.
-        """
-        return -x - 1
-
-    def fn2(self, _, y):
-        """
-        The function returns the negation of the input y minus 2.
-
-        :param _: The underscore symbol "_" is typically used as a placeholder for a variable that is not
-        going to be used in the function. In this case, it seems that the function `fn2` does not use the
-        first parameter, so it is represented by "_"
-        :param y: The parameter "y" represents a value that must be greater than or equal to -2 in the
-        context of the function "fn2"
-        :return: The function `fn2` is returning the value `-y - 2`.
-        """
-        return -y - 2
-
-    def fn3(self, x, y):
-        """
-        The function `fn3` returns the sum of `x` and `y` minus 1.
-
-        :param x: The parameter x is a variable that is used in the function fn3. It is an input value that
-        is used in the calculation along with the parameter y
-        :param y: The constraint for the parameter y is that it must be greater than or equal to -2
-        :return: The function `fn3` is returning the value of `x + y - 1`.
-        """
-        return x + y - 1
-
-    def fn4(self, x, y):
-        """
-        The function `fn4` takes two arguments `x` and `y`, and returns the result of `2 * x - 3 * y -
-        self.target`.
-
-        :param x: The parameter `x` in the function `fn4` represents the first input value that will be used
-        in the calculation
-        :param y: It looks like the function `fn4` takes two parameters `x` and `y`. The value of `y` is
-        used in the calculation inside the function to perform the operation `2 * x - 3 * y - self.target`.
-        If you have a specific value for `y`
-        :return: The function `fn4` is returning the result of the expression `2 * x - 3 * y - self.target`.
-        """
-        return 2 * x - 3 * y - self.target
-
-    def grad1(self):
-        """
-        The function `grad1` returns a NumPy array `[-1.0, 0.0]`.
-        :return: The function `grad1` is returning a NumPy array `[-1.0, 0.0]`.
-        """
-        return np.array([-1.0, 0.0])
-
-    def grad2(self):
-        """
-        The function `grad2` returns a NumPy array with values [0.0, -1.0].
-        :return: The function `grad2` is returning a NumPy array with values `[0.0, -1.0]`.
-        """
-        return np.array([0.0, -1.0])
-
-    def grad3(self):
-        """
-        The function `grad3` returns a NumPy array with two elements, both set to 1.0.
-        :return: An array containing the values [1.0, 1.0] is being returned.
-        """
-        return np.array([1.0, 1.0])
-
-    def grad4(self):
-        """
-        The function `grad4` returns a NumPy array with two elements: 2.0 and -3.0.
-        :return: The `grad4` function is returning a NumPy array with values `[2.0, -3.0]`.
-        """
-        return np.array([2.0, -3.0])
-
-    def __init__(self):
-        """
-        The function initializes a class instance with attributes for four functions and their corresponding
-        gradients.
-        """
-        self.fns = (self.fn1, self.fn2, self.fn3, self.fn4)
-        self.grads = (self.grad1, self.grad2, self.grad3, self.grad4)
 
     def assess_feas(self, xc):
         """
@@ -119,12 +33,26 @@ class MyOracle3(OracleFeas2):
         """
         x, y = xc
 
-        for _ in range(4):
+        for _ in range(num_constraints):
+            if self.idx == 0:
+                if (fj := -x - 1) > 0.0:
+                    return np.array([-1.0, 0.0]), fj
+            elif self.idx == 1:
+                if (fj := -y - 2) > 0.0:
+                    return np.array([0.0, -1.0]), fj
+            elif self.idx == 2:
+                if (fj := x + y - 1) > 0.0:
+                    return np.array([1.0, 1.0]), fj
+            elif self.idx == 3:
+                if (fj := 2 * x - 3 * y - self.target) > 0.0:
+                    return np.array([2.0, -3.0]), fj
+            else:
+                raise ValueError("Unexpected index value")
+
             self.idx += 1
-            if self.idx == 4:
+            if self.idx == num_constraints:
                 self.idx = 0  # round robin
-            if (fj := self.fns[self.idx](x, y)) > 0:
-                return self.grads[self.idx](), fj
+
         return None
 
     def update(self, gamma):

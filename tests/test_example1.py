@@ -1,5 +1,5 @@
 """
-Test Example 1
+Test Example 1 (with round robin)
 """
 
 from __future__ import print_function
@@ -9,27 +9,15 @@ from ellalgo.cutting_plane import Options, cutting_plane_optim
 from ellalgo.ell import Ell
 from ellalgo.ell_typing import OracleOptim
 
+num_constraints = 3
 
 class MyOracle1(OracleOptim):
     """
     This Python class `MyOracle1` contains a method `assess_optim` that assesses optimization based on
     given parameters and returns specific values accordingly.
     """
-
-    def __init__(self):
-        """
-        Creates a new `MyOracle` instance with the `idx` field initialized to 0.
-
-        This is the constructor for the `MyOracle` class, which is the main entry point for
-        creating new instances of this type. It initializes the `idx` field to 0, which is the
-        default value for this field.
-
-        Examples:
-        >>> oracle = MyOracle()
-        >>> assert oracle.idx == 0
-        """
-        self.idx = 0
-
+    idx = 0  # for round robin
+    
     def assess_optim(self, xc, gamma: float):
         """
         The function assess_optim assesses feasibility and optimality of a given point based on a specified
@@ -48,28 +36,24 @@ class MyOracle1(OracleOptim):
         x, y = xc
         f0 = x + y
 
-        for _ in range(3):
-            self.idx = (self.idx + 1) % 3  # round robin
-
+        for _ in range(num_constraints):
             if self.idx == 0:
-                fj = f0 - 3.0
+                if (fj := f0 - 3.0) > 0.0:
+                    return ((np.array([1.0, 1.0]), fj), None)
             elif self.idx == 1:
-                fj = -x + y + 1.0
+                if (fj := -x + y + 1.0) > 0.0:
+                    return ((np.array([-1.0, 1.0]), fj), None)
             elif self.idx == 2:
-                fj = gamma - f0
+                if (fj := gamma - f0) > 0.0:
+                    return ((np.array([-1.0, -1.0]), fj), None)
             else:
                 raise ValueError("Unexpected index value")
 
-            if fj > 0.0:
-                if self.idx == 0:
-                    return ((np.array([1.0, 1.0]), fj), None)
-                elif self.idx == 1:
-                    return ((np.array([-1.0, 1.0]), fj), None)
-                elif self.idx == 2:
-                    return ((np.array([-1.0, -1.0]), fj), None)
+            self.idx += 1
+            if self.idx == num_constraints:
+                self.idx = 0  # round robin
 
-        gamma = f0
-        return ((np.array([-1.0, -1.0]), 0.0), gamma)
+        return ((np.array([-1.0, -1.0]), 0.0), f0)
 
 
 def test_case_feasible():
