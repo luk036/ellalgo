@@ -12,21 +12,21 @@ from ellalgo.ell_typing import OracleOptim
 
 class MyQuasicvxOracle(OracleOptim):
     idx: int = -1  # for round robin
-    tmp2: float
+    y: float
     tmp3: float
 
     def __init__(self):
         self.fns = (self.fn1, self.fn2)
         self.grads = (self.grad1, self.grad2)
 
-    # constraint 1: exp(x) <= y, or sqrtx**2 <= ly
-    def fn1(self, sqrtx, ly, _):
-        return sqrtx * sqrtx - ly
+    # constraint 1: exp(x) <= y, or sqrtx**2 <= logy
+    def fn1(self, sqrtx, logy, _):
+        return sqrtx * sqrtx - logy
 
     # objective: minimize -sqrt(x) / y
-    def fn2(self, sqrtx, ly, gamma):
-        self.tmp2 = math.exp(ly)
-        self.tmp3 = gamma * self.tmp2
+    def fn2(self, sqrtx, logy, gamma):
+        self.y = math.exp(logy)
+        self.tmp3 = gamma * self.y
         return -sqrtx + self.tmp3
 
     def grad1(self, sqrtx):
@@ -45,34 +45,34 @@ class MyQuasicvxOracle(OracleOptim):
         Returns:
             [type]: [description]
         """
-        sqrtx, ly = z
+        sqrtx, logy = z
 
         for _ in [0, 1]:
             self.idx = (self.idx + 1) % 2  # round robin
-            if (fj := self.fns[self.idx](sqrtx, ly, gamma)) > 0:
+            if (fj := self.fns[self.idx](sqrtx, logy, gamma)) > 0:
                 return (self.grads[self.idx](sqrtx), fj), None
 
-        gamma = sqrtx / self.tmp2
+        gamma = sqrtx / self.y
         return (np.array([-1.0, sqrtx]), 0), gamma
 
 
 class MyQuasicvxOracle2(OracleOptim):
     idx: int = -1  # for round robin
-    tmp2: float
+    y: float
     tmp3: float
 
     def __init__(self):
         self.fns = (self.fn1, self.fn2)
         self.grads = (self.grad1, self.grad2)
 
-    # constraint 1: exp(x) <= y, or sqrtx**2 <= ly
-    def fn1(self, sqrtx, ly, _):
-        return sqrtx * sqrtx - ly
+    # constraint 1: exp(x) <= y, or sqrtx**2 <= logy
+    def fn1(self, sqrtx, logy, _):
+        return sqrtx * sqrtx - logy
 
     # objective: minimize -sqrt(x) / y
-    def fn2(self, sqrtx, ly, gamma):
-        self.tmp2 = math.exp(ly)
-        self.tmp3 = gamma * self.tmp2
+    def fn2(self, sqrtx, logy, gamma):
+        self.y = math.exp(logy)
+        self.tmp3 = gamma * self.y
         return -sqrtx + self.tmp3
 
     def grad1(self, sqrtx):
@@ -91,13 +91,13 @@ class MyQuasicvxOracle2(OracleOptim):
         Returns:
             [type]: [description]
         """
-        sqrtx, ly = z
+        sqrtx, logy = z
 
         for self.idx in [0, 1]:
-            if (fj := self.fns[self.idx](sqrtx, ly, gamma)) > 0:
+            if (fj := self.fns[self.idx](sqrtx, logy, gamma)) > 0:
                 return (self.grads[self.idx](sqrtx), fj), None
 
-        gamma = sqrtx / self.tmp2
+        gamma = sqrtx / self.y
         return (np.array([-1.0, sqrtx]), 0), gamma
 
 

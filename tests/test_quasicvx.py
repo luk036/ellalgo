@@ -30,7 +30,7 @@ class MyQuasicvxOracle(OracleOptim):
         The function calculates the difference between the square of a given value and another value.
 
         :param sqrtx: The parameter `sqrtx` represents the square root of a value
-        :param logy: The parameter `ly` represents the upper limit for the square of the square root of `x`
+        :param logy: The parameter `logy` represents the upper limit for the square of the square root of `x`
         :param _: The underscore symbol (_) is commonly used as a placeholder variable in Python to indicate
             that the value is not going to be used in the function. In this context, it seems that the third
             parameter is not used in the function `fn1`
@@ -43,7 +43,7 @@ class MyQuasicvxOracle(OracleOptim):
         The function calculates the value of -sqrt(x) plus gamma times the exponential of y.
 
         :param sqrtx: The `sqrtx` parameter represents the square root of a value
-        :param logy: The parameter `ly` appears to represent the natural logarithm of `y`
+        :param logy: The parameter `logy` appears to represent the natural logarithm of `y`
         :param gamma: Gamma is a constant value used in the calculation within the function
         :return: The function `fn2` is returning the value of `-sqrtx + self.tmp3`.
         """
@@ -80,7 +80,7 @@ class MyQuasicvxOracle(OracleOptim):
         tuple based on certain conditions.
 
         :param xc: The `xc` parameter in the `assess_optim` method seems to be a tuple containing two
-            elements: `sqrtx` and `ly`. These values are then used in the method for further calculations
+            elements: `sqrtx` and `logy`. These values are then used in the method for further calculations
         :param gamma: Gamma is a float value representing the best-so-far optimal value. It is used in the
             `assess_optim` method for calculations and comparisons
         :type gamma: float
@@ -97,7 +97,7 @@ class MyQuasicvxOracle(OracleOptim):
             if (fj := self.fns[self.idx](sqrtx, logy, gamma)) > 0:
                 return (self.grads[self.idx](sqrtx), fj), None
 
-        gamma = sqrtx / self.tmp2
+        gamma = sqrtx / self.y
         return (np.array([-1.0, sqrtx]), 0), gamma
 
 

@@ -18,10 +18,10 @@ class MyQuasicvxOracle(OracleOptim):
         Returns:
             [type]: [description]
         """
-        sqrtx, ly = z
+        sqrtx, logy = z
 
-        # constraint 1: exp(x) <= y, or sqrtx**2 <= ly
-        if (fj := sqrtx * sqrtx - ly) > 0:
+        # constraint 1: exp(x) <= y, or sqrtx**2 <= logy
+        if (fj := sqrtx * sqrtx - logy) > 0:
             return (np.array([2 * sqrtx, -1.0]), fj), None
 
         # constraint 3: x > 0
@@ -29,11 +29,11 @@ class MyQuasicvxOracle(OracleOptim):
         #     return (np.array([-1., 0.]), -x), None
 
         # objective: minimize -sqrt(x) / y
-        tmp2 = math.exp(ly)
-        tmp3 = gamma * tmp2
+        y = math.exp(logy)
+        tmp3 = gamma * y
         if (fj := -sqrtx + tmp3) >= 0.0:  # feasible
             return (np.array([-1.0, tmp3]), fj), None
-        gamma = sqrtx / tmp2
+        gamma = sqrtx / y
         return (np.array([-1.0, sqrtx]), 0), gamma
 
 
