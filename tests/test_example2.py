@@ -12,6 +12,7 @@ from ellalgo.ell_typing import OracleFeas
 
 num_constraints = 2
 
+
 class MyOracle2(OracleFeas):
     """
     The `MyOracle2` class in Python defines functions for calculating mathematical expressions and
@@ -36,7 +37,7 @@ class MyOracle2(OracleFeas):
         for _ in range(num_constraints):
             self.idx += 1
             if self.idx == num_constraints:
-                self.idx = 0  # round robin                
+                self.idx = 0  # round robin
 
             if self.idx == 0:
                 if (fj := x + y - 3.0) > 0.0:

@@ -11,6 +11,7 @@ from ellalgo.ell_typing import OracleFeas2
 
 num_constraints = 4
 
+
 class MyOracle3(OracleFeas2):
     """
     The `MyOracle3` class defines functions and gradients for mathematical operations, with a method to

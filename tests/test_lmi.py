@@ -16,6 +16,8 @@ Cut = Tuple[np.ndarray, float]
 
 
 class MyOracle(OracleOptim):
+    idx = -1
+
     def __init__(self, oracle):
         """
         The function initializes arrays and matrices using numpy and assigns them to variables in the class
@@ -60,15 +62,19 @@ class MyOracle(OracleOptim):
         value. The `Cut` object represents a cut in the optimization problem, while the float value
         represents the optimality measure.
         """
-        if cut := self.lmi1.assess_feas(xc):
-            return cut, None
+        for _ in range(3):
+            self.idx = 0 if self.idx == 2 else self.idx + 1  # round robin
 
-        if cut := self.lmi2.assess_feas(xc):
-            return cut, None
-
-        f0 = self.c.dot(xc)
-        if (fj := f0 - gamma) > 0.0:
-            return (self.c, fj), None
+            if self.idx == 0:
+                if cut := self.lmi1.assess_feas(xc):
+                    return cut, None
+            elif self.idx == 1:
+                if cut := self.lmi2.assess_feas(xc):
+                    return cut, None
+            elif self.idx == 2:
+                f0 = self.c.dot(xc)
+                if (fj := f0 - gamma) > 0.0:
+                    return (self.c, fj), None
         return (self.c, 0.0), f0
 
 

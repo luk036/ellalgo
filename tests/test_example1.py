@@ -11,13 +11,15 @@ from ellalgo.ell_typing import OracleOptim
 
 num_constraints = 3
 
+
 class MyOracle1(OracleOptim):
     """
     This Python class `MyOracle1` contains a method `assess_optim` that assesses optimization based on
     given parameters and returns specific values accordingly.
     """
+
     idx = -1  # for round robin
-    
+
     def assess_optim(self, xc, gamma: float):
         """
         The function assess_optim assesses feasibility and optimality of a given point based on a specified
