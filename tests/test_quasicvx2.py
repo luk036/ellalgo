@@ -56,13 +56,13 @@ class MyQuasicvxOracle(OracleOptim):
                 if x <= 0.0:
                     return (np.array([-1.0, 0.0]), -x), None
 
-        # objective: minimize -sqrt(x) / y
+        # objective: maximize sqrt(x) / y
         tmp2 = math.sqrt(x)
-        if (fj := -tmp2 - gamma * y) > 0.0:  # infeasible
-            return (np.array([-0.5 / tmp2, -gamma]), fj), None
+        if (fj := -tmp2 + gamma * y) > 0.0:  # infeasible
+            return (np.array([-0.5 / tmp2, gamma]), fj), None
 
-        gamma = -tmp2 / y
-        return (np.array([-0.5 / tmp2, -gamma]), 0.0), -tmp2 / y
+        gamma = tmp2 / y
+        return (np.array([-0.5 / tmp2, gamma]), 0.0), gamma
 
 
 def test_case_feasible():
@@ -75,9 +75,6 @@ def test_case_feasible():
     omega = MyQuasicvxOracle()
     xbest, fbest, _ = cutting_plane_optim(omega, ellip, 0.0)
     assert xbest is not None
-    # assert fbest == approx(-0.42888194247600586)
-    # assert xbest[0] == approx(0.5000004646814299)
-    # assert xbest[1] == approx(1.6487220368468205)
 
 
 def test_case_infeasible1():
@@ -98,5 +95,5 @@ def test_case_infeasible2():
     xinit = np.array([1.0, 1.0])  # initial xinit
     ellip = Ell(10.0, xinit)
     omega = MyQuasicvxOracle()
-    xbest, _, _ = cutting_plane_optim(omega, ellip, -100)  # wrong init best-so-far
+    xbest, _, _ = cutting_plane_optim(omega, ellip, 100)  # wrong init best-so-far
     assert xbest is None

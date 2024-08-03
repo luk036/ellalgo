@@ -15,7 +15,7 @@ from ellalgo.ell_typing import OracleOptim
 
 class MyQuasicvxOracle(OracleOptim):
     idx: int = -1  # for round robin
-    tmp2: float
+    y: float
     tmp3: float
 
     def __init__(self):
@@ -25,30 +25,30 @@ class MyQuasicvxOracle(OracleOptim):
         self.fns = (self.fn1, self.fn2)
         self.grads = (self.grad1, self.grad2)
 
-    def fn1(self, sqrtx, ly, _):
+    def fn1(self, sqrtx, logy, _):
         """
         The function calculates the difference between the square of a given value and another value.
 
         :param sqrtx: The parameter `sqrtx` represents the square root of a value
-        :param ly: The parameter `ly` represents the upper limit for the square of the square root of `x`
+        :param logy: The parameter `ly` represents the upper limit for the square of the square root of `x`
         :param _: The underscore symbol (_) is commonly used as a placeholder variable in Python to indicate
             that the value is not going to be used in the function. In this context, it seems that the third
             parameter is not used in the function `fn1`
-        :return: The function `fn1` is returning the value of `sqrtx * sqrtx - ly`.
+        :return: The function `fn1` is returning the value of `sqrtx * sqrtx - logy`.
         """
-        return sqrtx * sqrtx - ly
+        return sqrtx * sqrtx - logy
 
-    def fn2(self, sqrtx, ly, gamma):
+    def fn2(self, sqrtx, logy, gamma):
         """
         The function calculates the value of -sqrt(x) plus gamma times the exponential of y.
 
         :param sqrtx: The `sqrtx` parameter represents the square root of a value
-        :param ly: The parameter `ly` appears to represent the natural logarithm of `y`
+        :param logy: The parameter `ly` appears to represent the natural logarithm of `y`
         :param gamma: Gamma is a constant value used in the calculation within the function
         :return: The function `fn2` is returning the value of `-sqrtx + self.tmp3`.
         """
-        self.tmp2 = math.exp(ly)
-        self.tmp3 = gamma * self.tmp2
+        self.y = math.exp(logy)
+        self.tmp3 = gamma * self.y
         return -sqrtx + self.tmp3
 
     def grad1(self, sqrtx):
@@ -88,13 +88,13 @@ class MyQuasicvxOracle(OracleOptim):
             tuple containing an array and a float value, and the second element is either `None` or a float
             value.
         """
-        sqrtx, ly = xc
+        sqrtx, logy = xc
 
         for _ in [0, 1]:
             self.idx += 1
             if self.idx == 2:
                 self.idx = 0  # round robin
-            if (fj := self.fns[self.idx](sqrtx, ly, gamma)) > 0:
+            if (fj := self.fns[self.idx](sqrtx, logy, gamma)) > 0:
                 return (self.grads[self.idx](sqrtx), fj), None
 
         gamma = sqrtx / self.tmp2
