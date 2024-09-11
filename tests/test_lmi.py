@@ -24,8 +24,8 @@ class MyOracle(OracleOptim):
         instance.
 
         :param oracle: The `oracle` parameter in the `__init__` method is a function that takes two
-        arguments `F` and `B` and returns some value. In this code snippet, the `oracle` function is being
-        used to create two instances `lmi1` and `lmi2`
+            arguments `F` and `B` and returns some value. In this code snippet, the `oracle` function is being
+            used to create two instances `lmi1` and `lmi2`
         """
         self.c = np.array([1.0, -1.0, 1.0])
         F1 = np.array(
@@ -52,15 +52,15 @@ class MyOracle(OracleOptim):
         This function assesses the optimality of a solution based on given constraints and a target value.
 
         :param xc: The parameter `xc` is a NumPy array representing a point in a multidimensional space. It
-        is used as input to assess the optimality of a solution in a mathematical optimization context
+            is used as input to assess the optimality of a solution in a mathematical optimization context
         :type xc: np.ndarray
         :param gamma: Gamma is the best-so-far optimal value that is passed as an argument to the
-        `assess_optim` method. It is a float value used in the optimization process to determine the
-        optimality of a solution
+            `assess_optim` method. It is a float value used in the optimization process to determine the
+            optimality of a solution
         :type gamma: float
         :return: The `assess_optim` method returns a tuple containing a `Cut` object and an optional float
-        value. The `Cut` object represents a cut in the optimization problem, while the float value
-        represents the optimality measure.
+            value. The `Cut` object represents a cut in the optimization problem, while the float value
+            represents the optimality measure.
         """
         for _ in range(3):
             self.idx = 0 if self.idx == 2 else self.idx + 1  # round robin
@@ -84,13 +84,13 @@ def run_lmi(oracle, space):
     optimization using cutting plane method, and returns the number of iterations.
 
     :param oracle: The `oracle` parameter in the `run_lmi` function is expected to be a type that is
-    used as an argument for the `MyOracle` class. It seems like the `MyOracle` class is used to wrap the
-    `oracle` parameter for some specific functionality within the `run_l
+        used as an argument for the `MyOracle` class. It seems like the `MyOracle` class is used to wrap the
+        `oracle` parameter for some specific functionality within the `run_l
     :param Space: The `Space` parameter in the `run_lmi` function seems to be a class or function that
-    takes two arguments - a float value `10.0` and an array `xinit`. It likely initializes some kind of
-    space or environment based on these inputs
+        takes two arguments - a float value `10.0` and an array `xinit`. It likely initializes some kind of
+        space or environment based on these inputs
     :return: The function `run_lmi` returns the number of iterations (`num_iters`) after running the
-    cutting plane optimization algorithm.
+        cutting plane optimization algorithm.
     """
     xinit = np.array([0.0, 0.0, 0.0])  # initial xinit
     ellip = space(10.0, xinit)

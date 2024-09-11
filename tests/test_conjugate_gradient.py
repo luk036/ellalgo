@@ -20,9 +20,9 @@ def test_conjugate_gradient_simple():
 #     A = np.diag(np.arange(1, n + 1))
 #     x_true = np.random.rand(n)
 #     b = np.dot(A, x_true)
-# 
+#
 #     x = conjugate_gradient(A, b)
-# 
+#
 #     assert np.allclose(x, x_true, rtol=1e-5)
 
 
@@ -40,7 +40,7 @@ def test_conjugate_gradient_with_initial_guess():
 # def test_conjugate_gradient_non_convergence():
 #     A = np.array([[1.0, 2.0], [2.0, 1.0]])  # Not positive definite
 #     b = np.array([1.0, 1.0])
-# 
+#
 #     with pytest.raises(ValueError):
 #         conjugate_gradient(A, b, max_iter=10)
 
