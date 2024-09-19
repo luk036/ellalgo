@@ -28,10 +28,10 @@ def cutting_plane_feas(
 
     Description:
         A function f(x) is *convex* if there always exist a g(x)
-        such that f(z) >= f(x) + g(x)' * (z - x), forall z, x in dom f.
+        such that f(z) >= f(x) + g(x)^T * (z - x), forall z, x in dom f.
         Note that dom f does not need to be a convex set in our definition.
-        The affine function g' (x - xc) + beta is called a cutting-plane,
-        or a ``cut'' for short.
+        The affine function g^T (x - xc) + beta is called a cutting-plane,
+        or a "cut" for short.
         This algorithm solves the following feasibility problem:
 
                 find x
@@ -90,7 +90,7 @@ def cutting_plane_feas(
 
     for niter in range(options.max_iters):
         cut = omega.assess_feas(space.xc())  # query the oracle at space.xc()
-        if cut is None:  # feasible sol'n obtained
+        if cut is None:  # feasible solution obtained
             return space.xc(), niter
         status = space.update_bias_cut(cut)  # update space
         if status != CutStatus.Success or space.tsq() < options.tolerance:
@@ -270,7 +270,7 @@ def bsearch(
         if tau < options.tolerance:
             return upper, niter
         gamma = T(lower + tau)
-        if omega.assess_bs(gamma):  # feasible sol'n obtained
+        if omega.assess_bs(gamma):  # feasible solution obtained
             upper = gamma
         else:
             lower = gamma

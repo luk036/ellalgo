@@ -21,7 +21,7 @@ class LDLTMgr:
     - Cholesky-Banachiewicz style, row-based
     - Lazy evaluation
     - A matrix A in R^{m x m} is positive definite
-                         iff v' A v > 0 for all v in R^n.
+                         iff v^T A v > 0 for all v in R^n.
     - O(p^3) per iteration, independent of ndim
 
     Examples:
@@ -56,7 +56,7 @@ class LDLTMgr:
         If $A$ is positive definite, then $p$ is zero.
         If it is not, then $p$ is a positive integer,
         such that $v = R^{-1} e_p$ is a certificate vector
-        to make $v'*A[:p,:p]*v < 0$
+        to make $v^T*A[:p,:p]*v < 0$
 
         :param A: A is a numpy array representing a symmetric matrix
         :type A: np.ndarray
@@ -170,7 +170,7 @@ class LDLTMgr:
         The function "witness" provides evidence that a matrix is not symmetric positive definite.
             (square-root-free version)
 
-           evidence: v' A v = -ep
+           evidence: v^T A v = -ep
 
         Raises:
             AssertionError: $A$ indeeds a spd matrix
@@ -226,7 +226,7 @@ class LDLTMgr:
         return wit.dot(mat[start:ndim, start:ndim] @ wit)
 
     def sqrt(self) -> np.ndarray:
-        """Return upper triangular matrix R where A = R' * R
+        """Return upper triangular matrix R where A = R^T * R
 
         Raises:
             AssertionError: [description]

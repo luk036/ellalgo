@@ -20,10 +20,10 @@ class LMIOracle(OracleFeas):
 
     def __init__(self, mat_f, mat_b):
         """
-        The function initializes a new LMI oracle object with given arguments.
-
-        :param mat_f: A list of numpy arrays.
-        :param mat_b: mat_b is a numpy array
+        Initializes a new LMIOracle object with the given matrix arguments.
+        
+        :param mat_f: A list of numpy arrays representing the matrix F.
+        :param mat_b: A numpy array representing the matrix B.
         """
         self.mat_f = mat_f
         self.mat_f0 = mat_b
