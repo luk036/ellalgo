@@ -1,3 +1,24 @@
+"""
+Profit Oracle
+
+This code defines several classes that implement oracles for profit maximization problems. An oracle, in this context, is a function that helps solve optimization problems by providing information about the feasibility and optimality of potential solutions.
+
+The main class, ProfitOracle, is designed to solve a specific type of profit maximization problem. It takes as input parameters related to production (like price, scale, and limits) and output elasticities. The goal is to find the optimal input quantities that maximize profit, given certain constraints.
+
+The ProfitOracle class has methods to assess the feasibility of a solution (assess_feas) and to find the optimal solution (assess_optim). These methods take as input a vector y (representing input quantities in log scale) and a gamma value (representing the current best solution). They output "cuts", which are linear constraints that help narrow down the search for the optimal solution.
+
+The code also includes two variations of the profit oracle:
+
+1. ProfitRbOracle: This is a robust version of the profit oracle that can handle some uncertainty in the input parameters.
+
+2. ProfitQOracle: This version deals with discrete (integer) input quantities, as opposed to continuous ones.
+
+The main logic flow in these classes involves calculating various economic functions (like Cobb-Douglas production functions) and their gradients. The code uses these calculations to determine if a given solution is feasible and to guide the search towards the optimal solution.
+
+The output of these oracles is typically a "cut" (a linear constraint) and possibly an updated best solution (gamma). These outputs are used by an external optimization algorithm (not shown in this code) to iteratively improve the solution until the optimal one is found.
+
+For beginners, it's important to understand that this code is implementing mathematical optimization techniques. While the details might be complex, the basic idea is to efficiently search for the best solution to a profit maximization problem, given certain constraints and economic relationships.
+"""
 import copy
 import math
 from typing import Optional, Tuple

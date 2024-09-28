@@ -17,14 +17,14 @@ def norm_l1(x):
 
 def power_iteration(A, x, options):
     """Power iteration method
-    
+
     Performs the power iteration algorithm to find the largest eigenvalue and corresponding eigenvector of the input matrix A.
-    
+
     Args:
         A (numpy.ndarray): The input square matrix.
         x (numpy.ndarray): The initial vector, assumed to be non-zero.
         options (Options): An Options object containing the maximum number of iterations and the tolerance for convergence.
-    
+
     Returns:
         numpy.ndarray: The eigenvector corresponding to the largest eigenvalue.
         float: The largest eigenvalue.
@@ -42,14 +42,14 @@ def power_iteration(A, x, options):
 
 def power_iteration4(A, x, options):
     """Power iteration method
-    
+
     Performs the power iteration algorithm to find the largest eigenvalue and corresponding eigenvector of the input matrix A.
-    
+
     Args:
         A (numpy.ndarray): The input square matrix.
         x (numpy.ndarray): The initial vector, assumed to be non-zero.
         options (Options): An Options object containing the maximum number of iterations and the tolerance for convergence.
-    
+
     Returns:
         numpy.ndarray: The eigenvector corresponding to the largest eigenvalue.
         float: The largest eigenvalue.
@@ -69,14 +69,14 @@ def power_iteration4(A, x, options):
 
 def power_iteration2(A, x, options):
     """Power iteration method
-    
+
     Performs the power iteration algorithm to find the largest eigenvalue and corresponding eigenvector of the input matrix A.
-    
+
     Args:
         A (numpy.ndarray): The input square matrix.
         x (numpy.ndarray): The initial vector, assumed to be non-zero.
         options (Options): An Options object containing the maximum number of iterations and the tolerance for convergence.
-    
+
     Returns:
         numpy.ndarray: The eigenvector corresponding to the largest eigenvalue.
         float: The largest eigenvalue.
@@ -98,14 +98,14 @@ def power_iteration2(A, x, options):
 
 def power_iteration3(A, x, options):
     """Power iteration method
-    
+
     Performs the power iteration algorithm to find the largest eigenvalue and corresponding eigenvector of the input matrix A.
-    
+
     Args:
         A (numpy.ndarray): The input square matrix.
         x (numpy.ndarray): The initial vector, assumed to be non-zero.
         options (Options): An Options object containing the maximum number of iterations and the tolerance for convergence.
-    
+
     Returns:
         numpy.ndarray: The eigenvector corresponding to the largest eigenvalue.
         float: The largest eigenvalue.

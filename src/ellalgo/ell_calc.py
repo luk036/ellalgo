@@ -1,3 +1,27 @@
+"""
+EllCalc (Ellipsoid Calculator)
+
+The EllCalc class is a tool designed to perform calculations related to ellipsoids, which are mathematical shapes similar to stretched spheres. This code is part of an algorithm used in optimization problems, specifically for a method called the ellipsoid method.
+
+The main purpose of this code is to provide various functions that calculate how to adjust or "cut" an ellipsoid based on certain input parameters. These calculations are used to gradually refine the search space in optimization problems, helping to find optimal solutions more efficiently.
+
+The primary input for this class is the dimension of the problem space, represented by the parameter 'n' in the constructor. Other inputs vary depending on the specific calculation method being used, but generally include values like 'beta' (which represents a cut point) and 'tsq' (which is related to the tolerance or precision of the cut).
+
+The outputs of the various calculation methods are typically tuples containing a status (indicating whether the calculation was successful, had no solution, or had no effect) and, if successful, a set of three float values. These values (often named rho, sigma, and delta) represent parameters used to update the ellipsoid in the optimization algorithm.
+
+The class achieves its purpose through a series of mathematical calculations. It uses concepts from linear algebra and geometry to determine how to shrink or reshape the ellipsoid based on the input parameters. The exact calculations are quite complex, but they essentially determine where to make a "cut" in the ellipsoid and how to reshape it accordingly.
+
+Some important logic flows in the code include:
+
+1. Checking if the input parameters are valid and returning appropriate status codes if they're not.
+2. Deciding between different types of cuts (single, parallel, central) based on the input.
+3. Performing specific calculations for each type of cut.
+
+The code also includes a helper class (EllCalcCore) that likely handles some of the more complex mathematical operations.
+
+Overall, this code serves as a crucial component in an optimization algorithm, providing the mathematical backbone for adjusting the search space as the algorithm progresses towards finding an optimal solution. While the underlying math is complex, the code encapsulates this complexity into methods that can be easily used by other parts of the optimization algorithm.
+"""
+
 from math import sqrt
 from typing import Optional, Tuple
 

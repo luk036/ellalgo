@@ -191,7 +191,7 @@ def cutting_plane_optim_q(
     gamma,
     options=Options(),
 ) -> Tuple[Optional[ArrayType], float, int]:
-    """Cutting-plane method for solving convex discrete optimization problem
+    """Cutting-plane method for solving convex quantized discrete optimization problem
 
     :param omega: The `omega` parameter is an instance of the `OracleOptimQ` class, which is responsible
         for performing assessments on the initial solution `xinit`
@@ -262,7 +262,7 @@ def bsearch(
 
     :return: The function `bsearch` returns a tuple containing three elements:
     """
-    # assume monotone
+    # Assume monotonicity of the objective function
     lower, upper = intrvl
     T = type(upper)  # T could be `int`
     for niter in range(options.max_iters):

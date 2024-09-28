@@ -1,3 +1,29 @@
+"""
+Lowpass Oracle
+
+This code implements a Lowpass Oracle, which is used to design a low-pass filter for signal processing. A low-pass filter allows low-frequency signals to pass through while attenuating high-frequency signals. The main purpose of this code is to help optimize the design of such a filter by providing a way to assess whether a given set of filter coefficients meets certain specifications.
+
+The code defines a class called LowpassOracle that takes several inputs when initialized:
+
+1. ndim: The number of filter coefficients
+2. wpass: The end of the passband (frequencies that should pass through)
+3. wstop: The end of the stopband (frequencies that should be attenuated)
+4. lp_sq: The lower bound for the squared magnitude response in the passband
+5. up_sq: The upper bound for the squared magnitude response in the passband
+6. sp_sq: The upper bound for the squared magnitude response in the stopband
+
+The main outputs of this code are produced by two methods: assess_feas and assess_optim. These methods take a set of filter coefficients as input and determine whether they meet the specified requirements or how close they are to meeting them.
+
+The LowpassOracle achieves its purpose through a series of checks on the frequency response of the filter. It uses a pre-computed spectrum matrix to efficiently calculate the frequency response at different points. The code then checks if the response falls within the specified bounds for the passband and stopband.
+
+The important logic flow in this code involves iterating through different frequency points and checking the filter's response at each point. If any violations of the specifications are found, the code returns information about the violation, which can be used to adjust the filter coefficients.
+
+A key data transformation happening in this code is the conversion from filter coefficients to frequency response. This is done using the pre-computed spectrum matrix, which allows for efficient calculation of the response at many frequency points.
+
+The code also includes a helper function called create_lowpass_case, which sets up a specific instance of the LowpassOracle with predefined parameters. This function can be used to quickly create a standard test case for filter design.
+
+Overall, this code provides a tool for iteratively designing and optimizing low-pass filters by giving feedback on how well a set of coefficients meets the desired specifications. It's part of a larger optimization process where the coefficients would be adjusted based on the feedback from this oracle until a satisfactory filter design is achieved.
+"""
 from math import floor
 from typing import Optional, Tuple, Union
 from ellalgo.ell_typing import OracleOptim
@@ -51,6 +77,30 @@ class LowpassOracle(OracleOptim):
         up_sq: float,
         sp_sq: float,
     ):
+        """
+        Initializes a LowpassOracle object with the given parameters.
+        
+        Args:
+            ndim (int): The number of FIR coefficients (including the zeroth).
+            wpass (float): The end of the passband.
+            wstop (float): The end of the stopband.
+            lp_sq (float): The lower bound on the squared magnitude frequency response in the passband.
+            up_sq (float): The upper bound on the squared magnitude frequency response in the passband.
+            sp_sq (float): The upper bound on the squared magnitude frequency response in the stopband.
+        
+        Attributes:
+            spectrum (np.ndarray): The matrix used to compute the power spectrum.
+            nwpass (int): The index of the end of the passband.
+            nwstop (int): The index of the end of the stopband.
+            lp_sq (float): The lower bound on the squared magnitude frequency response in the passband.
+            up_sq (float): The upper bound on the squared magnitude frequency response in the passband.
+            sp_sq (float): The upper bound on the squared magnitude frequency response in the stopband.
+            idx1 (int): The current index for the passband.
+            idx2 (int): The current index for the stopband.
+            idx3 (int): The current index for the stopband.
+            fmax (float): The maximum value of the squared magnitude frequency response.
+            kmax (int): The index of the maximum value of the squared magnitude frequency response.
+        """
         # *********************************************************************
         # optimization parameters
         # *********************************************************************

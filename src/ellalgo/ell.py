@@ -1,3 +1,23 @@
+"""
+Ell Class
+
+This code defines a class called Ell which represents an ellipsoidal search space. The purpose of this class is to provide methods for updating and manipulating an ellipsoid, which is a mathematical shape used in certain optimization algorithms.
+
+The Ell class takes two main inputs when initialized: a value (which can be a number or a list of numbers) and an array xc. These inputs define the initial shape and position of the ellipsoid. The class doesn't produce a specific output on its own, but rather provides methods that can be used to modify and query the ellipsoid's state.
+
+The class achieves its purpose by maintaining several internal attributes that represent the ellipsoid's properties, such as its center (_xc), a matrix (_mq), and scaling factors (_kappa and _tsq). It then provides methods to update these properties based on different types of "cuts" to the ellipsoid.
+
+The main functionality of the Ell class revolves around three update methods: update_bias_cut, update_central_cut, and update_q. These methods take a "cut" as input, which is essentially a direction and a value that determine how to modify the ellipsoid. The cuts are used to shrink or reshape the ellipsoid, which is a key operation in certain optimization algorithms.
+
+The core logic of these update methods is implemented in the private _update_core method. This method applies the cut to the ellipsoid by performing a series of mathematical operations. It calculates new values for the ellipsoid's center and shape based on the input cut and a specified cut strategy.
+
+An important aspect of the code is its use of numpy, a library for numerical computations in Python. The class uses numpy arrays and matrix operations to efficiently perform the necessary calculations.
+
+The class also includes some helper methods like xc() and tsq() that allow access to certain properties of the ellipsoid. These can be used to query the current state of the ellipsoid during an optimization process.
+
+Overall, this code provides a flexible and efficient way to represent and manipulate an ellipsoidal search space, which is a crucial component in certain types of optimization algorithms. The class encapsulates the complex mathematics involved in these operations, providing a clean interface for users of the class to work with ellipsoids in their algorithms.
+"""
+
 from typing import Callable, Tuple, Union
 
 import numpy as np
@@ -26,12 +46,12 @@ class Ell(SearchSpace2[ArrayType], SearchSpaceQ[ArrayType]):
         The function initializes an object with given values and attributes.
 
         :param val: The parameter `val` can be either an integer, a float, or a list of numbers. If it
-        is an integer or a float, it represents the value of kappa. If it is a list of numbers, it
-        represents the diagonal elements of a matrix, mq
+            is an integer or a float, it represents the value of kappa. If it is a list of numbers, it
+            represents the diagonal elements of a matrix, mq
 
         :param xc: The parameter `xc` is of type `ArrayType`, which suggests that it is an array-like
-        object. It is used to store the values of `xc` in the `__init__` method. The length of `xc` is
-        calculated using `len(xc)` and stored in the variable
+            object. It is used to store the values of `xc` in the `__init__` method. The length of `xc` is
+            calculated using `len(xc)` and stored in the variable
 
         :type xc: ArrayType
         """
@@ -127,11 +147,11 @@ class Ell(SearchSpace2[ArrayType], SearchSpaceQ[ArrayType]):
         The `_update_core` function updates an ellipsoid by applying a cut and a cut strategy.
 
         :param cut: The `cut` parameter is of type `_type_` and represents the cut to be applied to the
-        ellipsoid. The specific type of `_type_` is not specified in the code snippet provided
+            ellipsoid. The specific type of `_type_` is not specified in the code snippet provided
 
         :param cut_strategy: The `cut_strategy` parameter is a callable object that represents the
-        strategy for determining the cut status. It takes two arguments: `beta` and `tsq`. `beta` is a
-        scalar value and `tsq` is a scalar value representing the squared norm of the current cut.
+            strategy for determining the cut status. It takes two arguments: `beta` and `tsq`. `beta` is a
+            scalar value and `tsq` is a scalar value representing the squared norm of the current cut.
 
         :type cut_strategy: Callable
 
