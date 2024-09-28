@@ -16,6 +16,7 @@ One of the key transformations happening in this code is the factorization itsel
 
 Overall, the LDLTMgr class provides a set of tools for working with symmetric matrices, with a focus on determining their properties (like positive definiteness) and performing useful calculations efficiently. It's designed to be flexible and can handle both standard matrices and those defined by functions, making it useful in a variety of mathematical and engineering contexts.
 """
+
 import math
 from typing import Callable, Tuple
 

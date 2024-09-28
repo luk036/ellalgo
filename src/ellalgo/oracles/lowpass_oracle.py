@@ -24,6 +24,7 @@ The code also includes a helper function called create_lowpass_case, which sets 
 
 Overall, this code provides a tool for iteratively designing and optimizing low-pass filters by giving feedback on how well a set of coefficients meets the desired specifications. It's part of a larger optimization process where the coefficients would be adjusted based on the feedback from this oracle until a satisfactory filter design is achieved.
 """
+
 from math import floor
 from typing import Optional, Tuple, Union
 from ellalgo.ell_typing import OracleOptim
@@ -79,7 +80,7 @@ class LowpassOracle(OracleOptim):
     ):
         """
         Initializes a LowpassOracle object with the given parameters.
-        
+
         Args:
             ndim (int): The number of FIR coefficients (including the zeroth).
             wpass (float): The end of the passband.
@@ -87,7 +88,7 @@ class LowpassOracle(OracleOptim):
             lp_sq (float): The lower bound on the squared magnitude frequency response in the passband.
             up_sq (float): The upper bound on the squared magnitude frequency response in the passband.
             sp_sq (float): The upper bound on the squared magnitude frequency response in the stopband.
-        
+
         Attributes:
             spectrum (np.ndarray): The matrix used to compute the power spectrum.
             nwpass (int): The index of the end of the passband.

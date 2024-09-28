@@ -19,6 +19,7 @@ The output of these oracles is typically a "cut" (a linear constraint) and possi
 
 For beginners, it's important to understand that this code is implementing mathematical optimization techniques. While the details might be complex, the basic idea is to efficiently search for the best solution to a profit maximization problem, given certain constraints and economic relationships.
 """
+
 import copy
 import math
 from typing import Optional, Tuple

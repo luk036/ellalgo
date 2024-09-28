@@ -15,6 +15,7 @@ An important part of the logic is the get_elem function inside assess_feas. This
 
 In summary, this code provides a way to check if a given solution satisfies a complex mathematical constraint, and if not, it provides information about why the solution doesn't work. This could be useful in optimization problems where you're trying to find a solution that satisfies certain mathematical conditions.
 """
+
 from typing import Optional, Tuple
 
 import numpy as np
