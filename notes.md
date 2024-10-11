@@ -1,5 +1,17 @@
 ## Cutting Plane Feasibility Algorithm
 
+```python
+def cutting_plane_feas(omega, space, options=Options()):
+    for niter in range(options.max_iters):
+        cut = omega.assess_feas(space.xc())  # query the oracle at space.xc()
+        if cut is None:  # feasible solution obtained
+            return space.xc(), niter
+        status = space.update_bias_cut(cut)  # update space
+        if status != CutStatus.Success or space.tsq() < options.tolerance:
+            return None, niter
+    return None, options.max_iters
+```
+
 This code defines a function called cutting_plane_feas which implements a cutting plane algorithm for finding a feasible point in a convex set. The purpose of this algorithm is to solve a feasibility problem, which means finding a point that satisfies certain constraints.
 
 The function takes three inputs:

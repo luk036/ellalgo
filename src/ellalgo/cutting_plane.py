@@ -1,3 +1,28 @@
+"""
+Cutting Plane Algorithm Implementation
+
+This code implements various cutting plane algorithms, which are optimization techniques used to solve convex optimization problems. The main purpose of these algorithms is to find optimal or feasible solutions within a given search space.
+
+The code defines several functions that take different inputs:
+
+1. cutting_plane_feas: Takes an oracle (a function that assesses feasibility), a search space, and options.
+2. cutting_plane_optim: Takes an optimization oracle, a search space, an initial best value (gamma), and options.
+3. cutting_plane_optim_q: Similar to cutting_plane_optim, but for quantized discrete optimization problems.
+4. bsearch: Performs a binary search using an oracle and an interval.
+
+These functions generally output a solution (if found), the best value achieved, and the number of iterations performed.
+
+The algorithms work by iteratively refining the search space. They start with an initial point and ask the oracle to assess it. The oracle either confirms the point is feasible/optimal or provides a "cut" - information about how to improve the solution. The search space is then updated based on this cut, and the process repeats until a solution is found or the maximum number of iterations is reached.
+
+An important concept in these algorithms is the "cut". A cut is like a hint that tells the algorithm which parts of the search space to exclude, helping it focus on more promising areas. The search space is continuously shrunk based on these cuts until a solution is found or the space becomes too small.
+
+The code also includes a BSearchAdaptor class, which adapts a feasibility oracle to work with the binary search algorithm. This allows the binary search to be used in solving certain types of optimization problems.
+
+Throughout the code, there's a focus on handling different types of problems (feasibility, optimization, discrete optimization) and different types of search spaces. The algorithms are designed to be flexible and work with various problem types.
+
+In summary, this code provides a toolkit for solving different types of optimization problems using cutting plane methods. It's designed to be adaptable to various problem types and to efficiently search for solutions by iteratively refining the search space based on feedback from problem-specific oracles.
+"""
+
 import copy
 from typing import Any, MutableSequence, Optional, Tuple, Union
 

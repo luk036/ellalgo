@@ -31,8 +31,8 @@ class LMIOracle(OracleFeas):
 
     This oracle solves the following feasibility problem:
 
-        find  x
-        s.t.  (B − F * x) ⪰ 0
+    |    find  x
+    |    s.t.  (B − F * x) ⪰ 0
 
     """
 
