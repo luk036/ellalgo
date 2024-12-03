@@ -39,6 +39,10 @@ In the context of the Ellipsoid Method, a parallel cut refers to a pair of linea
 
 <!-- pyscaffold-notes -->
 
+## See also
+
+- [Presentation Slides](https://luk036.github.io/cvx)
+
 ## 👉 Note
 
 This project has been set up using PyScaffold 4.5. For details and usage
