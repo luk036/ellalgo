@@ -63,9 +63,9 @@ def run_profit_q(E):
     algorithm.
 
     :param E: It looks like the function `run_profit_q` is using some parameters such as `r`,
-    `np.array([0.0, 0.0])`, `params`, `a`, and `v` without explicitly defining them in the function
+        `np.array([0.0, 0.0])`, `params`, `a`, and `v` without explicitly defining them in the function
     :return: The function `run_profit_q` returns the number of iterations (`num_iters`) performed during
-    the optimization process.
+        the optimization process.
     """
     ellip = E(r, np.array([0.0, 0.0]))
     omega = ProfitQOracle(params, a, v)
