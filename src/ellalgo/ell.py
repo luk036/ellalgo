@@ -26,77 +26,99 @@ from .ell_calc import EllCalc
 from .ell_config import CutStatus
 from .ell_typing import ArrayType, SearchSpace2, SearchSpaceQ
 
+# Type aliases for better code readability
 Mat = np.ndarray
-CutChoice = Union[float, ArrayType]  # single or parallel
-Cut = Tuple[ArrayType, CutChoice]
+CutChoice = Union[float, ArrayType]  # single or parallel cut
+Cut = Tuple[ArrayType, CutChoice]  # A cut consists of a gradient and a beta value
 
 
 # The `Ell` class represents an ellipsoidal search space.
 class Ell(SearchSpace2[ArrayType], SearchSpaceQ[ArrayType]):
+    # Class variable to control whether to defer the matrix scaling trick
     no_defer_trick: bool = False
 
-    _mq: Mat
-    _xc: ArrayType
-    _kappa: float
-    _tsq: float
-    helper: EllCalc
+    # Instance variables:
+    _mq: Mat        # Matrix representing the shape of the ellipsoid
+    _xc: ArrayType  # Center point of the ellipsoid
+    _kappa: float   # Scaling factor for the ellipsoid matrix
+    _tsq: float     # Measure of distance between current center and optimal point
+    helper: EllCalc # Helper object for ellipsoid calculations
 
     def __init__(self, val, xc: ArrayType) -> None:
         """
-        The function initializes an object with given values and attributes.
-
-        :param val: The parameter `val` can be either an integer, a float, or a list of numbers. If it
-            is an integer or a float, it represents the value of kappa. If it is a list of numbers, it
-            represents the diagonal elements of a matrix, mq
-
-        :param xc: The parameter `xc` is of type `ArrayType`, which suggests that it is an array-like
-            object. It is used to store the values of `xc` in the `__init__` method. The length of `xc` is
-            calculated using `len(xc)` and stored in the variable
-
-        :type xc: ArrayType
+        Initialize the ellipsoid with given parameters.
+        
+        The initialization can be done in two ways:
+        1. With a scalar value (kappa) which creates a unit matrix
+        2. With a list of values which creates a diagonal matrix
+        
+        Args:
+            val: Either a scalar (kappa) or a list of values for diagonal matrix
+            xc: The initial center point of the ellipsoid
+            
+        The method:
+        1. Determines the dimension from xc
+        2. Creates a helper object for calculations
+        3. Sets the center point
+        4. Initializes tsq to 0
+        5. Sets either kappa with unit matrix or diagonal matrix based on val type
         """
         ndim = len(xc)
         self.helper = EllCalc(ndim)
         self._xc = xc
         self._tsq = 0.0
         if isinstance(val, (int, float)):
+            # Case 1: val is a scalar (kappa), create identity matrix
             self._kappa = val
             self._mq = np.eye(ndim)
         else:
+            # Case 2: val is a list/array, create diagonal matrix
             self._kappa = 1.0
             self._mq = np.diag(val)
 
     def xc(self) -> ArrayType:
         """
-        The function `xc` returns the value of the `_xc` attribute.
-        :return: The method `xc` is returning the value of the attribute `_xc`.
+        Getter method for the ellipsoid's center point.
+        
+        Returns:
+            The current center point (_xc) of the ellipsoid
         """
         return self._xc
 
     def set_xc(self, xc: ArrayType) -> None:
         """
-        The function sets the value of the variable `_xc` to the input `x`.
-
-        :param x: The parameter `x` is of type `ArrayType`
-        :type x: ArrayType
+        Setter method for the ellipsoid's center point.
+        
+        Args:
+            xc: The new center point for the ellipsoid
         """
         self._xc = xc
 
     def tsq(self) -> float:
         """
-        The function `tsq` returns the measure of the distance between `xc` and `x*`.
-        :return: The method is returning a float value, which represents the measure of the distance between xc and x*.
+        Getter method for the tsq value.
+        
+        tsq represents the measure of distance between current center (xc) and optimal point (x*).
+        It's calculated as kappa * omega, where omega is grad^T * M * grad.
+        
+        Returns:
+            The current tsq value
         """
         return self._tsq
 
     def update_bias_cut(self, cut) -> CutStatus:
         """
-        The function `update_bias_cut` is an implementation of the `SearchSpace` interface that updates the
-        ellipsoid based on a given deep-cut.
-
-        :param cut: The `cut` parameter is of type `_type_` and it represents some kind of cut
-        :return: a `CutStatus` object.
-
+        Update the ellipsoid using a bias cut (deep cut) strategy.
+        
+        A bias cut is a general cut that can be either deep or shallow.
+        This method delegates to _update_core with the standard cut strategy.
+        
+        Args:
+            cut: A tuple containing (gradient, beta) for the cut
+            
+        Returns:
+            CutStatus indicating success or failure of the update
+            
         Examples:
             >>> ell = Ell(1.0, [1.0, 1.0, 1.0, 1.0])
             >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 1.0)
@@ -108,12 +130,17 @@ class Ell(SearchSpace2[ArrayType], SearchSpaceQ[ArrayType]):
 
     def update_central_cut(self, cut) -> CutStatus:
         """
-        The function `update_central_cut` is an implementation of the `SearchSpace` interface that updates the
-        ellipsoid based on a given central-cut.
-
-        :param cut: The `cut` parameter is of type `_type_` and it represents a cut
-        :return: a `CutStatus` object.
-
+        Update the ellipsoid using a central cut strategy.
+        
+        A central cut is a special case where beta = 0, meaning the cut passes
+        exactly through the center of the current ellipsoid.
+        
+        Args:
+            cut: A tuple containing (gradient, beta) for the cut
+            
+        Returns:
+            CutStatus indicating success or failure of the update
+            
         Examples:
             >>> ell = Ell(1.0, [1.0, 1.0, 1.0, 1.0])
             >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 0.0)
@@ -125,12 +152,16 @@ class Ell(SearchSpace2[ArrayType], SearchSpaceQ[ArrayType]):
 
     def update_q(self, cut) -> CutStatus:
         """
-        The function `update_q` is an implementation of the `SearchSpaceQ` interface that updates the
-        ellipsoid based on a given non-central cut (deep or shallow).
-
-        :param cut: The `cut` parameter is of type `_type_` and it represents the cut that needs to be updated
-        :return: a `CutStatus` object.
-
+        Update the ellipsoid using a non-central cut strategy for Q.
+        
+        This is used for non-central cuts (either deep or shallow) in Q space.
+        
+        Args:
+            cut: A tuple containing (gradient, beta) for the cut
+            
+        Returns:
+            CutStatus indicating success or failure of the update
+            
         Examples:
             >>> ell = Ell(1.0, [1.0, 1.0, 1.0, 1.0])
             >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), -0.01)
@@ -144,19 +175,23 @@ class Ell(SearchSpace2[ArrayType], SearchSpaceQ[ArrayType]):
 
     def _update_core(self, cut, cut_strategy: Callable) -> CutStatus:
         """
-        The `_update_core` function updates an ellipsoid by applying a cut and a cut strategy.
-
-        :param cut: The `cut` parameter is of type `_type_` and represents the cut to be applied to the
-            ellipsoid. The specific type of `_type_` is not specified in the code snippet provided
-
-        :param cut_strategy: The `cut_strategy` parameter is a callable object that represents the
-            strategy for determining the cut status. It takes two arguments: `beta` and `tsq`. `beta` is a
-            scalar value and `tsq` is a scalar value representing the squared norm of the current cut.
-
-        :type cut_strategy: Callable
-
-        :return: a `CutStatus` object.
-
+        Core method for updating the ellipsoid based on a cut and strategy.
+        
+        This method:
+        1. Extracts gradient and beta from the cut
+        2. Calculates grad_t = M * grad
+        3. Computes omega = grad^T * grad_t
+        4. Updates tsq = kappa * omega
+        5. Uses the cut strategy to get update parameters
+        6. Updates the center, matrix, and kappa if successful
+        
+        Args:
+            cut: A tuple containing (gradient, beta) for the cut
+            cut_strategy: The strategy function to calculate update parameters
+            
+        Returns:
+            CutStatus indicating success or failure of the update
+            
         Examples:
             >>> ell = Ell(1.0, [1.0, 1.0, 1.0, 1.0])
             >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 1.0)
@@ -171,21 +206,30 @@ class Ell(SearchSpace2[ArrayType], SearchSpaceQ[ArrayType]):
             CutStatus.Success
         """
         grad, beta = cut
+        # Calculate M * grad (matrix-vector multiplication)
         grad_t = self._mq @ grad  # n^2 multiplications
+        # Calculate grad^T * (M * grad)
         omega = grad.dot(grad_t)  # n multiplications
+        # Update tsq measure
         self._tsq = self._kappa * omega
 
+        # Get update parameters from the strategy
         status, result = cut_strategy(beta, self._tsq)
 
         if result is None:
             return status
 
+        # Extract update parameters
         rho, sigma, delta = result
 
+        # Update center point: xc -= (rho/omega) * grad_t
         self._xc -= (rho / omega) * grad_t
+        # Update matrix: M -= (sigma/omega) * grad_t * grad_t^T
         self._mq -= (sigma / omega) * np.outer(grad_t, grad_t)
+        # Update scaling factor
         self._kappa *= delta
 
+        # Optional: apply scaling immediately rather than deferring
         if self.no_defer_trick:
             self._mq *= self._kappa
             self._kappa = 1.0

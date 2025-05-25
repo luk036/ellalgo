@@ -33,20 +33,30 @@ class EllCalc:
     """The `EllCalc` class is used for calculating ellipsoid parameters and has attributes
     for storing constants and configuration options.
 
+    This class serves as the main interface for performing ellipsoid calculations in optimization
+    algorithms. It provides methods for different types of cuts (single, parallel, central) and
+    handles the logic for selecting the appropriate cut type based on input parameters.
+
+    The class uses an instance of EllCalcCore to perform the actual mathematical computations,
+    while handling the higher-level logic and status reporting.
+
     Examples:
         >>> from ellalgo.ell_calc import EllCalc
         >>> calc = EllCalc(3)
     """
 
-    use_parallel_cut: bool = True
-    _n_f: float
-    helper: EllCalcCore
+    use_parallel_cut: bool = True  # Flag to enable/disable parallel cut optimization
+    _n_f: float  # Dimension of the space as a float
+    helper: EllCalcCore  # Helper class for core calculations
 
     def __init__(self, n: int) -> None:
         """
-        The function initializes several variables based on the input value.
+        Initialize the EllCalc instance with the given dimension.
 
-        :param n: The parameter `n` represents an integer value. It is used to initialize the `EllCalc` object
+        The constructor sets up the necessary parameters for ellipsoid calculations,
+        including storing the dimension and initializing the helper class.
+
+        :param n: The dimension of the problem space (must be ≥ 2)
         :type n: int
 
         Examples:
@@ -62,20 +72,17 @@ class EllCalc:
     def calc_single_or_parallel(
         self, beta, tsq: float
     ) -> Tuple[CutStatus, Optional[Tuple[float, float, float]]]:
-        """single deep cut or parallel cut
+        """Calculate either a single deep cut or a parallel cut based on input parameters.
 
-        The `calc_single_or_parallel` function calculates either a single deep cut or a parallel cut based on
-        the input parameters.
+        This method serves as a dispatcher that chooses between single cut and parallel cut
+        calculations based on the type of beta parameter provided.
 
-        :param beta: The parameter `beta` can be of type `int`, `float`, or a list of two elements
-
-        :param tsq: The `tsq` parameter is a floating-point number that represents the square of the
-            tolerance for the ellipsoid algorithm. It is used in the calculations performed by the
-            `calc_single_or_parallel` method
-
+        :param beta: Either a single numeric value (for single cut) or a list of two values (for parallel cut)
+        :param tsq: The square of the tolerance parameter (τ²) used in the cut calculations
         :type tsq: float
-
-        :return: The function `calc_single_or_parallel` returns a tuple containing the following elements:
+        :return: A tuple containing:
+                 - CutStatus: indicating success or failure
+                 - Optional tuple of (rho, sigma, delta) if successful
 
         Examples:
             >>> from ellalgo.ell_calc import EllCalc
@@ -90,23 +97,15 @@ class EllCalc:
     def calc_single_or_parallel_central_cut(
         self, beta, tsq: float
     ) -> Tuple[CutStatus, Optional[Tuple[float, float, float]]]:
-        """single central cut or parallel cut
+        """Calculate either a single central cut or a parallel central cut.
 
-        The function `calc_single_or_parallel_central_cut` calculates either a single central cut or a parallel cut
-        based on the input parameters.
+        Similar to calc_single_or_parallel but specifically for central cuts (cuts passing through
+        the center of the ellipsoid).
 
-        :param beta: The parameter `beta` is of type `_type_` and represents some value. The specific
-            details of its purpose and usage are not provided in the code snippet
-
-        :param tsq: tsq is a float value representing the squared tau-value
-
+        :param beta: Either a single numeric value or a list of two values
+        :param tsq: The square of the tolerance parameter (τ²)
         :type tsq: float
-
-        :return: a tuple containing the following elements:
-            1. CutStatus: The status of the cut calculation.
-            2. float: The calculated value.
-            3. float: The calculated value.
-            4. float: The calculated value.
+        :return: A tuple containing status and optional result values
 
         Examples:
             >>> from ellalgo.ell_calc import EllCalc
@@ -121,17 +120,22 @@ class EllCalc:
     def calc_parallel(
         self, beta0: float, beta1: float, tsq: float
     ) -> Tuple[CutStatus, Optional[Tuple[float, float, float]]]:
-        """parallel deep cut
+        """Calculate parameters for a parallel deep cut.
 
-        The function `calc_parallel` calculates the parallel deep cut based on the given parameters.
+        A parallel cut involves two parallel hyperplanes cutting the ellipsoid. This method
+        calculates the transformation parameters for such a cut after validating the inputs.
 
-        :param beta0: The parameter `beta0` represents a float value
+        :param beta0: First cut parameter (lower bound)
         :type beta0: float
-        :param beta1: The parameter `beta1` represents a float value
+        :param beta1: Second cut parameter (upper bound)
         :type beta1: float
-        :param tsq: tsq is a float representing the value of tsq
+        :param tsq: Square of the tolerance parameter (τ²)
         :type tsq: float
-        :return: The function `calc_parallel` returns a tuple of type `Tuple[CutStatus, Optional[Tuple[float, float, float]]]`.
+        :return: Status and optional result tuple
+
+        The method first checks if beta1 < beta0 (invalid case), then checks if the cut
+        would be outside the ellipsoid (tsq ≤ b1sq), and falls back to a single cut if so.
+        Otherwise, it calculates the parallel cut parameters.
         """
         if beta1 < beta0:
             return (CutStatus.NoSoln, None)  # no sol'n
@@ -146,15 +150,17 @@ class EllCalc:
     def calc_bias_cut(
         self, beta: float, tsq: float
     ) -> Tuple[CutStatus, Optional[Tuple[float, float, float]]]:
-        """Deep Cut
+        """Calculate parameters for a single deep cut.
 
-        The function calculates the deep cut based on the given beta and tsq values.
+        A deep cut is a hyperplane cut that doesn't necessarily pass through the center
+        of the ellipsoid. This method validates the input and calculates the transformation
+        parameters if valid.
 
-        :param beta: The parameter `beta` represents a float value
+        :param beta: Cut parameter (must be ≥ 0)
         :type beta: float
-        :param tsq: tsq is the square of the value of tau
+        :param tsq: Square of the tolerance parameter (τ²)
         :type tsq: float
-        :return: The function `calc_bias_cut` returns a tuple of four values: `CutStatus`, `float`, `float`, `float`.
+        :return: Status and optional result tuple
 
         Examples:
             >>> from ellalgo.ell_calc import EllCalc
@@ -179,15 +185,15 @@ class EllCalc:
     def calc_single_or_parallel_q(
         self, beta, tsq: float
     ) -> Tuple[CutStatus, Optional[Tuple[float, float, float]]]:
-        """single deep cut or parallel cut (discrete)
+        """Calculate either single or parallel deep cut (discrete version).
 
-        The function `calc_single_or_parallel_q` calculates the deep cut or parallel cut based on the input
-        parameters `beta` and `tsq`.
+        This is a variant of calc_single_or_parallel designed for discrete optimization
+        problems, with additional checks for numerical stability.
 
-        :param beta: The parameter `beta` can be either a single value (int or float) or a list of two values
-        :param tsq: tsq is a float value representing the square of the threshold value
+        :param beta: Either a single numeric value or a list of two values
+        :param tsq: Square of the tolerance parameter (τ²)
         :type tsq: float
-        :return: The function `calc_single_or_parallel_q` returns a tuple containing four elements: `CutStatus`, `float`, `float`, and `float`.
+        :return: Status and optional result tuple
         """
         if isinstance(beta, (int, float)):
             return self.calc_bias_cut_q(beta, tsq)
@@ -198,17 +204,18 @@ class EllCalc:
     def calc_parallel_q(
         self, beta0: float, beta1: float, tsq: float
     ) -> Tuple[CutStatus, Optional[Tuple[float, float, float]]]:
-        """Parallel deep cut (discrete)
+        """Calculate parallel deep cut (discrete optimization version).
 
-        The function `calc_parallel_q` calculates the parallel deep cut for a given set of parameters.
+        This version includes additional checks for numerical stability in discrete
+        optimization problems, specifically checking if eta ≤ 0.0.
 
-        :param beta0: The parameter `beta0` represents a float value
+        :param beta0: First cut parameter
         :type beta0: float
-        :param beta1: The parameter `beta1` represents a float value
+        :param beta1: Second cut parameter
         :type beta1: float
-        :param tsq: tsq is a float value that represents the square of a variable
+        :param tsq: Square of the tolerance parameter (τ²)
         :type tsq: float
-        :return: The function `calc_parallel_q` returns a tuple of type `Tuple[CutStatus, float, float, float]`.
+        :return: Status and optional result tuple
         """
         if beta1 < beta0:
             return (CutStatus.NoSoln, None)  # no sol'n
@@ -227,16 +234,16 @@ class EllCalc:
     def calc_bias_cut_q(
         self, beta: float, tsq: float
     ) -> Tuple[CutStatus, Optional[Tuple[float, float, float]]]:
-        """Deep Cut (discrete)
+        """Calculate deep cut (discrete optimization version).
 
-        The function `calc_bias_cut_q` calculates the deep cut for a given beta and tsq value.
+        This version includes additional checks for numerical stability in discrete
+        optimization problems, specifically checking if eta ≤ 0.0.
 
-        :param beta: The parameter `beta` represents a float value
+        :param beta: Cut parameter
         :type beta: float
-        :param tsq: tsq is the square of the threshold value. It is a float value that represents the
-            threshold squared
+        :param tsq: Square of the tolerance parameter (τ²)
         :type tsq: float
-        :return: The function `calc_bias_cut_q` returns a tuple of four values: `CutStatus`, `float`, `float`, `float`.
+        :return: Status and optional result tuple
 
         Examples:
             >>> from ellalgo.ell_calc import EllCalc
@@ -263,6 +270,7 @@ class EllCalc:
 if __name__ == "__main__":
     from pytest import approx
 
+    # Test cases for the parallel cut calculations
     ell_calc = EllCalc(4)
     status, _ = ell_calc.calc_parallel_q(0.07, 0.03, 0.01)
     assert status == CutStatus.NoSoln

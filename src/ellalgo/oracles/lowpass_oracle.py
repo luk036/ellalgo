@@ -106,101 +106,152 @@ class LowpassOracle(OracleOptim):
         # optimization parameters
         # *********************************************************************
         # rule-of-thumb discretization (from Cheney's Approximation Theory)
-        mdim = 15 * ndim
-        w = np.linspace(0, np.pi, mdim)  # omega
+        mdim = 15 * ndim  # Number of frequency points to evaluate
+        w = np.linspace(0, np.pi, mdim)  # omega (frequency points from 0 to π)
 
         # spectrum is the matrix used to compute the power spectrum
         # spectrum(w,:) = [1 2*cos(w) 2*cos(2*w) ... 2*cos(mdim*w)]
+        # This creates a matrix where each row corresponds to a frequency point,
+        # and each column contains the cosine terms for that frequency
         temp = 2 * np.cos(np.outer(w, np.arange(1, ndim)))
         self.spectrum = np.concatenate((np.ones((mdim, 1)), temp), axis=1)
+        
+        # Convert normalized frequency bounds to array indices
         self.nwpass: int = floor(wpass * (mdim - 1)) + 1  # end of passband
         self.nwstop: int = floor(wstop * (mdim - 1)) + 1  # end of stopband
-        self.lp_sq = lp_sq
-        self.up_sq = up_sq
-        self.sp_sq = sp_sq
-        self.idx1 = 0
-        self.idx2 = self.nwpass
-        self.idx3 = self.nwstop
-        self.fmax = float("-inf")
-        self.kmax = 0
+        
+        # Store the squared magnitude bounds
+        self.lp_sq = lp_sq  # Lower bound for passband (squared)
+        self.up_sq = up_sq  # Upper bound for passband (squared)
+        self.sp_sq = sp_sq  # Upper bound for stopband (squared)
+        
+        # Initialize indices for round-robin checking of frequency points
+        self.idx1 = 0  # Current index for passband checking
+        self.idx2 = self.nwpass  # Current index for transition band checking
+        self.idx3 = self.nwstop  # Current index for stopband checking
+        
+        # Variables to track maximum response in stopband
+        self.fmax = float("-inf")  # Maximum response value found
+        self.kmax = 0  # Index where maximum response occurs
 
     def assess_feas(self, x: Arr) -> Optional[ParallelCut]:
-        """[summary]
+        """
+        Assess whether the given filter coefficients meet the design specifications.
+        
+        This method checks the frequency response at various points in three bands:
+        1. Passband (0 to nwpass): Checks if response is within [lp_sq, up_sq]
+        2. Stopband (nwstop to end): Checks if response is below sp_sq and non-negative
+        3. Transition band (nwpass to nwstop): Checks if response is non-negative
+        
+        Uses a round-robin approach to check different frequency points on each call
+        to distribute the computational load across multiple iterations.
 
-        Arguments:
-            x (Arr): coefficients of autocorrelation
-            sp_sq (float): the best-so-far stop_pass^2
+        Args:
+            x (Arr): The filter coefficients (autocorrelation coefficients)
 
         Returns:
-            [type]: [description]
+            Optional[ParallelCut]: 
+                - None if all specifications are met
+                - A tuple containing:
+                    * The gradient of the violating constraint
+                    * The violation amount (or tuple of lower/upper violations)
         """
-        # self.more_alt = True
-
+        # Get dimensions of the spectrum matrix
         mdim, ndim = self.spectrum.shape
+        
+        # Check passband frequencies (0 to nwpass)
         for _ in range(self.nwpass):
             self.idx1 += 1
             if self.idx1 == self.nwpass:
-                self.idx1 = 0  # round robin
-            col_k = self.spectrum[self.idx1, :]
-            v = col_k.dot(x)
+                self.idx1 = 0  # round robin - wrap around to start
+                
+            col_k = self.spectrum[self.idx1, :]  # Get frequency point coefficients
+            v = col_k.dot(x)  # Compute response at this frequency
+            
+            # Check upper bound violation
             if v > self.up_sq:
                 f = (v - self.up_sq, v - self.lp_sq)
-                return col_k, f
+                return col_k, f  # Return gradient and violation amounts
+                
+            # Check lower bound violation
             if v < self.lp_sq:
                 f = (-v + self.lp_sq, -v + self.up_sq)
-                return -col_k, f
+                return -col_k, f  # Return negative gradient and violation amounts
 
+        # Initialize tracking for stopband maximum response
         self.fmax = float("-inf")
         self.kmax = 0
+        
+        # Check stopband frequencies (nwstop to end)
         for _ in range(self.nwstop, mdim):
             self.idx3 += 1
             if self.idx3 == mdim:
-                self.idx3 = self.nwstop  # round robin
+                self.idx3 = self.nwstop  # round robin - wrap around to start
+                
             col_k = self.spectrum[self.idx3, :]
             v = col_k.dot(x)
+            
+            # Check upper bound violation in stopband
             if v > self.sp_sq:
                 return col_k, (v - self.sp_sq, v)
+                
+            # Check non-negativity constraint
             if v < 0:
                 return -col_k, (-v, -v + self.sp_sq)
+                
+            # Track maximum response in stopband (for optimization)
             if v > self.fmax:
                 self.fmax = v
                 self.kmax = self.idx3
 
-        # case 4,
-        # 1. nonnegative-real constraint on other frequences
+        # Check transition band frequencies (nwpass to nwstop)
+        # Only need to ensure non-negativity here
         for _ in range(self.nwpass, self.nwstop):
             self.idx2 += 1
             if self.idx2 == self.nwstop:
-                self.idx2 = self.nwpass  # round robin
+                self.idx2 = self.nwpass  # round robin - wrap around to start
+                
             col_k = self.spectrum[self.idx2, :]
             v = col_k.dot(x)
+            
+            # Check non-negativity constraint
             if v < 0:
-                return -col_k, -v  # single cut
+                return -col_k, -v  # Return single cut for non-negativity
 
-        # self.more_alt = False
-
-        # case 1 (unlikely)
+        # Additional check: First coefficient should be non-negative
         if x[0] < 0:
             grad = np.zeros(ndim)
             grad[0] = -1.0
             return grad, -x[0]
 
+        # If all checks pass, return None (no violations)
         return None
 
-    def assess_optim(self, x: Arr, sp_sq: float):
-        """[summary]
+    def assess_optim(self, xc: Arr, gamma: float):
+        """
+        Assess the optimality of the current filter coefficients for the stopband.
+        
+        First checks feasibility using assess_feas. If feasible, returns information
+        about the maximum response in the stopband which can be used to further
+        optimize the filter design.
 
-        Arguments:
-            x (Arr): coefficients of autocorrelation
-            sp_sq (float): the best-so-far stop_pass^2
+        Args:
+            xc (Arr): The filter coefficients (autocorrelation coefficients)
+            gamma (float): The current best stopband attenuation value to beat
 
         Returns:
-            [type]: [description]
+            tuple: A tuple containing:
+                - A tuple of (gradient, (lower, upper)) for the maximum stopband response
+                - The maximum stopband response value (or None if not feasible)
         """
-        self.sp_sq = sp_sq
-        if cut := self.assess_feas(x):
-            return cut, None
-        # Begin objective function
+        # Update the stopband bound
+        self.sp_sq = gamma
+        
+        # First check feasibility
+        if cut := self.assess_feas(xc):
+            return cut, None  # Return feasibility cut and no objective value
+            
+        # If feasible, return information about the maximum stopband response
         return (self.spectrum[self.kmax, :], (0.0, self.fmax)), self.fmax
 
 
@@ -209,28 +260,38 @@ class LowpassOracle(OracleOptim):
 # *********************************************************************
 # number of FIR coefficients (including zeroth)
 def create_lowpass_case(ndim=48):
-    """[summary]
-
-    Keyword Arguments:
-        mdim (int): [description] (default: {48})
+    """
+    Creates a standard low-pass filter design case with typical parameters.
+    
+    Sets up a LowpassOracle instance with commonly used specifications:
+    - Passband edge at 0.12π
+    - Stopband edge at 0.20π
+    - Passband ripple of ±0.025 dB
+    - Stopband attenuation of 0.125
+    
+    Args:
+        ndim (int, optional): Number of filter coefficients. Defaults to 48.
 
     Returns:
-        [type]: [description]
+        LowpassOracle: An initialized LowpassOracle instance with standard parameters
     """
-    delta0_wpass = 0.025
-    delta0_wstop = 0.125
-    # maximum passband ripple in dB (+/- around 0 dB)
-    delta1 = 20 * np.log10(1 + delta0_wpass)
-    # stopband attenuation desired in dB
-    delta2 = 20 * np.log10(delta0_wstop)
+    # Define normalized frequency tolerances
+    delta0_wpass = 0.025  # Passband ripple tolerance
+    delta0_wstop = 0.125  # Stopband attenuation tolerance
+    
+    # Convert to dB scale for calculations
+    delta1 = 20 * np.log10(1 + delta0_wpass)  # Passband ripple in dB
+    delta2 = 20 * np.log10(delta0_wstop)      # Stopband attenuation in dB
 
-    # passband 0 <= w <= w_pass
-    low_pass = pow(10, -delta1 / 20)
-    up_pass = pow(10, +delta1 / 20)
-    stop_pass = pow(10, +delta2 / 20)
+    # Convert dB specifications to linear scale
+    low_pass = pow(10, -delta1 / 20)   # Lower passband bound
+    up_pass = pow(10, +delta1 / 20)    # Upper passband bound
+    stop_pass = pow(10, +delta2 / 20)  # Stopband bound
 
+    # Square the bounds for use with squared magnitude response
     lp_sq = low_pass * low_pass
     up_sq = up_pass * up_pass
     sp_sq = stop_pass * stop_pass
 
+    # Create and return LowpassOracle instance with these parameters
     return LowpassOracle(ndim, 0.12, 0.20, lp_sq, up_sq, sp_sq)

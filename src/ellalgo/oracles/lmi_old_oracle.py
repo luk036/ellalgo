@@ -29,7 +29,7 @@ class LMIOldOracle(OracleFeas):
         self.mat_f0 = mat_b
         self.ldlt_mgr = LDLTMgr(len(mat_b))
 
-    def assess_feas(self, x: np.ndarray) -> Optional[Cut]:
+    def assess_feas(self, xc: np.ndarray) -> Optional[Cut]:
         """
         The `assess_feas` function assesses the feasibility of a given input array `x` and returns a `Cut`
         object if the feasibility is violated, otherwise it returns `None`.
@@ -38,9 +38,9 @@ class LMIOldOracle(OracleFeas):
         :type x: np.ndarray
         :return: The function `assess_feas` returns an `Optional[Cut]`.
         """
-        n = len(x)
+        n = len(xc)
         A = self.mat_f0.copy()
-        A -= sum(self.mat_f[k] * x[k] for k in range(n))
+        A -= sum(self.mat_f[k] * xc[k] for k in range(n))
         if not self.ldlt_mgr.factorize(A):
             ep = self.ldlt_mgr.witness()
             g = np.array([self.ldlt_mgr.sym_quad(self.mat_f[i]) for i in range(n)])

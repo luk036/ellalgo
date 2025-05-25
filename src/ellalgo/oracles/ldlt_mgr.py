@@ -53,13 +53,18 @@ class LDLTMgr:
 
     def __init__(self, ndim: int):
         """
-        The above function is the constructor for a LDLT Ext object, which initializes various attributes
-        and pre-allocates storage.
-
-        :param ndim: The parameter ndim represents the dimension of the object. It is an integer value that
-            determines the size of the object being constructed
-
-        :type ndim: int
+        Initializes the LDLT manager with given matrix dimension.
+        
+        Args:
+            ndim: The dimension of the square matrix to be factorized.
+            
+        Attributes initialized:
+            pos: Tuple tracking the position where positive definiteness fails (0,0) initially
+            wit: Witness vector storage initialized to zeros
+            _ndim: Stores the matrix dimension
+            _storage: Pre-allocated storage for factorization results (ndim x ndim matrix)
+            
+        The initialization prepares all necessary storage to avoid repeated allocations during factorization.
         """
         self.pos: Tuple[int, int] = (0, 0)
         self.wit: np.ndarray = np.zeros(ndim)
@@ -68,18 +73,17 @@ class LDLTMgr:
 
     def factorize(self, mat: np.ndarray) -> bool:
         """
-        The function factorize performs LDLT Factorization on a symmetric matrix A and returns a boolean
-        value indicating whether the factorization was successful.
-
-        If $A$ is positive definite, then $p$ is zero.
-        If it is not, then $p$ is a positive integer,
-        such that $v = R^{-1} e_p$ is a certificate vector
-        to make $v^T*A[:p,:p]*v < 0$
-
-        :param A: A is a numpy array representing a symmetric matrix
-        :type A: np.ndarray
-        :return: the result of calling the `factor` method with a lambda function as an argument.
-
+        Performs LDLT factorization on a given numpy array matrix.
+        
+        This is a convenience wrapper around the factor() method that takes a matrix directly
+        rather than an element-accessor function.
+        
+        Args:
+            mat: A symmetric numpy array to be factorized
+            
+        Returns:
+            bool: True if matrix is positive definite, False otherwise
+            
         Examples:
             >>> mat = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
             >>> ldl = LDLTMgr(3)
@@ -90,17 +94,22 @@ class LDLTMgr:
 
     def factor(self, get_elem: Callable[[int, int], float]) -> bool:
         """
-        The function performs LDLT Factorization on a symmetric matrix using lazy evaluation.
-
-        :param get_elem: The `get_elem` parameter is a callable function that is used to access the elements
-            of a symmetric matrix. It takes two integer arguments `i` and `j` and returns the value of the
-            element at the `(i, j)` position in the matrix
-
-        :type get_elem: Callable[[int, int], float]
-
-        :return: The function `factor` returns a boolean value indicating whether the matrix is symmetric
-            positive definite (SPD).
-
+        Performs LDLT factorization using lazy element access.
+        
+        The factorization proceeds row by row, computing diagonal entries and off-diagonal
+        multipliers. If any diagonal entry becomes non-positive, factorization stops early
+        and records the failure position.
+        
+        Args:
+            get_elem: Function that returns matrix element at (i,j) position
+            
+        Returns:
+            bool: True if matrix is positive definite (all diagonal entries positive)
+            
+        The factorization stores results in _storage:
+        - Diagonal entries (D matrix) are stored in _storage[i,i]
+        - Off-diagonal entries (L matrix) are stored in _storage[i,j] for j < i
+        
         Examples:
             >>> mat = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
             >>> ldl = LDLTMgr(3)
@@ -128,18 +137,20 @@ class LDLTMgr:
         self, get_elem: Callable[[int, int], float]
     ) -> bool:
         """
-        The function performs LDLT Factorization on a symmetric matrix using lazy evaluation and checks
-        if the matrix is positive definite.
-
-        :param get_elem: The `get_elem` parameter is a callable function that takes two integer arguments
-            `i` and `j` and returns a float value. This function is used to access the elements of a symmetric
-            matrix `mat`. The `factor_with_allow_semidefinite` method performs LDLT Factorization on
-
-        :type get_elem: Callable[[int, int], float]
-
-        :return: The function `factor_with_allow_semidefinite` returns a boolean value indicating whether
-            the matrix is symmetric positive definite (SPD).
-
+        Performs LDLT factorization allowing for positive semi-definite matrices.
+        
+        Similar to factor() but handles zero diagonal entries (indicating semi-definiteness)
+        by restarting factorization from the next row.
+        
+        Args:
+            get_elem: Function that returns matrix element at (i,j) position
+            
+        Returns:
+            bool: True if matrix is positive semi-definite (no negative diagonal entries)
+            
+        This version is more tolerant of zero diagonal entries than factor(), which
+        requires strictly positive entries for positive definiteness.
+        
         Examples:
             >>> mat = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
             >>> ldl = LDLTMgr(3)
@@ -167,12 +178,14 @@ class LDLTMgr:
 
     def is_spd(self):
         """
-        The function `is_spd` checks if a matrix `A` is symmetric positive definite (spd) and returns `True`
-        if it is.
-
-        :return: a boolean value. It returns True if the matrix A is symmetric positive definite (spd), and
-            False otherwise.
-
+        Checks if the matrix is symmetric positive definite (SPD).
+        
+        Returns:
+            bool: True if the matrix is SPD (pos[1] == 0), False otherwise
+            
+        The check is based on whether any diagonal entry was non-positive during
+        factorization, which would have set pos[1] to a non-zero value.
+        
         Examples:
             >>> mat = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
             >>> ldl = LDLTMgr(3)
@@ -185,17 +198,17 @@ class LDLTMgr:
 
     def witness(self) -> float:
         """
-        The function "witness" provides evidence that a matrix is not symmetric positive definite.
-            (square-root-free version)
-
-           evidence: v^T A v = -ep
-
-        Raises:
-            AssertionError: $A$ indeeds a spd matrix
-
+        Computes a witness vector proving the matrix is not positive definite.
+        
         Returns:
-            float: ep
-
+            float: The negative eigenvalue (ep) showing v^T A v = -ep < 0
+            
+        Raises:
+            AssertionError: If called on a positive definite matrix
+            
+        The witness vector is stored in self.wit and can be accessed after calling
+        this method. The vector satisfies v^T A v < 0 for the failed submatrix.
+        
         Examples:
             >>> mat = np.array([[1.0, 2.0, 3.0], [2.0, 3.5, 5.0], [3.0, 5.0, 6.0]])
             >>> ldl = LDLTMgr(3)
@@ -215,15 +228,17 @@ class LDLTMgr:
 
     def sym_quad(self, mat: np.ndarray):
         """
-        The `sym_quad` function calculates the quadratic form of a vector `v` with a symmetric matrix `mat`.
-
-        :param mat: mat is a numpy array
-
-        :type mat: np.ndarray
-
-        :return: The function `sym_quad` returns the result of the dot product between `v` and the matrix
-            product of `mat[start:ndim, start:ndim]` and `v`.
-
+        Computes the quadratic form v^T M v using the witness vector.
+        
+        Args:
+            mat: The matrix M to compute the quadratic form with
+            
+        Returns:
+            float: The value of v^T M v where v is the witness vector
+            
+        Note: witness() must be called first to set up the witness vector.
+        The computation uses only the submatrix where positive definiteness failed.
+        
         Examples:
             >>> mat = np.array([[1.0, 2.0, 3.0], [2.0, 3.5, 5.0], [3.0, 5.0, 6.0]])
             >>> ldl = LDLTMgr(3)
@@ -244,14 +259,18 @@ class LDLTMgr:
         return wit.dot(mat[start:ndim, start:ndim] @ wit)
 
     def sqrt(self) -> np.ndarray:
-        """Return upper triangular matrix R where A = R^T * R
-
-        Raises:
-            AssertionError: [description]
-
+        """
+        Computes the upper triangular square root matrix R where A = R^T R.
+        
         Returns:
-            np.ndarray: [description]
-
+            np.ndarray: Upper triangular matrix R
+            
+        Raises:
+            AssertionError: If matrix is not positive definite
+            
+        This is essentially the Cholesky decomposition, computed from the LDLT
+        factors without directly computing square roots until the final step.
+        
         Examples:
             >>> mat = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
             >>> ldl = LDLTMgr(3)

@@ -31,6 +31,10 @@ from typing import Tuple
 class EllCalcCore:
     """The `EllCalcCore` class is used for calculating ellipsoid parameters.
 
+    This class provides methods to compute various parameters (rho, sigma, delta) that define
+    how an ellipsoid should be transformed when cut by different types of hyperplanes. These
+    parameters are essential in ellipsoid-based optimization algorithms.
+
     Examples:
         >>> calc = EllCalcCore(3)
     """
@@ -48,8 +52,16 @@ class EllCalcCore:
 
         The __init__ method initializes the EllCalcCore object with the provided
         n_f parameter. This sets up internal variables used in calculations.
+        
+        The initialization computes several constants that are frequently used in
+        the ellipsoid calculations to avoid repeated computation:
+        - _half_n: Half of the dimension n_f
+        - _n_plus_1: n_f + 1
+        - _inv_n: 1/n_f
+        - _n_sq: n_f squared
+        - _cst0 to _cst3: Various precomputed constants used in cut calculations
 
-        :param n_f: Float value to initialize the instance with.
+        :param n_f: Float value representing the dimension of the space
         :type n_f: float
 
         Examples:
@@ -81,11 +93,17 @@ class EllCalcCore:
         r"""Calculate the central cut values.
 
         The `calc_central_cut` method calculates the central cut values ρ, σ, δ
-        based on the input tau value.
+        based on the input tau value. A central cut is a hyperplane that passes
+        through the center of the ellipsoid.
 
-        :param tau: The tau value
+        The parameters returned are:
+        - ρ (rho): Determines the shift of the ellipsoid center
+        - σ (sigma): Determines how much to scale the ellipsoid
+        - δ (delta): Determines how much to stretch the ellipsoid
+
+        :param tau: The distance parameter for the central cut
         :type tau: float
-        :return: Tuple of (ρ, σ, δ)
+        :return: Tuple of (ρ, σ, δ) values for the central cut
         :rtype: Tuple[float, float, float]
 
         .. svgbob::
@@ -133,18 +151,21 @@ class EllCalcCore:
     ) -> Tuple[float, float, float]:
         r"""Calculates the deep cut ellipsoid parameters using precomputed eta values.
 
-        Given the beta, tau, and eta values, this method calculates the
-        deep cut ellipsoid parameters rho, sigma, and delta using a precomputed eta value.
-        that avoids explicitly calculating the intermediate eta value.
-        This allows the deep cut to be computed faster.
+        This is an optimized version of calc_bias_cut that takes a precomputed eta value
+        (η = τ + n⋅β) as input to avoid redundant calculations when eta is already known.
 
-        The rho, sigma, and delta values define the deep cut ellipsoid.
+        The method computes parameters for a biased (non-central) cut of the ellipsoid,
+        where the cut doesn't pass through the center. The parameters determine how to
+        transform the ellipsoid after the cut.
 
-        :param beta: beta is a float representing the value of beta
+        :param beta: The bias parameter (distance from center to cut hyperplane)
         :type beta: float
-        :param tau: tau is a float representing the value of tau
+        :param tau: The distance parameter for the cut
         :type tau: float
-        :return: The function `calc_bias_cut` returns a tuple containing the following elements:
+        :param eta: Precomputed value of τ + n⋅β
+        :type eta: float
+        :return: Tuple of (ρ, σ, δ) values for the biased cut
+        :rtype: Tuple[float, float, float]
 
         .. svgbob::
            :align: center
@@ -192,13 +213,19 @@ class EllCalcCore:
     def calc_bias_cut(self, beta: float, tau: float) -> Tuple[float, float, float]:
         r"""Calculate deep cut values.
 
-        Calculates the deep cut values ρ, σ, δ for given β and τ.
+        Calculates the deep cut values ρ, σ, δ for given β and τ. This is the standard
+        version that computes η internally before calling calc_bias_cut_fast.
 
-        :param beta: beta is a float representing the value of beta
+        A deep cut is a generalization of a central cut where the cutting hyperplane
+        doesn't necessarily pass through the center of the ellipsoid. The parameters
+        determine how to transform the ellipsoid after the cut.
+
+        :param beta: The bias parameter (distance from center to cut hyperplane)
         :type beta: float
-        :param tau: tau is a float representing the value of tau
+        :param tau: The distance parameter for the cut
         :type tau: float
-        :return: The function `calc_bias_cut` returns a tuple containing the following elements:
+        :return: Tuple of (ρ, σ, δ) values for the biased cut
+        :rtype: Tuple[float, float, float]
 
         .. svgbob::
            :align: center
@@ -246,13 +273,20 @@ class EllCalcCore:
     ) -> Tuple[float, float, float]:
         r"""Calculate Parallel Central Cut (7 mul/div + 1 sqrt)
 
-        The function `calc_parallel_central_cut` calculates the parallel central cut for given values of `beta1` and `tsq`.
+        Computes parameters for a cut that is parallel to a central cut but offset by beta1.
+        This optimized version uses fewer operations than the old version.
 
-        :param beta1: The parameter `beta1` represents a float value. It is used in the calculation of the central cut
+        The method calculates:
+        - ρ: Determines the shift of the ellipsoid center
+        - σ: Scaling factor for the ellipsoid
+        - δ: Stretching factor for the ellipsoid
+
+        :param beta1: Offset parameter for the parallel cut
         :type beta1: float
-        :param tsq: The parameter `tsq` represents the square of a value
+        :param tsq: Square of the distance parameter (τ²)
         :type tsq: float
-        :return: The function `calc_parallel_central_cut` returns a tuple of four values: `CutStatus`, `float`, `float`, `float`.
+        :return: Tuple of (ρ, σ, δ) values for the parallel central cut
+        :rtype: Tuple[float, float, float]
 
         .. svgbob::
            :align: center
@@ -311,13 +345,19 @@ class EllCalcCore:
     ) -> Tuple[float, float, float]:
         r"""Calculate Parallel Central Cut
 
-        The function `calc_parallel_central_cut` calculates the parallel central cut for given values of `beta1` and `tsq`.
+        Original version of the parallel central cut calculation. This version
+        uses more operations than the optimized version.
 
-        :param beta1: The parameter `beta1` represents a float value. It is used in the calculation of the central cut
+        The method calculates parameters for transforming an ellipsoid after
+        a parallel central cut, where the cut is parallel to a central cut
+        but offset by beta1.
+
+        :param beta1: Offset parameter for the parallel cut
         :type beta1: float
-        :param tsq: The parameter `tsq` represents the square of a value
+        :param tsq: Square of the distance parameter (τ²)
         :type tsq: float
-        :return: The function `calc_parallel_central_cut` returns a tuple of four values: `CutStatus`, `float`, `float`, `float`.
+        :return: Tuple of (ρ, σ, δ) values for the parallel central cut
+        :rtype: Tuple[float, float, float]
 
         .. svgbob::
            :align: center
@@ -385,16 +425,23 @@ class EllCalcCore:
     ) -> Tuple[float, float, float]:
         r"""Calculation Parallel Deep Cut (15 mul/div + 1 sqrt)
 
-        The `calc_parallel_bias_cut` function calculates various values based on the input parameters and returns
-        them as a tuple.
+        Computes parameters for a biased cut that is parallel to another biased cut.
+        This version computes intermediate values (b0b1 and eta) internally before
+        calling the fast version.
 
-        :param beta0: The parameter `beta0` represents a float value
+        The method calculates:
+        - ρ: Center shift parameter
+        - σ: Scaling parameter
+        - δ: Stretching parameter
+
+        :param beta0: First bias parameter (for the reference cut)
         :type beta0: float
-        :param beta1: The parameter `beta1` represents a float value
+        :param beta1: Second bias parameter (for the parallel cut)
         :type beta1: float
-        :param tsq: tsq is a float representing the square of the value tau
+        :param tsq: Square of the distance parameter (τ²)
         :type tsq: float
-        :return: a tuple with three elements.
+        :return: Tuple of (ρ, σ, δ) values for the parallel biased cut
+        :rtype: Tuple[float, float, float]
 
         .. svgbob::
            :align: center
@@ -460,19 +507,24 @@ class EllCalcCore:
     ) -> Tuple[float, float, float]:
         r"""Calculation Parallel Deep Cut (13 mul/div + 1 sqrt)
 
-        The `calc_parallel_bias_cut_fast` function calculates various values based on the input parameters and returns them as a tuple.
+        Optimized version of parallel biased cut calculation that takes precomputed
+        b0b1 (β₀β₁) and eta (η) values as input to reduce computation.
 
-        :param beta0: The parameter `beta0` represents a float value
+        This version is more efficient when the calling code can precompute these
+        values, saving redundant calculations.
+
+        :param beta0: First bias parameter (for the reference cut)
         :type beta0: float
-        :param beta1: The parameter `beta1` represents a float value
+        :param beta1: Second bias parameter (for the parallel cut)
         :type beta1: float
-        :param tsq: tsq is a float representing the square of the value tau
+        :param tsq: Square of the distance parameter (τ²)
         :type tsq: float
-        :param b0b1: The parameter `b0b1` represents a float value
+        :param b0b1: Precomputed product of beta0 and beta1 (β₀β₁)
         :type b0b1: float
-        :param eta: The parameter `eta` represents a float value
+        :param eta: Precomputed value of τ² + n⋅β₀β₁
         :type eta: float
-        :return: a tuple with three elements.
+        :return: Tuple of (ρ, σ, δ) values for the parallel biased cut
+        :rtype: Tuple[float, float, float]
 
         .. svgbob::
            :align: center
@@ -539,15 +591,21 @@ class EllCalcCore:
     ) -> Tuple[float, float, float]:
         r"""Calculation Parallel Deep Cut
 
-        The `calc_parallel_bias_cut` function calculates various values based on the input parameters and returns them as a tuple.
+        Original version of the parallel biased cut calculation. This version
+        uses a different mathematical formulation that requires more computations
+        than the optimized versions.
 
-        :param beta0: The parameter `beta0` represents a float value
+        The method calculates parameters for transforming an ellipsoid after
+        a parallel biased cut, where the cut is parallel to another biased cut.
+
+        :param beta0: First bias parameter (for the reference cut)
         :type beta0: float
-        :param beta1: The parameter `beta1` represents a float value
+        :param beta1: Second bias parameter (for the parallel cut)
         :type beta1: float
-        :param tsq: tsq is a float representing the square of the value tau
+        :param tsq: Square of the distance parameter (τ²)
         :type tsq: float
-        :return: a tuple with three elements.
+        :return: Tuple of (ρ, σ, δ) values for the parallel biased cut
+        :rtype: Tuple[float, float, float]
 
         .. svgbob::
            :align: center
