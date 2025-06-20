@@ -115,6 +115,11 @@ class EllCalc:
         """
         if isinstance(beta, (int, float)) or len(beta) < 2 or not self.use_parallel_cut:
             return (CutStatus.Success, self.helper.calc_central_cut(sqrt(tsq)))
+        if beta[1] < 0.0:
+            return (CutStatus.NoSoln, None)
+        b1sq = beta[1] * beta[1]
+        if tsq <= b1sq:
+            return (CutStatus.Success, self.helper.calc_central_cut(sqrt(tsq)))
         return (CutStatus.Success, self.helper.calc_parallel_central_cut(beta[1], tsq))
 
     def calc_parallel(
