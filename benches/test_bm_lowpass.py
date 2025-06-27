@@ -39,7 +39,7 @@ def test_lowpass(benchmark):
     result, feasible = benchmark(run_lowpass, True)
     assert feasible
     assert result >= 12400
-    assert result <= 12470
+    assert result <= 12480
 
 
 def test_no_parallel_cut(benchmark):

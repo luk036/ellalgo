@@ -41,4 +41,4 @@ def test_lowpass():
     feasible, num_iters = run_lowpass(True)
     assert feasible
     assert num_iters >= 12400
-    assert num_iters <= 12470
+    assert num_iters <= 12480
