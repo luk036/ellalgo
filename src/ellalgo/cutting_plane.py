@@ -50,7 +50,7 @@ def cutting_plane_feas(
     omega: OracleFeas[ArrayType], space: SearchSpace[ArrayType], options=Options()
 ) -> Tuple[Optional[ArrayType], int]:
     r"""Cutting-plane algorithm for convex feasibility problems.
-    
+
     Implementation Details:
     Solves: find x s.t. f(x) ≤ 0 for convex f(x) using iterative cutting planes
     - At each iteration:
@@ -59,7 +59,7 @@ def cutting_plane_feas(
       3. If infeasible, get separating hyperplane (cut) from oracle
       4. Update search space by eliminating region violating cut
       5. Repeat until space becomes too small (tsq < tolerance)
-    
+
     Mathematical Basis:
     For convex function f and current point xc:
     - If f(xc) > 0: exists g s.t. f(x) ≥ g^T(x - xc) + f(xc) > 0 for some x
@@ -89,7 +89,7 @@ def cutting_plane_feas(
          ┌─────┴──────┐    ┌─────┴─────┐┌────┴─────┐
          │CuttingPlane│    │SearchSpace││OracleFeas│
          └────────────┘    └───────────┘└──────────┘
-    
+
     :param omega: Feasibility oracle implementing assess_feas()
     :param space: Search space object maintaining current solution candidate
     :param options: Algorithm control parameters
@@ -113,17 +113,17 @@ def cutting_plane_optim(
     options=Options(),
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for convex optimization problems.
-    
+
     Solves: maximize γ s.t. f(x) ≥ γ using central/bias cut updates
     - Maintains current best γ and candidate solution x_best
     - Alternates between:
       1. Optimality cuts (improve γ when better solution found)
       2. Feasibility cuts (maintain solution space when γ increases)
-    
+
     Update Rules:
     - Central cut: Tightens search around improving solutions
     - Bias cut: Maintains feasibility for current γ level
-    
+
     :param omega: Optimization oracle implementing assess_optim()
     :param space: Search space maintaining current solution candidate
     :param gamma: Initial best objective value
@@ -196,18 +196,18 @@ def cutting_plane_optim_q(
     options=Options(),
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for discrete convex optimization.
-    
+
     Handles quantized solutions through:
     - Continuous relaxation with rounding
     - Retry mechanism for discrete feasibility checks
     - Adaptive cut management for discrete solutions
-    
+
     Process Flow:
     1. First attempt with continuous solution
     2. If feasible, round to nearest integer solution
     3. Verify discrete solution feasibility
     4. Generate cuts adjusted for rounding effects
-    
+
     :param omega: Discrete optimization oracle
     :param space_q: Quantized search space
     :param gamma: Initial best objective value
@@ -241,12 +241,12 @@ def bsearch(
     omega: OracleBS, intrvl: Tuple[Any, Any], options=Options()
 ) -> Tuple[Any, int]:
     """Binary search with feasibility oracle.
-    
+
     Operates on monotonic objectives by:
     1. Maintaining upper/lower bounds
     2. Testing mid-point feasibility
     3. Halving search interval each iteration
-    
+
     :param omega: Binary search oracle implementing assess_bs()
     :param intrvl: (lower, upper) bound tuple
     :param options: Control parameters
@@ -268,13 +268,14 @@ def bsearch(
 
 class BSearchAdaptor(OracleBS):
     """Adapter for using feasibility oracle in binary search.
-    
+
     Enables γ-parameterized feasibility checks for:
     maximize γ
     s.t. ∃x feasible for given γ
-    
+
     Maintains state between binary search iterations for efficiency.
     """
+
     def __init__(
         self, omega: OracleFeas2, space: SearchSpace2, options=Options()
     ) -> None:
@@ -294,7 +295,7 @@ class BSearchAdaptor(OracleBS):
 
     def assess_bs(self, gamma: Num) -> bool:
         """Test feasibility for given γ value.
-        
+
         Implementation:
         1. Clone current search space state
         2. Update oracle with new γ value

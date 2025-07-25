@@ -52,7 +52,7 @@ class EllCalcCore:
 
         The __init__ method initializes the EllCalcCore object with the provided
         n_f parameter. This sets up internal variables used in calculations.
-        
+
         The initialization computes several constants that are frequently used in
         the ellipsoid calculations to avoid repeated computation:
         - _half_n: Half of the dimension n_f

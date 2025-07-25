@@ -36,7 +36,7 @@ class ProfitOracle(OracleOptim):
     """Oracle for a profit maximization problem using Cobb-Douglas production function.
 
     This implementation follows the formulation from [Aliabadi and Salahi, 2013]:
-    
+
     Optimization problem:
       max  p(A y₁^α y₂^β) − v₁y₁ − v₂y₂
       s.t. y₁ ≤ k
@@ -90,10 +90,10 @@ class ProfitOracle(OracleOptim):
 
     def fn1(self, x: Arr, _: float) -> float:
         """Constraint function for y₁ ≤ k (in log-space).
-        
+
         Args:
             x: Log-scale input vector [log(y₁), log(y₂)]
-        
+
         Returns:
             Constraint violation measure: x[0] - log(k)
             Positive values indicate constraint violation
@@ -102,16 +102,16 @@ class ProfitOracle(OracleOptim):
 
     def fn2(self, x: Arr, gamma: float) -> float:
         """Optimality condition function for profit maximization.
-        
+
         Computes:
         - Cobb-Douglas value in log-space: log(pA) + αlog(y₁) + βlog(y₂)
         - Variable costs: v₁y₁ + v₂y₂
         - Optimality gap: log(γ + vy) - log_Cobb
-        
+
         Args:
             x: Log-scale input vector
             gamma: Current best profit estimate
-            
+
         Updates intermediate values used in gradient calculations
         """
         self.log_Cobb = self.log_pA + self.elasticities.dot(x)
@@ -121,7 +121,7 @@ class ProfitOracle(OracleOptim):
 
     def grad1(self, _: float) -> Arr:
         """Gradient for y₁ ≤ k constraint.
-        
+
         Returns:
             Gradient vector [1, 0] since ∂(x₀ - log_k)/∂x = (1, 0)
         """
@@ -129,28 +129,28 @@ class ProfitOracle(OracleOptim):
 
     def grad2(self, gamma: float) -> Arr:
         """Gradient of optimality condition function.
-        
+
         Computes:
             ∇f = [v₁y₁/(γ+vy) - α, v₂y₂/(γ+vy) - β]
-            
+
         Args:
             gamma: Current profit estimate used in denominator
-            
+
         Uses precomputed q (v₁y₁, v₂y₂) from last fn2 call
         """
         return self.q / (gamma + self.vy) - self.elasticities
 
     def assess_feas(self, xc: Arr, gamma: float) -> Optional[Cut]:
         """Feasibility assessment using round-robin constraint checking.
-        
+
         Implements:
         - Alternates between checking y₁ constraint (fn1) and optimality (fn2)
         - Returns first violated constraint found
-        
+
         Args:
             xc: Current solution point in log-space
             gamma: Current best profit estimate
-            
+
         Returns:
             Cut (gradient, violation) if constraint violated
             None if all constraints satisfied
@@ -165,16 +165,16 @@ class ProfitOracle(OracleOptim):
 
     def assess_optim(self, xc: Arr, gamma: float) -> Tuple[Cut, Optional[float]]:
         """Optimization assessment generating optimality cuts.
-        
+
         Workflow:
         1. Check feasibility using assess_feas
         2. If feasible, calculate new profit estimate and optimality cut
         3. If infeasible, return feasibility cut
-        
+
         Args:
             y: Proposed solution point
             gamma: Current best profit value
-            
+
         Returns:
             Tuple containing:
             - Cut (gradient, beta)
@@ -216,7 +216,7 @@ class ProfitRbOracle(OracleOptim):
             - ε₃: Price uncertainty
             - ε₄: Production limit uncertainty
             - ε₅: Input price uncertainty
-            
+
         Constructs worst-case scenario parameters for robust optimization.
         """
         e1, e2, e3, e4, e5 = vparams

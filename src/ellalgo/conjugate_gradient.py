@@ -32,7 +32,7 @@ def conjugate_gradient(A, b, x0=None, tol=1e-5, max_iter=1000):
         x = np.zeros(n)  # Initialize solution vector with zeros if no initial guess
     else:
         x = x0.copy()  # Use provided initial guess
-    
+
     # Initial residual calculation: r = b - A*x
     r = b - np.dot(A, x)
     p = r.copy()  # Initial search direction is set to residual

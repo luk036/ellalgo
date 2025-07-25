@@ -54,16 +54,16 @@ class LDLTMgr:
     def __init__(self, ndim: int):
         """
         Initializes the LDLT manager with given matrix dimension.
-        
+
         Args:
             ndim: The dimension of the square matrix to be factorized.
-            
+
         Attributes initialized:
             pos: Tuple tracking the position where positive definiteness fails (0,0) initially
             wit: Witness vector storage initialized to zeros
             _ndim: Stores the matrix dimension
             _storage: Pre-allocated storage for factorization results (ndim x ndim matrix)
-            
+
         The initialization prepares all necessary storage to avoid repeated allocations during factorization.
         """
         self.pos: Tuple[int, int] = (0, 0)
@@ -74,16 +74,16 @@ class LDLTMgr:
     def factorize(self, mat: np.ndarray) -> bool:
         """
         Performs LDLT factorization on a given numpy array matrix.
-        
+
         This is a convenience wrapper around the factor() method that takes a matrix directly
         rather than an element-accessor function.
-        
+
         Args:
             mat: A symmetric numpy array to be factorized
-            
+
         Returns:
             bool: True if matrix is positive definite, False otherwise
-            
+
         Examples:
             >>> mat = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
             >>> ldl = LDLTMgr(3)
@@ -95,21 +95,21 @@ class LDLTMgr:
     def factor(self, get_elem: Callable[[int, int], float]) -> bool:
         """
         Performs LDLT factorization using lazy element access.
-        
+
         The factorization proceeds row by row, computing diagonal entries and off-diagonal
         multipliers. If any diagonal entry becomes non-positive, factorization stops early
         and records the failure position.
-        
+
         Args:
             get_elem: Function that returns matrix element at (i,j) position
-            
+
         Returns:
             bool: True if matrix is positive definite (all diagonal entries positive)
-            
+
         The factorization stores results in _storage:
         - Diagonal entries (D matrix) are stored in _storage[i,i]
         - Off-diagonal entries (L matrix) are stored in _storage[i,j] for j < i
-        
+
         Examples:
             >>> mat = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
             >>> ldl = LDLTMgr(3)
@@ -138,19 +138,19 @@ class LDLTMgr:
     ) -> bool:
         """
         Performs LDLT factorization allowing for positive semi-definite matrices.
-        
+
         Similar to factor() but handles zero diagonal entries (indicating semi-definiteness)
         by restarting factorization from the next row.
-        
+
         Args:
             get_elem: Function that returns matrix element at (i,j) position
-            
+
         Returns:
             bool: True if matrix is positive semi-definite (no negative diagonal entries)
-            
+
         This version is more tolerant of zero diagonal entries than factor(), which
         requires strictly positive entries for positive definiteness.
-        
+
         Examples:
             >>> mat = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
             >>> ldl = LDLTMgr(3)
@@ -179,13 +179,13 @@ class LDLTMgr:
     def is_spd(self):
         """
         Checks if the matrix is symmetric positive definite (SPD).
-        
+
         Returns:
             bool: True if the matrix is SPD (pos[1] == 0), False otherwise
-            
+
         The check is based on whether any diagonal entry was non-positive during
         factorization, which would have set pos[1] to a non-zero value.
-        
+
         Examples:
             >>> mat = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
             >>> ldl = LDLTMgr(3)
@@ -199,16 +199,16 @@ class LDLTMgr:
     def witness(self) -> float:
         """
         Computes a witness vector proving the matrix is not positive definite.
-        
+
         Returns:
             float: The negative eigenvalue (ep) showing v^T A v = -ep < 0
-            
+
         Raises:
             AssertionError: If called on a positive definite matrix
-            
+
         The witness vector is stored in self.wit and can be accessed after calling
         this method. The vector satisfies v^T A v < 0 for the failed submatrix.
-        
+
         Examples:
             >>> mat = np.array([[1.0, 2.0, 3.0], [2.0, 3.5, 5.0], [3.0, 5.0, 6.0]])
             >>> ldl = LDLTMgr(3)
@@ -229,16 +229,16 @@ class LDLTMgr:
     def sym_quad(self, mat: np.ndarray):
         """
         Computes the quadratic form v^T M v using the witness vector.
-        
+
         Args:
             mat: The matrix M to compute the quadratic form with
-            
+
         Returns:
             float: The value of v^T M v where v is the witness vector
-            
+
         Note: witness() must be called first to set up the witness vector.
         The computation uses only the submatrix where positive definiteness failed.
-        
+
         Examples:
             >>> mat = np.array([[1.0, 2.0, 3.0], [2.0, 3.5, 5.0], [3.0, 5.0, 6.0]])
             >>> ldl = LDLTMgr(3)
@@ -261,16 +261,16 @@ class LDLTMgr:
     def sqrt(self) -> np.ndarray:
         """
         Computes the upper triangular square root matrix R where A = R^T R.
-        
+
         Returns:
             np.ndarray: Upper triangular matrix R
-            
+
         Raises:
             AssertionError: If matrix is not positive definite
-            
+
         This is essentially the Cholesky decomposition, computed from the LDLT
         factors without directly computing square roots until the final step.
-        
+
         Examples:
             >>> mat = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
             >>> ldl = LDLTMgr(3)

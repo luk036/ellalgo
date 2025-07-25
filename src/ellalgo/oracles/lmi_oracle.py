@@ -28,12 +28,12 @@ Cut = Tuple[np.ndarray, float]
 
 class LMIOracle(OracleFeas):
     """Oracle for Linear Matrix Inequality (LMI) constraint.
-    
+
     This oracle solves the following semidefinite feasibility problem:
-    
+
     |    find  x
     |    s.t.  (B − ∑ F_i * x_i) ⪰ 0  [Matrix PSD constraint]
-    
+
     Where:
     - B is a constant symmetric matrix
     - F_i are coefficient matrices
@@ -43,26 +43,28 @@ class LMIOracle(OracleFeas):
 
     def __init__(self, mat_f, mat_b):
         """Initialize LMI Oracle with problem matrices.
-        
+
         The constructor sets up the LMI constraint structure:
         (B - F₁x₁ - F₂x₂ - ... - Fₙxₙ) ⪰ 0
-        
+
         :param mat_f: List of coefficient matrices [F₁, F₂, ..., Fₙ] where each F_i ∈ ℝ^{m×m}
         :param mat_b: Constant matrix B ∈ ℝ^{m×m} defining the LMI constraint
         """
         self.mat_f = mat_f  # Coefficient matrices for variables
         self.mat_f0 = mat_b  # Constant term matrix in LMI
-        self.ldlt_mgr = LDLTMgr(len(mat_b))  # Factorization manager for LDLT decomposition
+        self.ldlt_mgr = LDLTMgr(
+            len(mat_b)
+        )  # Factorization manager for LDLT decomposition
 
     def assess_feas(self, xc: np.ndarray) -> Optional[Cut]:
         """Assess feasibility of candidate solution xc against LMI constraint.
-        
+
         Implementation Steps:
         1. Construct matrix M(xc) = B - ∑ F_i*xc_i
         2. Perform LDLT factorization of M(xc)
         3. If factorization succeeds (matrix PSD), return None (feasible)
         4. If factorization fails (not PSD), return separating hyperplane (cut)
-        
+
         :param xc: Candidate solution vector xc ∈ ℝⁿ
         :return: None if feasible, else (g, σ) where:
             - g ∈ ℝⁿ: subgradient of the violation
@@ -71,7 +73,7 @@ class LMIOracle(OracleFeas):
 
         def get_elem(i, j):
             """Construct element (i,j) of M(xc) = B - ∑ F_k*xc_k.
-            
+
             Implements the LMI matrix construction element-wise for factorization.
             This avoids full matrix construction, enabling sparse computation.
             """
@@ -82,7 +84,7 @@ class LMIOracle(OracleFeas):
         # Attempt LDLT factorization (fails if matrix not PSD)
         if self.ldlt_mgr.factor(get_elem):
             return None  # Matrix is PSD => feasible solution
-        
+
         # If infeasible, compute cut information:
         ep = self.ldlt_mgr.witness()  # Witness vector for negative eigenvalue
         # Compute subgradient components through symmetric quadratic form
