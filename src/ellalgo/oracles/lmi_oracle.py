@@ -77,11 +77,9 @@ class LMIOracle(OracleFeas):
             Implements the LMI matrix construction element-wise for factorization.
             This avoids full matrix construction, enabling sparse computation.
             """
-            return self.mat_f0[i, j] - sum(
-                Fk[i, j] * xk for Fk, xk in zip(self.mat_f, xc)
-            )
+            s = sum(Fk[i, j] * xk for Fk, xk in zip(self.mat_f, xc))
+            return self.mat_f0[i, j] - s
 
-        # Attempt LDLT factorization (fails if matrix not PSD)
         if self.ldlt_mgr.factor(get_elem):
             return None  # Matrix is PSD => feasible solution
 

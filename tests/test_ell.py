@@ -76,3 +76,12 @@ def test_update_q_no_effect():
     assert ell._xc == approx(np.zeros(4))
     assert ell._mq == approx(np.eye(4))
     assert ell._kappa == approx(0.01)
+
+
+def test_no_defer_trick():
+    ell = Ell(0.01, np.zeros(4))
+    ell.no_defer_trick = True
+    cut = 0.5 * np.ones(4), 0.05
+    status = ell.update_bias_cut(cut)
+    assert status == CutStatus.Success
+    assert ell._kappa == 1.0

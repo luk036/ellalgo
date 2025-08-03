@@ -199,6 +199,8 @@ class EllStable(SearchSpace[ArrayType], SearchSpaceQ[ArrayType]):
         # rank-one update: 3*n + (n-1)*n/2
         # r = self._sigma / omega
         mu = sigma / (1.0 - sigma)
+        if mu == 0.0:
+            return status
         oldt = omega / mu  # initially
         v = g.copy()
         for j in range(self._ndim):
