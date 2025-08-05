@@ -3,10 +3,11 @@ Test Lowpass
 """
 
 import numpy as np
+from pytest import approx
 
 from ellalgo.cutting_plane import Options, cutting_plane_optim
 from ellalgo.ell import Ell
-from ellalgo.oracles.lowpass_oracle import create_lowpass_case
+from ellalgo.oracles.lowpass_oracle import LowpassOracle, create_lowpass_case
 
 
 def run_lowpass(use_parallel_cut: bool):
@@ -31,6 +32,20 @@ def run_lowpass(use_parallel_cut: bool):
     options.tolerance = 1e-14
     h, _, num_iters = cutting_plane_optim(omega, ellip, Spsq, options)
     return h is not None, num_iters
+
+
+def test_lowpass_oracle():
+    """
+    The function `test_lowpass_oracle` tests the `LowpassOracle` class.
+    """
+    ndim = 32
+    omega = create_lowpass_case(ndim)
+    h = np.zeros(ndim)
+    h[0] = 1.0
+    cut = omega.assess_optim(h, omega.sp_sq)
+    assert cut is not None
+    assert cut[0] is not None
+    # assert cut[1] < 0.0
 
 
 def test_lowpass():

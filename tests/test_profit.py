@@ -74,6 +74,16 @@ def run_profit_q(E):
     return num_iters
 
 
+def test_profit_oracle():
+    e1 = 0.003
+    e2 = 0.007
+    e3 = e4 = e5 = 1.0
+    omega = ProfitRbOracle(params, a, v, (e1, e2, e3, e4, e5))
+    x = np.array([0.0, 0.0])
+    cut = omega.assess_optim(x, 0.0)
+    assert cut is not None
+
+
 def test_profit_ell():
     """
     The function `test_profit_ell` checks if the number of iterations required to run the `run_profit`

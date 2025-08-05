@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 from ellalgo.ell_config import CutStatus
 from pytest import approx
 
@@ -76,6 +77,24 @@ def test_update_q_no_effect():
     assert ell._xc == approx(np.zeros(4))
     assert ell._mq == approx(np.eye(4))
     assert ell._kappa == approx(0.01)
+
+
+def test_update_q_with_effect():
+    ell = Ell(0.01, np.zeros(4))
+    cut = 0.5 * np.ones(4), [0.01, 0.04]
+    status = ell.update_q(cut)
+    assert status == CutStatus.Success
+    assert ell._xc == approx(-0.0116 * np.ones(4))
+    assert ell._mq == approx(np.eye(4) - 0.232 * np.ones((4, 4)))
+    assert ell._kappa == approx(0.01232)
+    assert ell._tsq == 0.01
+
+
+def test_update_central_cut_with_zero_g():
+    ell = Ell(0.01, np.zeros(4))
+    cut = np.zeros(4), 0.0
+    with pytest.raises(ValueError):
+        ell.update_central_cut(cut)
 
 
 def test_no_defer_trick():

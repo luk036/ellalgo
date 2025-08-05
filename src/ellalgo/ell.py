@@ -206,6 +206,8 @@ class Ell(SearchSpace2[ArrayType], SearchSpaceQ[ArrayType]):
             CutStatus.Success
         """
         grad, beta = cut
+        if np.all(grad == 0.0):
+            raise ValueError("Gradient cannot be a zero vector.")
         # Calculate M * grad (matrix-vector multiplication)
         grad_t = self._mq @ grad  # n^2 multiplications
         # Calculate grad^T * (M * grad)

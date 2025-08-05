@@ -9,6 +9,7 @@ import numpy as np
 from ellalgo.cutting_plane import OracleOptim, cutting_plane_optim
 from ellalgo.ell import Ell
 from ellalgo.ell_stable import EllStable
+from ellalgo.oracles.lmi0_oracle import LMI0Oracle
 from ellalgo.oracles.lmi_old_oracle import LMIOldOracle
 from ellalgo.oracles.lmi_oracle import LMIOracle
 
@@ -98,6 +99,33 @@ def run_lmi(oracle, space):
     xbest, _, num_iters = cutting_plane_optim(omega, ellip, float("inf"))
     assert xbest is not None
     return num_iters
+
+
+def test_lmi_oracle():
+    F1 = np.array(
+        [
+            [[-7.0, -11.0], [-11.0, 3.0]],
+            [[7.0, -18.0], [-18.0, 8.0]],
+            [[-2.0, -8.0], [-8.0, 1.0]],
+        ]
+    )
+    B1 = np.array([[33.0, -9.0], [-9.0, 26.0]])
+    lmi1 = LMIOracle(F1, B1)
+    cut = lmi1.assess_feas(np.array([0.0, 0.0, 0.0]))
+    assert cut is None
+
+
+def test_lmi0_oracle():
+    F1 = np.array(
+        [
+            [[-7.0, -11.0], [-11.0, 3.0]],
+            [[7.0, -18.0], [-18.0, 8.0]],
+            [[-2.0, -8.0], [-8.0, 1.0]],
+        ]
+    )
+    lmi1 = LMI0Oracle(F1)
+    cut = lmi1.assess_feas(np.array([0.0, 0.0, 0.0]))
+    assert cut is not None
 
 
 def test_lmi_lazy():
