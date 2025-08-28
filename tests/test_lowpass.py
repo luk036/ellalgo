@@ -3,11 +3,10 @@ Test Lowpass
 """
 
 import numpy as np
-from pytest import approx
 
 from ellalgo.cutting_plane import Options, cutting_plane_optim
 from ellalgo.ell import Ell
-from ellalgo.oracles.lowpass_oracle import LowpassOracle, create_lowpass_case
+from ellalgo.oracles.lowpass_oracle import create_lowpass_case
 
 
 def run_lowpass(use_parallel_cut: bool):
