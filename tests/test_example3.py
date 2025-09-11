@@ -5,6 +5,7 @@ Test Example 3
 from __future__ import print_function
 
 import numpy as np
+
 from ellalgo.cutting_plane import BSearchAdaptor, Options, bsearch
 from ellalgo.ell import Ell
 from ellalgo.ell_typing import OracleFeas2

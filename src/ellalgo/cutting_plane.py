@@ -27,12 +27,11 @@ import copy
 from typing import Any, MutableSequence, Optional, Tuple, Union
 
 from .ell_config import CutStatus, Options
-from .ell_typing import (
+from .ell_typing import (  # OracleFeasQ,
     ArrayType,
     OracleBS,
     OracleFeas,
     OracleFeas2,
-    # OracleFeasQ,
     OracleOptim,
     OracleOptimQ,
     SearchSpace,

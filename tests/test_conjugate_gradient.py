@@ -1,6 +1,7 @@
 # test_conjugate_gradient.py
 
 import numpy as np
+
 from ellalgo.conjugate_gradient import conjugate_gradient
 
 

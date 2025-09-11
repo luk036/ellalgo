@@ -3,11 +3,13 @@ Test Quasiconvex (with Round Robin)
 """
 
 from __future__ import print_function
-import math
-from pytest import approx
-import numpy as np
 
-from ellalgo.cutting_plane import cutting_plane_optim, Options
+import math
+
+import numpy as np
+from pytest import approx
+
+from ellalgo.cutting_plane import Options, cutting_plane_optim
 from ellalgo.ell import Ell
 from ellalgo.ell_stable import EllStable
 from ellalgo.ell_typing import OracleOptim

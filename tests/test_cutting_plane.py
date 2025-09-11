@@ -4,18 +4,20 @@ Test Cutting Plane
 
 from __future__ import print_function
 
+from typing import Optional, Tuple
+
 import numpy as np
 import pytest
+
 from ellalgo.cutting_plane import (
     Options,
+    bsearch,
     cutting_plane_feas,
     cutting_plane_optim,
     cutting_plane_optim_q,
-    bsearch,
 )
 from ellalgo.ell import Ell
-from ellalgo.ell_typing import OracleFeas, OracleOptim, OracleOptimQ, OracleBS
-from typing import Tuple, Optional
+from ellalgo.ell_typing import OracleBS, OracleFeas, OracleOptim, OracleOptimQ
 
 
 class MyOracleFeas(OracleFeas):

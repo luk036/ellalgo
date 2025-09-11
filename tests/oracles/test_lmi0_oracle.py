@@ -3,6 +3,7 @@ Test LMI0 Oracle
 """
 
 import numpy as np
+
 from ellalgo.oracles.lmi0_oracle import LMI0Oracle
 
 

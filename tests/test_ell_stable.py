@@ -1,7 +1,7 @@
 import numpy as np
-from ellalgo.ell_config import CutStatus
 from pytest import approx
 
+from ellalgo.ell_config import CutStatus
 from ellalgo.ell_stable import EllStable
 
 

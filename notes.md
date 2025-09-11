@@ -157,4 +157,3 @@ The assess_bs method is the core of this class. It works like this:
 The important logic flow here is the binary search adaptation. By repeatedly calling assess_bs with different gamma values, an optimization algorithm can narrow down the best possible value. If assess_bs returns True, it means the current gamma is feasible, and the algorithm might try a better (lower) value next time. If it returns False, the algorithm would try a worse (higher) value.
 
 This class acts as a bridge between a binary search algorithm and a more complex optimization problem, allowing the binary search to be used in contexts where simply comparing two numbers isn't enough to determine the best solution.
-

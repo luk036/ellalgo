@@ -1,9 +1,9 @@
 import numpy as np
 import pytest
-from ellalgo.ell_config import CutStatus
 from pytest import approx
 
 from ellalgo.ell import Ell
+from ellalgo.ell_config import CutStatus
 
 
 def test_construct():

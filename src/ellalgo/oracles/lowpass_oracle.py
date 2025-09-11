@@ -27,9 +27,10 @@ Overall, this code provides a tool for iteratively designing and optimizing low-
 
 from math import floor
 from typing import Optional, Tuple, Union
-from ellalgo.ell_typing import OracleOptim
 
 import numpy as np
+
+from ellalgo.ell_typing import OracleOptim
 
 Arr = np.ndarray
 ParallelCut = Tuple[Arr, Union[float, Tuple[float, float]]]
