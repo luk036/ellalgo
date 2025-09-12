@@ -215,7 +215,7 @@ class LDLTMgr:
             >>> ldl.factorize(mat)
             False
             >>> ldl.witness()
-            0.5
+            np.float64(0.5)
         """
         if self.is_spd():
             raise AssertionError()
@@ -247,12 +247,12 @@ class LDLTMgr:
             >>> ldl.pos
             (0, 2)
             >>> ldl.witness() # call this before sym_quad()
-            0.5
+            np.float64(0.5)
             >>> ldl.wit
             array([-2.,  1.,  0.])
             >>> mat_b = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
             >>> ldl.sym_quad(mat_b)
-            3.25
+            np.float64(3.25)
         """
         start, ndim = self.pos
         wit = self.wit[start:ndim]

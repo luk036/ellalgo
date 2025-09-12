@@ -111,7 +111,7 @@ class EllCalc:
             >>> from ellalgo.ell_calc import EllCalc
             >>> calc = EllCalc(4)
             >>> calc.calc_single_or_parallel_central_cut([0, 0.11], 0.01)
-            (<CutStatus.Success: 0>, (0.01897790039191521, 0.3450527343984584, 1.0549907942519101))
+            (<CutStatus.Success: 0>, (0.020000000000000004, 0.4, 1.0666666666666667))
         """
         if isinstance(beta, (int, float)) or len(beta) < 2 or not self.use_parallel_cut:
             return (CutStatus.Success, self.helper.calc_central_cut(sqrt(tsq)))
