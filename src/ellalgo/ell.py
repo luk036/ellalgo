@@ -1,13 +1,26 @@
 """
 Ell Class
 
-This code defines a class called Ell which represents an ellipsoidal search space. The purpose of this class is to provide methods for updating and manipulating an ellipsoid, which is a mathematical shape used in certain optimization algorithms.
+This code defines a class called Ell which represents an ellipsoidal search space.
+The purpose of this class is to provide methods for updating and manipulating an
+ellipsoid, which is a mathematical shape used in certain optimization algorithms.
 
-The Ell class takes two main inputs when initialized: a value (which can be a number or a list of numbers) and an array xc. These inputs define the initial shape and position of the ellipsoid. The class doesn't produce a specific output on its own, but rather provides methods that can be used to modify and query the ellipsoid's state.
+The Ell class takes two main inputs when initialized: a value (which can be a
+number or a list of numbers) and an array xc. These inputs define the initial
+shape and position of the ellipsoid. The class doesn't produce a specific output
+on its own, but rather provides methods that can be used to modify and query the
+ellipsoid's state.
 
-The class achieves its purpose by maintaining several internal attributes that represent the ellipsoid's properties, such as its center (_xc), a matrix (_mq), and scaling factors (_kappa and _tsq). It then provides methods to update these properties based on different types of "cuts" to the ellipsoid.
+The class achieves its purpose by maintaining several internal attributes that
+represent the ellipsoid's properties, such as its center (_xc), a matrix (_mq),
+and scaling factors (_kappa and _tsq). It then provides methods to update these
+properties based on different types of "cuts" to the ellipsoid.
 
-The main functionality of the Ell class revolves around three update methods: update_bias_cut, update_central_cut, and update_q. These methods take a "cut" as input, which is essentially a direction and a value that determine how to modify the ellipsoid. The cuts are used to shrink or reshape the ellipsoid, which is a key operation in certain optimization algorithms.
+The main functionality of the Ell class revolves around three update methods:
+update_bias_cut, update_central_cut, and update_q. These methods take a "cut"
+as input, which is essentially a direction and a value that determine how to
+modify the ellipsoid. The cuts are used to shrink or reshape the ellipsoid,
+which is a key operation in certain optimization algorithms.
 
 The core logic of these update methods is implemented in the private _update_core method. This method applies the cut to the ellipsoid by performing a series of mathematical operations. It calculates new values for the ellipsoid's center and shape based on the input cut and a specified cut strategy.
 
@@ -15,7 +28,11 @@ An important aspect of the code is its use of numpy, a library for numerical com
 
 The class also includes some helper methods like xc() and tsq() that allow access to certain properties of the ellipsoid. These can be used to query the current state of the ellipsoid during an optimization process.
 
-Overall, this code provides a flexible and efficient way to represent and manipulate an ellipsoidal search space, which is a crucial component in certain types of optimization algorithms. The class encapsulates the complex mathematics involved in these operations, providing a clean interface for users of the class to work with ellipsoids in their algorithms.
+Overall, this code provides a flexible and efficient way to represent and
+manipulate an ellipsoidal search space, which is a crucial component in certain
+types of optimization algorithms. The class encapsulates the complex mathematics
+involved in these operations, providing a clean interface for users of the class
+to work with ellipsoids in their algorithms.
 """
 
 from typing import Callable, Tuple, Union

@@ -2,19 +2,47 @@
 """
 LDLTMgr (LDLT Manager)
 
-This code defines a class called LDLTMgr, which stands for LDLT Manager. The purpose of this class is to perform a special kind of matrix factorization called LDLT factorization on symmetric matrices. This factorization is useful in various mathematical and engineering applications, especially when dealing with linear systems and eigenvalue problems.
+This code defines a class called LDLTMgr, which stands for LDLT Manager. The
+purpose of this class is to perform a special kind of matrix factorization
+called LDLT factorization on symmetric matrices. This factorization is useful
+in various mathematical and engineering applications, especially when dealing
+with linear systems and eigenvalue problems.
 
-The main input for this class is a symmetric matrix, which can be provided either as a NumPy array or through a function that returns individual matrix elements. The primary output is a boolean value indicating whether the input matrix is positive definite (a special property of matrices). Additionally, the class can produce other outputs like a witness vector (if the matrix is not positive definite) and a square root of the matrix (if it is positive definite).
+The main input for this class is a symmetric matrix, which can be provided
+either as a NumPy array or through a function that returns individual matrix
+elements. The primary output is a boolean value indicating whether the input
+matrix is positive definite (a special property of matrices). Additionally, the
+class can produce other outputs like a witness vector (if the matrix is not
+positive definite) and a square root of the matrix (if it is positive definite).
 
-The LDLTMgr class achieves its purpose through several methods. The main method is 'factor', which performs the actual LDLT factorization. It does this by going through the matrix elements row by row, calculating and storing values in a special way. This process helps determine if the matrix is positive definite and allows for efficient calculations later.
+The LDLTMgr class achieves its purpose through several methods. The main method
+is 'factor', which performs the actual LDLT factorization. It does this by
+going through the matrix elements row by row, calculating and storing values in
+a special way. This process helps determine if the matrix is positive definite
+and allows for efficient calculations later.
 
-An important aspect of this code is its use of "lazy evaluation". This means it doesn't need the entire matrix upfront but can work with just a function that provides matrix elements as needed. This can be more efficient for large matrices or when the matrix is defined by a formula rather than stored values.
+An important aspect of this code is its use of "lazy evaluation". This means it
+doesn't need the entire matrix upfront but can work with just a function that
+provides matrix elements as needed. This can be more efficient for large
+matrices or when the matrix is defined by a formula rather than stored values.
 
-The class also includes methods to check if the matrix is positive definite ('is_spd'), calculate a witness vector if it's not ('witness'), and compute a symmetric quadratic form ('sym_quad'). These additional functionalities make the class versatile for various matrix-related tasks.
+The class also includes methods to check if the matrix is positive definite
+('is_spd'), calculate a witness vector if it's not ('witness'), and compute a
+symmetric quadratic form ('sym_quad'). These additional functionalities make
+the class versatile for various matrix-related tasks.
 
-One of the key transformations happening in this code is the factorization itself. It's breaking down the original matrix into simpler parts (L, D, and L transpose), which can be used to solve problems more easily. This factorization is done in a way that avoids using square roots, which can be computationally expensive.
+One of the key transformations happening in this code is the factorization
+itself. It's breaking down the original matrix into simpler parts (L, D, and L
+transpose), which can be used to solve problems more easily. This factorization
+is done in a way that avoids using square roots, which can be computationally
+expensive.
 
-Overall, the LDLTMgr class provides a set of tools for working with symmetric matrices, with a focus on determining their properties (like positive definiteness) and performing useful calculations efficiently. It's designed to be flexible and can handle both standard matrices and those defined by functions, making it useful in a variety of mathematical and engineering contexts.
+Overall, the LDLTMgr class provides a set of tools for working with symmetric
+matrices, with a focus on determining their properties (like positive
+definiteness) and performing useful calculations efficiently. It's designed to
+be flexible and can handle both standard matrices and those defined by
+functions, making it useful in a variety of mathematical and engineering
+contexts.
 """
 
 import math

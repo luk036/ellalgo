@@ -51,7 +51,8 @@ def cutting_plane_feas(
     r"""Cutting-plane algorithm for convex feasibility problems.
 
     Implementation Details:
-    Solves: find x s.t. f(x) ≤ 0 for convex f(x) using iterative cutting planes
+    Solves: find x s.t. f(x) ≤ 0 for convex f(x)
+    using iterative cutting planes
     - At each iteration:
       1. Query oracle at current center point xc = space.xc()
       2. If feasible (cut=None), return xc as solution
@@ -61,8 +62,10 @@ def cutting_plane_feas(
 
     Mathematical Basis:
     For convex function f and current point xc:
-    - If f(xc) > 0: exists g s.t. f(x) ≥ g^T(x - xc) + f(xc) > 0 for some x
-    - The cut g^T(x - xc) + β ≤ 0 (β = f(xc)) eliminates infeasible region
+    - If f(xc) > 0: exists g s.t. f(x) ≥ g^T(x - xc) + f(xc)
+      > 0 for some x
+    - The cut g^T(x - xc) + β ≤ 0 (β = f(xc))
+      eliminates infeasible region
 
         .. svgbob::
            :align: center

@@ -1,7 +1,11 @@
 """
 Lowpass Oracle
 
-This code implements a Lowpass Oracle, which is used to design a low-pass filter for signal processing. A low-pass filter allows low-frequency signals to pass through while attenuating high-frequency signals. The main purpose of this code is to help optimize the design of such a filter by providing a way to assess whether a given set of filter coefficients meets certain specifications.
+This code implements a LowpassOracle, which is used to design a low-pass filter
+for signal processing. A low-pass filter allows low-frequency signals to pass
+through while attenuating high-frequency signals. The main purpose of this code
+is to help optimize the design of such a filter by providing a way to assess
+whether a given set of filter coefficients meets certain specifications.
 
 The code defines a class called LowpassOracle that takes several inputs when initialized:
 
@@ -14,15 +18,26 @@ The code defines a class called LowpassOracle that takes several inputs when ini
 
 The main outputs of this code are produced by two methods: assess_feas and assess_optim. These methods take a set of filter coefficients as input and determine whether they meet the specified requirements or how close they are to meeting them.
 
-The LowpassOracle achieves its purpose through a series of checks on the frequency response of the filter. It uses a pre-computed spectrum matrix to efficiently calculate the frequency response at different points. The code then checks if the response falls within the specified bounds for the passband and stopband.
+The LowpassOracle achieves its purpose through a series of checks on the
+frequency response of the filter. It uses a pre-computed spectrum matrix to
+efficiently calculate the frequency response at different points. The code then
+checks if the response falls within the specified bounds for the passband and
+stopband.
 
-The important logic flow in this code involves iterating through different frequency points and checking the filter's response at each point. If any violations of the specifications are found, the code returns information about the violation, which can be used to adjust the filter coefficients.
+The important logic flow in this code involves iterating through different
+frequency points and checking the filter's response at each point. If any
+violations of the specifications are found, the code returns information about
+the violation, which can be used to adjust the filter coefficients.
 
 A key data transformation happening in this code is the conversion from filter coefficients to frequency response. This is done using the pre-computed spectrum matrix, which allows for efficient calculation of the response at many frequency points.
 
 The code also includes a helper function called create_lowpass_case, which sets up a specific instance of the LowpassOracle with predefined parameters. This function can be used to quickly create a standard test case for filter design.
 
-Overall, this code provides a tool for iteratively designing and optimizing low-pass filters by giving feedback on how well a set of coefficients meets the desired specifications. It's part of a larger optimization process where the coefficients would be adjusted based on the feedback from this oracle until a satisfactory filter design is achieved.
+Overall, this code provides a tool for iteratively designing and optimizing
+low-pass filters by giving feedback on how well a set of coefficients meets the
+desired specifications. It's part of a larger optimization process where the
+coefficients would be adjusted based on the feedback from this oracle until a
+satisfactory filter design is achieved.
 """
 
 from math import floor

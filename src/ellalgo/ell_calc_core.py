@@ -1,8 +1,14 @@
 """This module contains the `EllCalcCore` class.
 
-This code defines a class called EllCalcCore, which is designed to perform calculations related to ellipsoids in mathematics. An ellipsoid is a 3D shape that's like a stretched or squashed sphere. The class provides methods to calculate various parameters of ellipsoids under different conditions.
+This code defines a class called EllCalcCore, which is designed to perform
+calculations related to ellipsoids in mathematics. An ellipsoid is a 3D shape
+that's like a stretched or squashed sphere. The class provides methods to
+calculate various parameters of ellipsoids under different conditions.
 
-The main purpose of this code is to provide a set of tools for working with ellipsoids in optimization problems. It takes in various numerical inputs representing different aspects of an ellipsoid or cuts through it, and produces output values that describe how the ellipsoid should be adjusted or analyzed.
+The main purpose of this code is to provide a set of tools for working with
+ellipsoids in optimization problems. It takes in various numerical inputs
+representing different aspects of an ellipsoid or cuts through it, and produces
+output values that describe how the ellipsoid should be adjusted or analyzed.
 
 The class is initialized with a single input 'n_f', which represents the dimension of the space the ellipsoid exists in. This value is used to set up several constant values that are used in later calculations.
 
@@ -13,13 +19,24 @@ The class provides several methods, each performing a different type of calculat
 3. calc_parallel_central_cut and calc_parallel_central_cut_old: These handle cuts that are parallel to a central cut.
 4. calc_parallel_bias_cut, calc_parallel_bias_cut_fast, and calc_parallel_bias_cut_old: These deal with parallel cuts that don't go through the center.
 
-Each of these methods takes in one or more numerical inputs (like 'tau', 'beta', 'tsq') that represent different aspects of the cut or the ellipsoid. They then perform a series of mathematical calculations using these inputs and the constants set up during initialization. The calculations involve basic arithmetic, square roots, and some more complex formulas specific to ellipsoid geometry.
+Each of these methods takes in one or more numerical inputs (like 'tau', 'beta',
+'tsq') that represent different aspects of the cut or the ellipsoid. They then
+perform a series of mathematical calculations using these inputs and the
+constants set up during initialization. The calculations involve basic
+arithmetic, square roots, and some more complex formulas specific to ellipsoid
+geometry.
 
 The output of each method is typically a tuple of three float values, often represented as (rho, sigma, delta). These values describe how the ellipsoid should be adjusted based on the cut that was calculated.
 
-The code achieves its purpose by encapsulating all these complex mathematical calculations into easy-to-use methods. A programmer can create an instance of EllCalcCore and then call these methods as needed, without having to understand all the underlying mathematics.
+The code achieves its purpose by encapsulating all these complex mathematical
+calculations into easy-to-use methods. A programmer can create an instance of
+EllCalcCore and then call these methods as needed, without having to understand
+all the underlying mathematics.
 
-The main logic flow in this code is from the input parameters, through the mathematical calculations, to the output tuple. The data transformations happening are primarily mathematical: converting the input parameters into the desired output parameters using the formulas of ellipsoid geometry.
+The main logic flow in this code is from the input parameters, through the
+mathematical calculations, to the output tuple. The data transformations
+happening are primarily mathematical: converting the input parameters into the
+desired output parameters using the formulas of ellipsoid geometry.
 
 This code is a tool for more complex algorithms that might be using these ellipsoid calculations as part of a larger optimization or analysis process. It provides a clean, object-oriented way to perform these specific mathematical operations.
 """
