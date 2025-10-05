@@ -96,6 +96,20 @@ def cutting_plane_feas(
     :param space: Search space object maintaining current solution candidate
     :param options: Algorithm control parameters
     :return: (Feasible solution, iteration count) or (None, iterations)
+
+    Examples:
+        >>> import numpy as np
+        >>> from ellalgo.cutting_plane import cutting_plane_feas
+        >>> from ellalgo.ell import Ell
+        >>> from ellalgo.ell_config import Options
+        >>> class MyOracle:
+        ...     def assess_feas(self, xc):
+        ...         return (np.array([1.0, 1.0]), 0.0) if xc[0] + xc[1] > 0 else None
+        >>> omega = MyOracle()
+        >>> space = Ell(10.0, np.array([0.0, 0.0]))
+        >>> x, niter = cutting_plane_feas(omega, space, Options())
+        >>> x is None
+        False
     """
     for niter in range(options.max_iters):
         cut = omega.assess_feas(space.xc())  # Evaluate current solution

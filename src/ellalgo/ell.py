@@ -50,7 +50,21 @@ Cut = Tuple[ArrayType, CutChoice]  # A cut consists of a gradient and a beta val
 
 
 # The `Ell` class represents an ellipsoidal search space.
-class Ell(SearchSpace2[ArrayType], SearchSpaceQ[ArrayType]):
+class Ell:
+    """Ellipsoid
+
+    The `Ell` class represents an ellipsoid.
+
+    Examples:
+        >>> from ellalgo.ell import Ell
+        >>> E = Ell(1.0, [0.0, 0.0])
+        >>> E.Q       # doctest: +SKIP
+        array([[ 1.,  0.],
+               [ 0.,  1.]])
+        >>> E.tsq()
+        0.0
+    """
+
     # Class variable to control whether to defer the matrix scaling trick
     no_defer_trick: bool = False
 

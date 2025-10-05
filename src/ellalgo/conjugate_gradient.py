@@ -26,6 +26,15 @@ def conjugate_gradient(A, b, x0=None, tol=1e-5, max_iter=1000):
 
     Raises:
         ValueError: If the Conjugate Gradient method does not converge after the maximum number of iterations.
+
+    Examples:
+        >>> import numpy as np
+        >>> from ellalgo.conjugate_gradient import conjugate_gradient
+        >>> A = np.array([[3, 2], [2, 6]])
+        >>> b = np.array([2, -8])
+        >>> x = conjugate_gradient(A, b)
+        >>> np.allclose(x, np.array([2.0, -2.0]))
+        True
     """
     n = len(b)
     if x0 is None:

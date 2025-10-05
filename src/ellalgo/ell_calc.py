@@ -65,7 +65,13 @@ class EllCalc:
     Examples:
         >>> from ellalgo.ell_calc import EllCalc
         >>> calc = EllCalc(3)
+        >>> calc._n_f
+        3.0
     """
+
+    use_parallel_cut: bool = True  # Flag to enable/disable parallel cut optimization
+    _n_f: float  # Dimension of the space as a float
+    helper: EllCalcCore  # Helper class for core calculations
 
     use_parallel_cut: bool = True  # Flag to enable/disable parallel cut optimization
     _n_f: float  # Dimension of the space as a float

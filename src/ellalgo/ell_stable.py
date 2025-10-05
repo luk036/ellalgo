@@ -13,6 +13,20 @@ Cut = Tuple[ArrayType, CutChoice]
 
 # The `EllStable` class represents an ellipsoidal search space with stability properties.
 class EllStable(SearchSpace[ArrayType], SearchSpaceQ[ArrayType]):
+    """Ellipsoid Search Space
+
+    The `EllStable` class represents an ellipsoidal search space with stability properties.
+
+    Examples:
+        >>> import numpy as np
+        >>> from ellalgo.ell_stable import EllStable
+        >>> ell = EllStable(1.0, np.array([0.0, 0.0]))
+        >>> ell.xc()
+        array([0., 0.])
+        >>> ell.tsq()
+        0.0
+    """
+
     no_defer_trick: bool = False
 
     _mq: Matrix

@@ -53,7 +53,10 @@ class EllCalcCore:
     parameters are essential in ellipsoid-based optimization algorithms.
 
     Examples:
+        >>> from ellalgo.ell_calc_core import EllCalcCore
         >>> calc = EllCalcCore(3)
+        >>> calc._n_f
+        3
     """
 
     _n_f: float
