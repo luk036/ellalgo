@@ -51,18 +51,19 @@ Cut = Tuple[ArrayType, CutChoice]  # A cut consists of a gradient and a beta val
 
 # The `Ell` class represents an ellipsoidal search space.
 class Ell:
-    """Ellipsoid
+    """Ellipsoid Search Space.
 
-    The `Ell` class represents an ellipsoid.
+    The `Ell` class represents an ellipsoid, which is a search space for convex
+    optimization problems. It provides methods to update the ellipsoid based on
+    cutting planes, which are used to narrow down the search for an optimal
+    solution.
 
     Examples:
         >>> from ellalgo.ell import Ell
         >>> E = Ell(1.0, [0.0, 0.0])
-        >>> E.Q       # doctest: +SKIP
-        array([[ 1.,  0.],
-               [ 0.,  1.]])
         >>> E.tsq()
         0.0
+
     """
 
     # Class variable to control whether to defer the matrix scaling trick

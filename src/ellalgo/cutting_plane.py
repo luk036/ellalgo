@@ -50,27 +50,29 @@ def cutting_plane_feas(
     space: SearchSpace[ArrayType],
     options=Options(),
 ) -> Tuple[Optional[ArrayType], int]:
-    r"""Cutting-plane algorithm
-    for convex feasibility problems.
+    r"""Cutting-plane algorithm for convex feasibility problems.
+
+    This algorithm solves the problem of finding a feasible solution for a convex
+    function `f(x)` such that `f(x) <= 0`. It uses an iterative cutting-plane
+    approach.
 
     Implementation Details:
-    Solves: find x s.t. f(x) ≤ 0
-    for convex f(x)
-    using iterative cutting planes
-    - At each iteration:
-      1. Query oracle at current center point xc = space.xc()
-      2. If feasible (cut=None), return xc as solution
-      3. If infeasible, get separating hyperplane (cut) from oracle
-      4. Update search space by eliminating region violating cut
-      5. Repeat until space becomes too small (tsq < tolerance)
+        The algorithm works as follows:
+        1. At each iteration, it queries the oracle at the current center point `xc`.
+        2. If the point is feasible (i.e., `cut` is `None`), it returns `xc` as a
+           solution.
+        3. If the point is infeasible, the oracle returns a separating hyperplane
+           (a "cut").
+        4. The search space is then updated by eliminating the region that violates
+           the cut.
+        5. This process is repeated until the search space becomes too small (i.e.,
+           `tsq < tolerance`).
 
     Mathematical Basis:
-    For convex function f and current point xc:
-    - If f(xc) > 0: exists g s.t. f(x) ≥ g^T(x - xc)
-      + f(xc)
-      > 0 for some x
-    - The cut g^T(x - xc) + β ≤ 0 (β = f(xc))
-      eliminates infeasible region
+        For a convex function `f` and a given point `xc`, if `f(xc) > 0`, there
+        exists a subgradient `g` such that `f(x) >= g^T(x - xc) + f(xc)` for all
+        `x`. The cut is defined by `g^T(x - xc) + beta <= 0`, where `beta = f(xc)`.
+        This cut eliminates the infeasible region from the search space.
 
         .. svgbob::
            :align: center
@@ -97,10 +99,15 @@ def cutting_plane_feas(
          │CuttingPlane│    │SearchSpace││OracleFeas│
          └────────────┘    └───────────┘└──────────┘
 
-    :param omega: Feasibility oracle implementing assess_feas()
-    :param space: Search space object maintaining current solution candidate
-    :param options: Algorithm control parameters
-    :return: (Feasible solution, iteration count) or (None, iterations)
+    Arguments:
+        omega (OracleFeas): The feasibility oracle.
+        space (SearchSpace): The search space.
+        options (Options, optional): The options for the algorithm. Defaults to
+            `Options()`.
+
+    Returns:
+        Tuple[Optional[ArrayType], int]: A tuple containing the feasible solution
+        (if found) and the number of iterations.
 
     Examples:
         >>> import numpy as np
@@ -134,28 +141,40 @@ def cutting_plane_optim(
     gamma,
     options=Options(),
 ) -> Tuple[Optional[ArrayType], float, int]:
-    """Cutting-plane method
-    for convex optimization problems.
+    """Cutting-plane method for convex optimization problems.
 
-    Solves: maximize γ s.t. f(x) ≥ γ using central/bias cut updates
-    - Maintains current best γ and candidate solution x_best
-    - Alternates between:
-      1. Optimality cuts (improve γ when better solution found)
-      2. Feasibility cuts (maintain solution space when γ increases)
+    This algorithm solves the problem of maximizing a variable `gamma` subject to
+    the constraint `f(x) >= gamma`, where `f` is a convex function. It uses a
+    cutting-plane approach with central and bias cut updates.
 
-    Update Rules:
-    - Central cut: Tightens search around improving solutions
-    - Bias cut: Maintains feasibility for current γ level
+    The algorithm maintains the current best `gamma` and the corresponding
+    candidate solution `x_best`. It alternates between two types of cuts:
 
-    :param omega: Optimization oracle implementing assess_optim()
-    :param space: Search space maintaining current solution candidate
-    :param gamma: Initial best objective value
-    :param options: Algorithm control parameters
-    :return: (Best solution, achieved γ, iteration count)
+    1. Optimality cuts: These are used to improve the value of `gamma` when a
+       better solution is found.
+    2. Feasibility cuts: These are used to maintain the feasibility of the solution
+       space as `gamma` increases.
+
+    The update rules for the search space are as follows:
+
+    - Central cut: This tightens the search around a solution that has shown
+      improvement.
+    - Bias cut: This maintains the feasibility of the current `gamma` level.
+
+    Arguments:
+        omega (OracleOptim): The optimization oracle.
+        space (SearchSpace): The search space.
+        gamma (float): The initial best objective value.
+        options (Options, optional): The options for the algorithm. Defaults to
+            `Options()`.
+
+    Returns:
+        Tuple[Optional[ArrayType], float, int]: A tuple containing the best
+        solution, the achieved `gamma`, and the number of iterations.
     """
     x_best = None
     for niter in range(options.max_iters):
-        # Get optimality/feasibility cut and possible better γ
+        # Get optimality/feasibility cut and possible better g
         cut, gamma1 = omega.assess_optim(space.xc(), gamma)
         if gamma1 is not None:  # Found better objective value
             gamma = gamma1
@@ -235,7 +254,7 @@ def cutting_plane_optim_q(
     :param space_q: Quantized search space
     :param gamma: Initial best objective value
     :param options: Algorithm parameters
-    :return: (Best discrete solution, achieved γ, iterations)
+    :return: (Best discrete solution, achieved g, iterations)
     """
     x_best = None
     retry = False  # Discrete feasibility check flag
@@ -273,7 +292,7 @@ def bsearch(
     :param omega: Binary search oracle implementing assess_bs()
     :param intrvl: (lower, upper) bound tuple
     :param options: Control parameters
-    :return: (Best γ found, iterations used)
+    :return: (Best g found, iterations used)
     """
     lower, upper = intrvl
     T = type(upper)  # Preserve numerical type (int/float)
@@ -292,9 +311,9 @@ def bsearch(
 class BSearchAdaptor(OracleBS):
     """Adapter for using feasibility oracle in binary search.
 
-    Enables γ-parameterized feasibility checks for:
-    maximize γ
-    s.t. ∃x feasible for given γ
+    Enables g-parameterized feasibility checks for:
+    maximize g
+    s.t. Exists x feasible for given g
 
     Maintains state between binary search iterations for efficiency.
     """
@@ -303,7 +322,7 @@ class BSearchAdaptor(OracleBS):
         self, omega: OracleFeas2, space: SearchSpace2, options=Options()
     ) -> None:
         """
-        :param omega: γ-parameterized feasibility oracle
+        :param omega: g-parameterized feasibility oracle
         :param space: Search space for feasibility subproblems
         :param options: Cutting-plane parameters for subproblems
         """
@@ -317,16 +336,16 @@ class BSearchAdaptor(OracleBS):
         return self.space.xc()
 
     def assess_bs(self, gamma: Num) -> bool:
-        """Test feasibility for given γ value.
+        """Test feasibility for given g value.
 
         Implementation:
         1. Clone current search space state
-        2. Update oracle with new γ value
+        2. Update oracle with new g value
         3. Solve feasibility subproblem
         4. Update main space if feasible solution found
         """
         space = copy.deepcopy(self.space)  # Isolate subproblem space
-        self.omega.update(gamma)  # Set current γ level
+        self.omega.update(gamma)  # Set current g level
         x_feas, _ = cutting_plane_feas(self.omega, space, self.options)
         if x_feas is not None:  # Feasible solution found
             self.space.set_xc(x_feas)  # Update main search space

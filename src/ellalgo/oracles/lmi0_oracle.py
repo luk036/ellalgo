@@ -34,21 +34,28 @@ class LMI0Oracle:
         self.ldlt_mgr = LDLTMgr(len(mat_f[0]))
 
     def assess_feas(self, x: np.ndarray) -> Optional[Cut]:
-        """Assess feasibility of solution x against LMI constraint
+        """Assess the feasibility of a solution `x` against the LMI constraint.
+
+        This method checks if the matrix `F(x)` is positive semidefinite (PSD).
 
         Implementation Strategy:
-        1. Construct matrix F(x) = ∑ x_k F_k through element-wise computation
-        2. Attempt LDLT factorization:
-           - Success: F(x) is PSD (feasible) → return None
-           - Failure: F(x) not PSD → compute cutting plane (g, σ)
+            1. Construct the matrix `F(x) = sum(x_k * F_k)` using an element-wise
+               approach to save memory.
+            2. Attempt to perform an LDLT factorization of `F(x)`.
+            3. If the factorization is successful, it means `F(x)` is PSD, and the
+               solution `x` is feasible. In this case, the method returns `None`.
+            4. If the factorization fails, it means `F(x)` is not PSD. The method
+               then computes a cutting plane `(g, sigma)` that separates `x` from
+               the feasible region.
 
-        Args:
-            x (np.ndarray): Candidate solution vector [x₁, ..., xₙ]^T ∈ ℝⁿ
+        Arguments:
+            x (np.ndarray): The candidate solution vector.
 
         Returns:
             Optional[Cut]:
-                - None if x is feasible (F(x) ≽ 0)
-                - Tuple (g, σ) representing cutting plane gᵀ(y - x) ≥ σ otherwise
+                - `None` if `x` is feasible (i.e., `F(x)` is PSD).
+                - A tuple `(g, sigma)` representing the cutting plane if `x` is
+                  infeasible.
         """
 
         def get_elem(i, j):
