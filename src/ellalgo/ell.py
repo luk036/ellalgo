@@ -5,8 +5,8 @@ This code defines a class called Ell which represents an ellipsoidal search spac
 The purpose of this class is to provide methods for updating and manipulating an
 ellipsoid, which is a mathematical shape used in certain optimization algorithms.
 
-The Ell class takes two main inputs when initialized: a value (which can be a
-number or a list of numbers) and an array xc. These inputs define the initial
+    The Ell class takes two main inputs when initialized:
+    a value (which can be a number or a list of numbers) and an array xc. These inputs define the initial
 shape and position of the ellipsoid. The class doesn't produce a specific output
 on its own, but rather provides methods that can be used to modify and query the
 ellipsoid's state.
@@ -41,7 +41,7 @@ import numpy as np
 
 from .ell_calc import EllCalc
 from .ell_config import CutStatus
-from .ell_typing import ArrayType, SearchSpace2, SearchSpaceQ
+from .ell_typing import ArrayType
 
 # Type aliases for better code readability
 Mat = np.ndarray

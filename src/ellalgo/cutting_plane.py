@@ -46,12 +46,16 @@ Num = Union[float, int]
 
 
 def cutting_plane_feas(
-    omega: OracleFeas[ArrayType], space: SearchSpace[ArrayType], options=Options()
+    omega: OracleFeas[ArrayType],
+    space: SearchSpace[ArrayType],
+    options=Options(),
 ) -> Tuple[Optional[ArrayType], int]:
-    r"""Cutting-plane algorithm for convex feasibility problems.
+    r"""Cutting-plane algorithm
+    for convex feasibility problems.
 
     Implementation Details:
-    Solves: find x s.t. f(x) ≤ 0 for convex f(x)
+    Solves: find x s.t. f(x) ≤ 0
+    for convex f(x)
     using iterative cutting planes
     - At each iteration:
       1. Query oracle at current center point xc = space.xc()
@@ -62,7 +66,8 @@ def cutting_plane_feas(
 
     Mathematical Basis:
     For convex function f and current point xc:
-    - If f(xc) > 0: exists g s.t. f(x) ≥ g^T(x - xc) + f(xc)
+    - If f(xc) > 0: exists g s.t. f(x) ≥ g^T(x - xc)
+      + f(xc)
       > 0 for some x
     - The cut g^T(x - xc) + β ≤ 0 (β = f(xc))
       eliminates infeasible region
@@ -112,7 +117,8 @@ def cutting_plane_feas(
         False
     """
     for niter in range(options.max_iters):
-        cut = omega.assess_feas(space.xc())  # Evaluate current solution
+        # Evaluate current solution
+        cut = omega.assess_feas(space.xc())
         if cut is None:  # Found feasible point
             return space.xc(), niter
         # Update search space with new constraint
@@ -128,7 +134,8 @@ def cutting_plane_optim(
     gamma,
     options=Options(),
 ) -> Tuple[Optional[ArrayType], float, int]:
-    """Cutting-plane method for convex optimization problems.
+    """Cutting-plane method
+    for convex optimization problems.
 
     Solves: maximize γ s.t. f(x) ≥ γ using central/bias cut updates
     - Maintains current best γ and candidate solution x_best
