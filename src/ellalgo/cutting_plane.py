@@ -57,47 +57,47 @@ def cutting_plane_feas(
     approach.
 
     Implementation Details:
-        The algorithm works as follows:
-        1. At each iteration, it queries the oracle at the current center point `xc`.
-        2. If the point is feasible (i.e., `cut` is `None`), it returns `xc` as a
-           solution.
-        3. If the point is infeasible, the oracle returns a separating hyperplane
-           (a "cut").
-        4. The search space is then updated by eliminating the region that violates
-           the cut.
-        5. This process is repeated until the search space becomes too small (i.e.,
-           `tsq < tolerance`).
+    The algorithm works as follows:
+    1. At each iteration, it queries the oracle at the current center point `xc`.
+    2. If the point is feasible (i.e., `cut` is `None`), it returns `xc` as a
+        solution.
+    3. If the point is infeasible, the oracle returns a separating hyperplane
+        (a "cut").
+    4. The search space is then updated by eliminating the region that violates
+        the cut.
+    5. This process is repeated until the search space becomes too small (i.e.,
+        `tsq < tolerance`).
 
     Mathematical Basis:
-        For a convex function `f` and a given point `xc`, if `f(xc) > 0`, there
-        exists a subgradient `g` such that `f(x) >= g^T(x - xc) + f(xc)` for all
-        `x`. The cut is defined by `g^T(x - xc) + beta <= 0`, where `beta = f(xc)`.
-        This cut eliminates the infeasible region from the search space.
+    For a convex function `f` and a given point `xc`, if `f(xc) > 0`, there
+    exists a subgradient `g` such that `f(x) >= g^T(x - xc) + f(xc)` for all
+    `x`. The cut is defined by `g^T(x - xc) + beta <= 0`, where `beta = f(xc)`.
+    This cut eliminates the infeasible region from the search space.
 
-        .. svgbob::
-           :align: center
-
-         ┌────────────┐    ┌───────────┐┌──────────┐
-         │CuttingPlane│    │SearchSpace││OracleFeas│
-         └─────┬──────┘    └─────┬─────┘└────┬─────┘
-               │                 │           │
-               │   request xc    │           │
-               │────────────────>│           │
-               │                 │           │
-               │    return xc    │           │
-               │<────────────────│           │
-               │                 │           │
-               │       assess_feas(xc)       │
-               │────────────────────────────>│
-               │                 │           │
-               │         return cut          │
-               │<────────────────────────────│
-               │                 │           │
-               │update by the cut│           │
-               │────────────────>│           │
-         ┌─────┴──────┐    ┌─────┴─────┐┌────┴─────┐
-         │CuttingPlane│    │SearchSpace││OracleFeas│
-         └────────────┘    └───────────┘└──────────┘
+    .. svgbob::
+       :align: center
+       
+     ┌────────────┐    ┌───────────┐┌──────────┐
+     │CuttingPlane│    │SearchSpace││OracleFeas│
+     └─────┬──────┘    └─────┬─────┘└────┬─────┘
+           │                 │           │
+           │   request xc    │           │
+           │────────────────>│           │
+           │                 │           │
+           │    return xc    │           │
+           │<────────────────│           │
+           │                 │           │
+           │       assess_feas(xc)       │
+           │────────────────────────────>│
+           │                 │           │
+           │         return cut          │
+           │<────────────────────────────│
+           │                 │           │
+           │update by the cut│           │
+           │────────────────>│           │
+     ┌─────┴──────┐    ┌─────┴─────┐┌────┴─────┐
+     │CuttingPlane│    │SearchSpace││OracleFeas│
+     └────────────┘    └───────────┘└──────────┘
 
     Arguments:
         omega (OracleFeas): The feasibility oracle.

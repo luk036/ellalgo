@@ -57,13 +57,6 @@ class Ell:
     optimization problems. It provides methods to update the ellipsoid based on
     cutting planes, which are used to narrow down the search for an optimal
     solution.
-
-    Examples:
-        >>> from ellalgo.ell import Ell
-        >>> E = Ell(1.0, [0.0, 0.0])
-        >>> E.tsq()
-        0.0
-
     """
 
     # Class variable to control whether to defer the matrix scaling trick
