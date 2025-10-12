@@ -27,7 +27,7 @@ import copy
 from typing import Any, MutableSequence, Optional, Tuple, Union
 
 from .ell_config import CutStatus, Options
-from .ell_typing import (  # OracleFeasQ,
+from .ell_typing import (
     ArrayType,
     OracleBS,
     OracleFeas,
@@ -37,9 +37,11 @@ from .ell_typing import (  # OracleFeasQ,
     SearchSpace,
     SearchSpace2,
     SearchSpaceQ,
-)
+)  # OracleFeasQ,
 
-CutChoice = Union[float, MutableSequence]  # Single cut or parallel cuts
+CutChoice = Union[
+    float, MutableSequence
+]  # Single cut or parallel cuts
 Cut = Tuple[ArrayType, CutChoice]  # Cut representation: (gradient, intercept)
 
 Num = Union[float, int]
@@ -76,7 +78,7 @@ def cutting_plane_feas(
 
     .. svgbob::
        :align: center
-       
+
      ┌────────────┐    ┌───────────┐┌──────────┐
      │CuttingPlane│    │SearchSpace││OracleFeas│
      └─────┬──────┘    └─────┬─────┘└────┬─────┘

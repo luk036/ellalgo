@@ -73,10 +73,6 @@ class EllCalc:
     _n_f: float  # Dimension of the space as a float
     helper: EllCalcCore  # Helper class for core calculations
 
-    use_parallel_cut: bool = True  # Flag to enable/disable parallel cut optimization
-    _n_f: float  # Dimension of the space as a float
-    helper: EllCalcCore  # Helper class for core calculations
-
     def __init__(self, n: int) -> None:
         """
         Initialize the EllCalc instance with the given dimension.

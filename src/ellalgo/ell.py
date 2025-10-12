@@ -35,7 +35,7 @@ involved in these operations, providing a clean interface for users of the class
 to work with ellipsoids in their algorithms.
 """
 
-from typing import Callable, Tuple, Union
+from typing import Callable, Generic, Tuple, Union
 
 import numpy as np
 
@@ -50,7 +50,7 @@ Cut = Tuple[ArrayType, CutChoice]  # A cut consists of a gradient and a beta val
 
 
 # The `Ell` class represents an ellipsoidal search space.
-class Ell:
+class Ell(Generic[ArrayType]):
     """Ellipsoid Search Space.
 
     The `Ell` class represents an ellipsoid, which is a search space for convex
@@ -63,7 +63,7 @@ class Ell:
     no_defer_trick: bool = False
 
     # Instance variables:
-    _mq: Mat  # Matrix representing the shape of the ellipsoid
+    _mq: Mat  # Shape matrix
     _xc: ArrayType  # Center point of the ellipsoid
     _kappa: float  # Scaling factor for the ellipsoid matrix
     _tsq: float  # Measure of distance between current center and optimal point
@@ -101,7 +101,7 @@ class Ell:
             self._kappa = 1.0
             self._mq = np.diag(val)
 
-    def xc(self) -> ArrayType:
+    def xc(self) -> np.ndarray:
         """
         Getter method for the ellipsoid's center point.
 
