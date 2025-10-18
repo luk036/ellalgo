@@ -140,7 +140,7 @@ def cutting_plane_feas(
 def cutting_plane_optim(
     omega: OracleOptim[ArrayType],
     space: SearchSpace[ArrayType],
-    gamma,
+    gamma: float,
     options=Options(),
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for convex optimization problems.
@@ -236,7 +236,7 @@ def cutting_plane_optim(
 def cutting_plane_optim_q(
     omega: OracleOptimQ[ArrayType],
     space_q: SearchSpaceQ[ArrayType],
-    gamma,
+    gamma: float,
     options=Options(),
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for discrete convex optimization.

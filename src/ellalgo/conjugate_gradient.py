@@ -1,9 +1,13 @@
 # conjugate_gradient.py
 
+from typing import Optional
+
 import numpy as np
 
 
-def conjugate_gradient(A, b, x0=None, tol=1e-5, max_iter=1000):
+def conjugate_gradient(
+    A: np.ndarray, b: np.ndarray, x0: Optional[np.ndarray] = None, tol: float = 1e-5, max_iter: int = 1000
+) -> np.ndarray:
     """
     Solve the linear system Ax = b using the Conjugate Gradient method.
 
