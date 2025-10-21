@@ -52,21 +52,22 @@ from .ell_config import CutStatus
 
 
 class EllCalc:
-    """The `EllCalc` class is used for calculating ellipsoid parameters and has attributes
-    for storing constants and configuration options.
+    """
+    The `EllCalc` class is a core component of the ellipsoid method, responsible for
+    calculating the parameters required to update the search ellipsoid at each iteration.
+    It provides methods for various types of cutting planes, including deep cuts,
+    parallel cuts, and central cuts.
 
-    This class serves as the main interface for performing ellipsoid calculations in optimization
-    algorithms. It provides methods for different types of cuts (single, parallel, central) and
-    handles the logic for selecting the appropriate cut type based on input parameters.
+    - A **deep cut** is a hyperplane that cuts the ellipsoid, excluding a portion of
+      the search space that does not contain the optimal solution.
+    - A **parallel cut** uses two parallel hyperplanes to cut the ellipsoid, which can
+      be more efficient in certain situations.
+    - A **central cut** is a special case of a deep cut that passes through the center
+      of the ellipsoid.
 
-    The class uses an instance of EllCalcCore to perform the actual mathematical computations,
-    while handling the higher-level logic and status reporting.
-
-    Examples:
-        >>> from ellalgo.ell_calc import EllCalc
-        >>> calc = EllCalc(3)
-        >>> calc._n_f
-        3.0
+    The class uses an instance of `EllCalcCore` to perform the low-level mathematical
+    computations, while it handles the higher-level logic for selecting the appropriate
+    cut type and returning the results.
     """
 
     use_parallel_cut: bool = True  # Flag to enable/disable parallel cut optimization
@@ -96,21 +97,26 @@ class EllCalc:
     def calc_single_or_parallel(
         self, beta, tsq: float
     ) -> Tuple[CutStatus, Optional[Tuple[float, float, float]]]:
-        """Calculate either a single deep cut or a parallel cut based on input parameters.
+        """
+        Calculates the parameters for either a single deep cut or a parallel cut.
 
-        This method serves as a dispatcher that chooses between single cut and parallel cut
-        calculations based on the type of beta parameter provided.
+        This method acts as a dispatcher, determining whether to perform a single
+        deep cut or a parallel cut based on the `beta` parameter.
 
-        :param beta: Either a single numeric value (for single cut) or a list of two values (for parallel cut)
-        :param tsq: The square of the tolerance parameter (τ²) used in the cut calculations
-        :type tsq: float
-        :return: A tuple containing:
-                 - CutStatus: indicating success or failure
-                 - Optional tuple of (rho, sigma, delta) if successful
+        - If `beta` is a single float, a single deep cut is performed.
+        - If `beta` is a list or tuple with two elements, a parallel cut is performed
+          using `beta[0]` and `beta[1]` as the two cut parameters.
+        - The `use_parallel_cut` flag can be used to disable parallel cuts, in which
+          case a single deep cut will be used as a fallback.
 
-        Examples:
-            >>> from ellalgo.ell_calc import EllCalc
-            >>> calc = EllCalc(3)
+        Args:
+            beta: The cut parameter(s). Can be a single float for a deep cut, or
+                a list/tuple of two floats for a parallel cut.
+            tsq: The square of the tolerance (τ²), used in the cut calculations.
+
+        Returns:
+            A tuple containing the `CutStatus` and an optional tuple of the
+            update parameters (rho, sigma, delta) if the cut is successful.
         """
         if isinstance(beta, (int, float)):
             return self.calc_bias_cut(beta, tsq)

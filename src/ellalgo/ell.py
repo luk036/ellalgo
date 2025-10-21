@@ -41,7 +41,8 @@ import numpy as np
 
 from .ell_calc import EllCalc
 from .ell_config import CutStatus
-from .ell_typing import ArrayType
+from .ell_typing import ArrayType, SearchSpace
+
 
 # Type aliases for better code readability
 Mat = np.ndarray
@@ -50,7 +51,7 @@ Cut = Tuple[ArrayType, CutChoice]  # A cut consists of a gradient and a beta val
 
 
 # The `Ell` class represents an ellipsoidal search space.
-class Ell(Generic[ArrayType]):
+class Ell(SearchSpace[ArrayType]):
     """Ellipsoid Search Space.
 
     The `Ell` class represents an ellipsoid, which is a search space for convex

@@ -52,29 +52,28 @@ import numpy as np
 
 
 class LDLTMgr:
-    """LDLT factorization (mainly for LMI oracles)
+    """
+    The `LDLTMgr` class implements a square-root-free version of the Cholesky
+    decomposition, known as LDLT factorization. This method decomposes a symmetric
+    matrix A into A = LDL^T, where L is a lower triangular matrix with ones on
+    the diagonal, D is a diagonal matrix, and L^T is the transpose of L.
 
-    `LDLTMgr` is a class that performs the LDLT factorization for a given
-    symmetric matrix. The LDLT factorization decomposes a symmetric matrix A into
-    the product of a lower triangular matrix L, a diagonal matrix D, and the
-    transpose of L. This factorization is useful for solving linear systems and
-    eigenvalue problems. The class provides methods to perform the factorization,
-    check if the matrix is positive definite, calculate a witness vector if it is
-    not positive definite, and calculate the symmetric quadratic form.
+    This factorization is particularly useful for Linear Matrix Inequality (LMI)
+    oracles in optimization problems. Its main advantages include:
 
-    - LDL^T square-root-free version
-    - Option allow semidefinite
-    - Cholesky-Banachiewicz style, row-based
-    - Lazy evaluation
-    - A matrix A in R^{m x m} is positive definite
-                         iff v^T A v > 0 for all v in R^n.
-    - O(p^3) per iteration, independent of ndim
+    - **Numerical Stability**: By avoiding the computation of square roots, the
+      LDLT factorization can be more numerically stable than the standard
+      Cholesky decomposition.
+    - **Efficiency**: The square-root-free nature of the algorithm can also lead
+      to performance improvements.
+    - **Lazy Evaluation**: The implementation supports lazy evaluation, allowing
+      it to work with matrices that are not explicitly stored in memory.
 
-    Examples:
-        >>> A = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
-        >>> ldl = LDLTMgr(3)
-        >>> ldl.factorize(A)
-        True
+    The class provides methods to:
+    - Check if a matrix is symmetric positive-definite (SPD).
+    - Find a "witness" vector that certifies that a matrix is not SPD.
+    - Compute the Cholesky factorization (R matrix such that A = R^T R) if the
+      matrix is SPD.
     """
 
     __slots__ = ("pos", "wit", "_ndim", "_storage")
@@ -101,22 +100,17 @@ class LDLTMgr:
 
     def factorize(self, mat: np.ndarray) -> bool:
         """
-        Performs LDLT factorization on a given numpy array matrix.
+        Performs LDLT factorization on a NumPy array.
 
-        This is a convenience wrapper around the factor() method that takes a matrix directly
-        rather than an element-accessor function.
+        This method is a convenience wrapper around the `factor` method. It
+        allows you to perform the factorization directly on a NumPy array
+        without needing to provide a custom element access function.
 
         Args:
-            mat: A symmetric numpy array to be factorized
+            mat (np.ndarray): The symmetric matrix to be factorized.
 
         Returns:
-            bool: True if matrix is positive definite, False otherwise
-
-        Examples:
-            >>> mat = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
-            >>> ldl = LDLTMgr(3)
-            >>> ldl.factorize(mat)
-            True
+            bool: `True` if the matrix is positive-definite, `False` otherwise.
         """
         return self.factor(lambda i, j: mat[i, j])
 
@@ -243,7 +237,7 @@ class LDLTMgr:
             >>> ldl.factorize(mat)
             False
             >>> ldl.witness()
-            0.5
+            np.float64(0.5)
         """
         if self.is_spd():
             raise AssertionError()
@@ -275,12 +269,12 @@ class LDLTMgr:
             >>> ldl.pos
             (0, 2)
             >>> ldl.witness() # call this before sym_quad()
-            0.5
+            np.float64(0.5)
             >>> ldl.wit
             array([-2.,  1.,  0.])
             >>> mat_b = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
             >>> ldl.sym_quad(mat_b)
-            3.25
+            np.float64(3.25)
         """
         start, ndim = self.pos
         wit = self.wit[start:ndim]

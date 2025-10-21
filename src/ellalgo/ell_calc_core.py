@@ -46,17 +46,20 @@ from typing import Tuple
 
 
 class EllCalcCore:
-    """The `EllCalcCore` class is used for calculating ellipsoid parameters.
+    """
+    The `EllCalcCore` class provides the low-level mathematical calculations
+    required for the ellipsoid method. It computes the essential parameters (rho,
+    sigma, and delta) that define the transformation of the search ellipsoid at
+    each iteration of the algorithm.
 
-    This class provides methods to compute various parameters (rho, sigma, delta) that define
-    how an ellipsoid should be transformed when cut by different types of hyperplanes. These
-    parameters are essential in ellipsoid-based optimization algorithms.
+    - `rho` (ρ): Represents the displacement of the ellipsoid's center.
+    - `sigma` (σ): A scaling factor for the ellipsoid's shape matrix.
+    - `delta` (δ): A factor that adjusts the overall size of the ellipsoid.
 
-    Examples:
-        >>> from ellalgo.ell_calc_core import EllCalcCore
-        >>> calc = EllCalcCore(3)
-        >>> calc._n_f
-        3
+    This class is designed to be used by `EllCalc`, which handles the higher-level
+    logic of the ellipsoid method. By encapsulating the core calculations,
+    `EllCalcCore` allows for a clean separation of concerns and facilitates
+    maintenance and optimization of the mathematical formulas.
     """
 
     _n_f: float
@@ -110,56 +113,22 @@ class EllCalcCore:
         self._cst3 = self._n_f * self._cst0
 
     def calc_central_cut(self, tau: float) -> Tuple[float, float, float]:
-        r"""Calculate the central cut values.
+        r"""
+        Calculates the update parameters for a central cut.
 
-        The `calc_central_cut` method calculates the central cut values ρ, σ, δ
-        based on the input tau value. A central cut is a hyperplane that passes
-        through the center of the ellipsoid.
+        A central cut is a special case where the cutting hyperplane passes
+        through the center of the ellipsoid. This method computes the parameters
+        (rho, sigma, and delta) required to update the ellipsoid for such a cut.
 
-        The parameters returned are:
-        - ρ (rho): Determines the shift of the ellipsoid center
-        - σ (sigma): Determines how much to scale the ellipsoid
-        - δ (delta): Determines how much to stretch the ellipsoid
+        The `tau` parameter represents the distance from the center to the
+        intersection of the ellipsoid's boundary with the cutting hyperplane.
 
-        :param tau: The distance parameter for the central cut
-        :type tau: float
-        :return: Tuple of (ρ, σ, δ) values for the central cut
-        :rtype: Tuple[float, float, float]
+        Args:
+            tau (float): The distance parameter for the central cut.
 
-        .. svgbob::
-           :align: center
-
-                    _.-'''''''-._
-                  ,'      |      `.
-                 /        |        \
-                .         |         .
-                |                   |
-                |         .         |
-                |                   |
-                :\        |        /:
-                | `._     |     _.' |
-                |    '-.......-'    |
-                |         |         |
-               "-τ"       0        +τ
-
-                      2
-                σ = ─────
-                    n + 1
-
-                      τ
-                ϱ = ─────
-                    n + 1
-
-                       2
-                      n
-                δ = ──────
-                     2
-                    n  - 1
-
-        Examples:
-            >>> calc = EllCalcCore(3)
-            >>> calc.calc_central_cut(4.0)
-            (1.0, 0.5, 1.125)
+        Returns:
+            Tuple[float, float, float]: A tuple containing the update parameters
+            (rho, sigma, delta).
         """
         rho = self._cst0 * tau
         sigma = self._cst2

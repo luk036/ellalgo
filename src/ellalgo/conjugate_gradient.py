@@ -9,36 +9,36 @@ def conjugate_gradient(
     A: np.ndarray, b: np.ndarray, x0: Optional[np.ndarray] = None, tol: float = 1e-5, max_iter: int = 1000
 ) -> np.ndarray:
     """
-    Solve the linear system Ax = b using the Conjugate Gradient method.
+    Solves the linear system of equations Ax = b using the Conjugate Gradient method.
 
-    The Conjugate Gradient method is an iterative algorithm for solving symmetric positive definite linear systems. It is particularly efficient for large, sparse systems.
+    The Conjugate Gradient method is an iterative algorithm designed for solving
+    large, sparse linear systems where the matrix A is symmetric and
+    positive-definite. It is one of the most popular and efficient methods for
+    such problems.
 
-    Algorithm Steps:
-    1. Initialize residual (r), search direction (p), and solution vector (x)
-    2. Iteratively update solution using orthogonal search directions
-    3. Maintain conjugacy of search directions to ensure convergence in at most n steps
+    The key idea of the method is to generate a sequence of search directions
+    that are A-orthogonal (or conjugate) to each other. This property ensures
+
+    that the algorithm converges to the exact solution in at most n iterations,
+    where n is the dimension of the system (assuming no rounding errors).
 
     Args:
-        A (numpy.ndarray): The coefficient matrix (must be symmetric and positive definite).
-        b (numpy.ndarray): The right-hand side vector.
-        x0 (numpy.ndarray, optional): Initial guess for the solution (default is zero vector).
-        tol (float, optional): Tolerance for convergence (default is 1e-5).
-        max_iter (int, optional): Maximum number of iterations (default is 1000).
+        A (numpy.ndarray): The coefficient matrix of the linear system. It must be
+            a symmetric and positive-definite matrix.
+        b (numpy.ndarray): The right-hand side vector of the linear system.
+        x0 (numpy.ndarray, optional): An initial guess for the solution. If not
+            provided, a zero vector is used. Defaults to None.
+        tol (float, optional): The tolerance for convergence. The iteration stops
+            when the norm of the residual is less than this value. Defaults to 1e-5.
+        max_iter (int, optional): The maximum number of iterations to perform.
+            Defaults to 1000.
 
     Returns:
-        numpy.ndarray: The solution vector.
+        numpy.ndarray: The solution vector x that satisfies Ax = b.
 
     Raises:
-        ValueError: If the Conjugate Gradient method does not converge after the maximum number of iterations.
-
-    Examples:
-        >>> import numpy as np
-        >>> from ellalgo.conjugate_gradient import conjugate_gradient
-        >>> A = np.array([[3, 2], [2, 6]])
-        >>> b = np.array([2, -8])
-        >>> x = conjugate_gradient(A, b)
-        >>> np.allclose(x, np.array([2.0, -2.0]))
-        True
+        ValueError: If the method does not converge within the specified maximum
+            number of iterations.
     """
     n = len(b)
     if x0 is None:

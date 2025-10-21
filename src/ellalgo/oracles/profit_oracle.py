@@ -53,24 +53,22 @@ Cut = Tuple[Arr, float]
 
 
 class ProfitOracle(OracleOptim):
-    """Oracle for a profit maximization problem using Cobb-Douglas production function.
+    """
+    Oracle for a profit maximization problem with a Cobb-Douglas production function.
 
-    This implementation follows the formulation from [Aliabadi and Salahi, 2013]:
+    This class implements the `OracleOptim` interface for a specific profit
+    maximization problem. The production function is of the Cobb-Douglas type,
+    which is widely used in economics to represent the relationship between
+    production inputs and the amount of output.
 
-    Optimization problem:
-      max  p(A y₁^α y₂^β) − v₁y₁ − v₂y₂
-      s.t. y₁ ≤ k
+    The optimization problem is to maximize the profit, which is the difference
+    between the revenue from selling the product and the cost of the inputs.
+    The problem is subject to a constraint on one of the inputs.
 
-    Where:
-    - p(A y₁^α y₂^β): Cobb-Douglas production function in exponential form
-    - p: Market price per unit
-    - A: Production scale factor
-    - α, β: Output elasticities (α + β ≤ 1 for constant returns to scale)
-    - y: Input quantities (decision variables in log scale)
-    - v: Input prices
-    - k: Upper bound constraint for x₁
-
-    The oracle uses cutting plane methods to iteratively refine the solution space.
+    The `assess_optim` method is the core of the oracle. It takes a candidate
+    solution (a vector of input quantities) and the current best profit, and
+    it returns a cutting plane that helps to narrow down the search for the
+    optimal solution.
     """
 
     idx: int = -1  # Index for round-robin constraint checking
@@ -184,21 +182,26 @@ class ProfitOracle(OracleOptim):
         return None
 
     def assess_optim(self, xc: Arr, gamma: float) -> Tuple[Cut, Optional[float]]:
-        """Optimization assessment generating optimality cuts.
+        """
+        Assess the optimality of a candidate solution `xc`.
 
-        Workflow:
-        1. Check feasibility using assess_feas
-        2. If feasible, calculate new profit estimate and optimality cut
-        3. If infeasible, return feasibility cut
+        This method is the core of the `ProfitOracle`. It takes a candidate
+        solution `xc` and the current best profit `gamma`, and it returns a
+        cutting plane that helps to narrow down the search for the optimal
+        solution.
+
+        The method first checks if the solution is feasible. If not, it returns
+        a feasibility cut. If the solution is feasible, it calculates the
+        profit at `xc` and generates an optimality cut.
 
         Args:
-            y: Proposed solution point
-            gamma: Current best profit value
+            xc (Arr): The candidate solution vector (in log-space).
+            gamma (float): The current best profit.
 
         Returns:
-            Tuple containing:
-            - Cut (gradient, beta)
-            - Updated gamma (None if infeasible)
+            Tuple[Cut, Optional[float]]: A tuple containing the cutting plane
+            `(g, beta)` and the updated profit `gamma_new`. If the solution is
+            infeasible, `gamma_new` is `None`.
         """
         cut = self.assess_feas(xc, gamma)
         if cut is not None:

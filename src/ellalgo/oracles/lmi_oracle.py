@@ -52,18 +52,23 @@ Cut = Tuple[np.ndarray, float]
 
 
 class LMIOracle(OracleFeas):
-    """Oracle for Linear Matrix Inequality (LMI) constraint.
+    """
+    Oracle for Linear Matrix Inequality (LMI) constraints.
 
-    This oracle solves the following semidefinite feasibility problem:
+    This class implements the `OracleFeas` interface for solving semidefinite
+    feasibility problems involving Linear Matrix Inequalities (LMIs). An LMI
+    constraint is of the form:
 
-    |    find  x
-    |    s.t.  (B − ∑ F_i * x_i) ⪰ 0  [Matrix PSD constraint]
+        B - (F₁x₁ + F₂x₂ + ... + Fₙxₙ) ⪰ 0
 
-    Where:
-    - B is a constant symmetric matrix
-    - F_i are coefficient matrices
-    - x_i are decision variables
-    - ⪰ 0 denotes positive semidefinite requirement
+    where `B` and `Fᵢ` are symmetric matrices, and `x` is the vector of decision
+    variables. The notation `⪰ 0` means that the resulting matrix is required to
+    be positive semidefinite.
+
+    The `assess_feas` method checks if a given solution `x` satisfies the LMI
+    constraint. If it does, the method returns `None`. If not, it returns a
+    separating hyperplane (a "cut") that separates the infeasible point from
+    the feasible set.
     """
 
     def __init__(self, mat_f, mat_b):
@@ -82,18 +87,22 @@ class LMIOracle(OracleFeas):
         )  # Factorization manager for LDLT decomposition
 
     def assess_feas(self, xc: np.ndarray) -> Optional[Cut]:
-        """Assess feasibility of candidate solution xc against LMI constraint.
+        """
+        Assess the feasibility of a candidate solution `xc`.
 
-        Implementation Steps:
-        1. Construct matrix M(xc) = B - ∑ F_i*xc_i
-        2. Perform LDLT factorization of M(xc)
-        3. If factorization succeeds (matrix PSD), return None (feasible)
-        4. If factorization fails (not PSD), return separating hyperplane (cut)
+        This method checks if the given solution `xc` satisfies the LMI
+        constraint. It does this by constructing the matrix `M(xc)` and
+        performing an LDLT factorization to determine if it is positive
+        semidefinite.
 
-        :param xc: Candidate solution vector xc ∈ ℝⁿ
-        :return: None if feasible, else (g, σ) where:
-            - g ∈ ℝⁿ: subgradient of the violation
-            - σ ∈ ℝ: measure of constraint violation
+        Args:
+            xc (np.ndarray): The candidate solution vector.
+
+        Returns:
+            Optional[Cut]: `None` if `xc` is feasible (i.e., the LMI constraint
+            is satisfied). Otherwise, a tuple `(g, ep)` representing a
+            separating hyperplane, where `g` is the subgradient and `ep` is
+            the measure of violation.
         """
 
         def get_elem(i, j):

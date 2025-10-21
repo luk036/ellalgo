@@ -8,17 +8,21 @@ Cut = Tuple[np.ndarray, float]
 
 
 class LMI0Oracle:
-    """Oracle for Linear Matrix Inequality (LMI) constraint: F(x) ⪰ 0
+    """
+    Oracle for the Linear Matrix Inequality (LMI) constraint: F(x) ⪰ 0.
 
-    Solves the feasibility problem:
-        Find x ∈ ℝⁿ such that ∑_{k=1}^n F_k x_k ≽ 0
-    Where:
-        - F_k ∈ 𝕊^m (symmetric matrices) are given in mat_f
-        - x = [x_1, ..., x_n]^T is the decision vector
-        - ≽ denotes positive semidefinite (PSD) constraint
+    This class is a specialized oracle for solving the LMI feasibility problem
+    where the constant matrix `B` is zero. The constraint is of the form:
 
-    The oracle uses LDLT factorization to verify PSD property
-    and generates cutting planes for infeasible solutions.
+        F(x) = F₁x₁ + F₂x₂ + ... + Fₙxₙ ⪰ 0
+
+    where `Fᵢ` are symmetric matrices and `x` is the vector of decision
+    variables.
+
+    The `assess_feas` method checks if a given solution `x` satisfies the LMI
+    constraint. If it does, the method returns `None`. If not, it returns a
+    separating hyperplane (a "cut") that separates the infeasible point from
+    the feasible set.
     """
 
     def __init__(self, mat_f):
@@ -34,28 +38,22 @@ class LMI0Oracle:
         self.ldlt_mgr = LDLTMgr(len(mat_f[0]))
 
     def assess_feas(self, x: np.ndarray) -> Optional[Cut]:
-        """Assess the feasibility of a solution `x` against the LMI constraint.
+        """
+        Assess the feasibility of a candidate solution `x`.
 
-        This method checks if the matrix `F(x)` is positive semidefinite (PSD).
+        This method checks if the given solution `x` satisfies the LMI
+        constraint `F(x) ⪰ 0`. It does this by constructing the matrix `F(x)`
+        and performing an LDLT factorization to determine if it is positive
+        semidefinite.
 
-        Implementation Strategy:
-            1. Construct the matrix `F(x) = sum(x_k * F_k)` using an element-wise
-               approach to save memory.
-            2. Attempt to perform an LDLT factorization of `F(x)`.
-            3. If the factorization is successful, it means `F(x)` is PSD, and the
-               solution `x` is feasible. In this case, the method returns `None`.
-            4. If the factorization fails, it means `F(x)` is not PSD. The method
-               then computes a cutting plane `(g, sigma)` that separates `x` from
-               the feasible region.
-
-        Arguments:
+        Args:
             x (np.ndarray): The candidate solution vector.
 
         Returns:
-            Optional[Cut]:
-                - `None` if `x` is feasible (i.e., `F(x)` is PSD).
-                - A tuple `(g, sigma)` representing the cutting plane if `x` is
-                  infeasible.
+            Optional[Cut]: `None` if `x` is feasible (i.e., the LMI constraint
+            is satisfied). Otherwise, a tuple `(g, ep)` representing a
+            separating hyperplane, where `g` is the subgradient and `ep` is
+            the measure of violation.
         """
 
         def get_elem(i, j):
