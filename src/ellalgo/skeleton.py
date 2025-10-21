@@ -40,6 +40,7 @@ _logger = logging.getLogger(__name__)
 # `from ellalgo.skeleton import fib`,
 # when using this Python module as a library.
 
+
 def fib(n: int) -> int:
     """Fibonacci example function
 
@@ -60,6 +61,7 @@ def fib(n: int) -> int:
 # The functions defined in this section are wrappers around the main Python
 # API allowing them to be called directly from the terminal as a CLI
 # executable/script.
+
 
 def parse_args(args: List[str]) -> argparse.Namespace:
     """Parse command line parameters

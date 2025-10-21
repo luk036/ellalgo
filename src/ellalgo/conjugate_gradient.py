@@ -6,7 +6,11 @@ import numpy as np
 
 
 def conjugate_gradient(
-    A: np.ndarray, b: np.ndarray, x0: Optional[np.ndarray] = None, tol: float = 1e-5, max_iter: int = 1000
+    A: np.ndarray,
+    b: np.ndarray,
+    x0: Optional[np.ndarray] = None,
+    tol: float = 1e-5,
+    max_iter: int = 1000,
 ) -> np.ndarray:
     """
     Solves the linear system of equations Ax = b using the Conjugate Gradient method.

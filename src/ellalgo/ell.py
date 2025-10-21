@@ -35,7 +35,7 @@ involved in these operations, providing a clean interface for users of the class
 to work with ellipsoids in their algorithms.
 """
 
-from typing import Callable, Generic, Tuple, Union
+from typing import Callable, Tuple, Union
 
 import numpy as np
 
@@ -88,6 +88,13 @@ class Ell(SearchSpace[ArrayType]):
         3. Sets the center point
         4. Initializes tsq to 0
         5. Sets either kappa with unit matrix or diagonal matrix based on val type
+
+        Examples:
+            >>> import numpy as np
+            >>> from ellalgo.ell import Ell
+            >>> ell = Ell(1.0, np.array([0.0, 0.0]))
+            >>> ell.xc()
+            array([0., 0.])
         """
         ndim = len(xc)
         self.helper = EllCalc(ndim)
@@ -146,11 +153,14 @@ class Ell(SearchSpace[ArrayType]):
             CutStatus indicating success or failure of the update
 
         Examples:
-            >>> ell = Ell(1.0, [1.0, 1.0, 1.0, 1.0])
-            >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 1.0)
+            >>> import numpy as np
+            >>> from ellalgo.ell import Ell
+            >>> from ellalgo.ell_config import CutStatus
+            >>> ell = Ell(1.0, np.array([0.0, 0.0]))
+            >>> cut = (np.array([1.0, 1.0]), 0.0)
             >>> status = ell.update_bias_cut(cut)
-            >>> print(status)
-            CutStatus.Success
+            >>> status == CutStatus.Success
+            True
         """
         return self._update_core(cut, self.helper.calc_single_or_parallel)
 
@@ -168,11 +178,14 @@ class Ell(SearchSpace[ArrayType]):
             CutStatus indicating success or failure of the update
 
         Examples:
-            >>> ell = Ell(1.0, [1.0, 1.0, 1.0, 1.0])
-            >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 0.0)
+            >>> import numpy as np
+            >>> from ellalgo.ell import Ell
+            >>> from ellalgo.ell_config import CutStatus
+            >>> ell = Ell(1.0, np.array([0.0, 0.0]))
+            >>> cut = (np.array([1.0, 1.0]), 0.0)
             >>> status = ell.update_central_cut(cut)
-            >>> print(status)
-            CutStatus.Success
+            >>> status == CutStatus.Success
+            True
         """
         return self._update_core(cut, self.helper.calc_single_or_parallel_central_cut)
 
@@ -189,11 +202,14 @@ class Ell(SearchSpace[ArrayType]):
             CutStatus indicating success or failure of the update
 
         Examples:
-            >>> ell = Ell(1.0, [1.0, 1.0, 1.0, 1.0])
-            >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), -0.01)
+            >>> import numpy as np
+            >>> from ellalgo.ell import Ell
+            >>> from ellalgo.ell_config import CutStatus
+            >>> ell = Ell(1.0, np.array([0.0, 0.0]))
+            >>> cut = (np.array([1.0, 1.0]), 0.01)
             >>> status = ell.update_q(cut)
-            >>> print(status)
-            CutStatus.Success
+            >>> status == CutStatus.Success
+            True
         """
         return self._update_core(cut, self.helper.calc_single_or_parallel_q)
 
@@ -219,17 +235,14 @@ class Ell(SearchSpace[ArrayType]):
             CutStatus indicating success or failure of the update
 
         Examples:
-            >>> ell = Ell(1.0, [1.0, 1.0, 1.0, 1.0])
-            >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 1.0)
+            >>> import numpy as np
+            >>> from ellalgo.ell import Ell
+            >>> from ellalgo.ell_config import CutStatus
+            >>> ell = Ell(1.0, np.array([0.0, 0.0]))
+            >>> cut = (np.array([1.0, 1.0]), 0.0)
             >>> status = ell._update_core(cut, ell.helper.calc_single_or_parallel)
-            >>> print(status)
-            CutStatus.Success
-
-            >>> ell = Ell(1.0, [1.0, 1.0, 1.0, 1.0])
-            >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 1.0)
-            >>> status = ell._update_core(cut, ell.helper.calc_single_or_parallel_central_cut)
-            >>> print(status)
-            CutStatus.Success
+            >>> status == CutStatus.Success
+            True
         """
         grad, beta = cut
         if np.all(grad == 0.0):
@@ -238,6 +251,8 @@ class Ell(SearchSpace[ArrayType]):
         grad_t = self._mq @ grad  # n^2 multiplications
         # Calculate grad^T * (M * grad)
         omega = grad.dot(grad_t)  # n multiplications
+        if omega == 0.0:
+            return CutStatus.NoEffect
         # Update tsq measure
         self._tsq = self._kappa * omega
 

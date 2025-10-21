@@ -39,9 +39,7 @@ from .ell_typing import (
     SearchSpaceQ,
 )  # OracleFeasQ,
 
-CutChoice = Union[
-    float, MutableSequence
-]  # Single cut or parallel cuts
+CutChoice = Union[float, MutableSequence]  # Single cut or parallel cuts
 Cut = Tuple[ArrayType, CutChoice]  # Cut representation: (gradient, intercept)
 
 Num = Union[float, int]
@@ -101,7 +99,7 @@ def cutting_plane_feas(
      │CuttingPlane│    │SearchSpace││OracleFeas│
      └────────────┘    └───────────┘└──────────┘
 
-    Arguments:
+    Args:
         omega (OracleFeas): The feasibility oracle.
         space (SearchSpace): The search space.
         options (Options, optional): The options for the algorithm. Defaults to
@@ -122,8 +120,8 @@ def cutting_plane_feas(
         >>> omega = MyOracle()
         >>> space = Ell(10.0, np.array([0.0, 0.0]))
         >>> x, niter = cutting_plane_feas(omega, space, Options())
-        >>> x is None
-        False
+        >>> x is not None
+        True
     """
     for niter in range(options.max_iters):
         # Evaluate current solution
@@ -163,7 +161,7 @@ def cutting_plane_optim(
       improvement.
     - Bias cut: This maintains the feasibility of the current `gamma` level.
 
-    Arguments:
+    Args:
         omega (OracleOptim): The optimization oracle.
         space (SearchSpace): The search space.
         gamma (float): The initial best objective value.
@@ -173,6 +171,26 @@ def cutting_plane_optim(
     Returns:
         Tuple[Optional[ArrayType], float, int]: A tuple containing the best
         solution, the achieved `gamma`, and the number of iterations.
+
+    Examples:
+        >>> import numpy as np
+        >>> from ellalgo.cutting_plane import cutting_plane_optim
+        >>> from ellalgo.ell import Ell
+        >>> from ellalgo.ell_config import Options
+        >>> class MyOracle:
+        ...     def assess_optim(self, xc, gamma):
+        ...         g = 2 * (xc[0] + xc[1]) * np.array([1.0, 1.0])
+        ...         if np.all(g == 0.0):
+        ...             g = np.array([1.0, 1.0])
+        ...         if (xc[0] + xc[1])**2 > gamma:
+        ...             return (g, 0.0), (xc[0] + xc[1])**2
+        ...         else:
+        ...             return (g, 0.0), None
+        >>> omega = MyOracle()
+        >>> space = Ell(10.0, np.array([0.0, 0.0]))
+        >>> x, _, niter = cutting_plane_optim(omega, space, 0.0, Options())
+        >>> x is not None
+        True
     """
     x_best = None
     for niter in range(options.max_iters):
@@ -252,11 +270,14 @@ def cutting_plane_optim_q(
     3. Verify discrete solution feasibility
     4. Generate cuts adjusted for rounding effects
 
-    :param omega: Discrete optimization oracle
-    :param space_q: Quantized search space
-    :param gamma: Initial best objective value
-    :param options: Algorithm parameters
-    :return: (Best discrete solution, achieved g, iterations)
+    Args:
+        omega: Discrete optimization oracle
+        space_q: Quantized search space
+        gamma: Initial best objective value
+        options: Algorithm parameters
+
+    Returns:
+        (Best discrete solution, achieved g, iterations)
     """
     x_best = None
     retry = False  # Discrete feasibility check flag
@@ -291,10 +312,24 @@ def bsearch(
     2. Testing mid-point feasibility
     3. Halving search interval each iteration
 
-    :param omega: Binary search oracle implementing assess_bs()
-    :param intrvl: (lower, upper) bound tuple
-    :param options: Control parameters
-    :return: (Best g found, iterations used)
+    Args:
+        omega: Binary search oracle implementing assess_bs()
+        intrvl: (lower, upper) bound tuple
+        options: Control parameters
+
+    Returns:
+        (Best g found, iterations used)
+
+    Examples:
+        >>> from ellalgo.cutting_plane import bsearch
+        >>> from ellalgo.ell_config import Options
+        >>> class MyOracle:
+        ...     def assess_bs(self, gamma):
+        ...         return gamma > 0.5
+        >>> omega = MyOracle()
+        >>> upper, niter = bsearch(omega, (0.0, 1.0), Options())
+        >>> upper > 0.5
+        True
     """
     lower, upper = intrvl
     T = type(upper)  # Preserve numerical type (int/float)

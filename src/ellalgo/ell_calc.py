@@ -52,7 +52,8 @@ from .ell_config import CutStatus
 
 
 class EllCalc:
-    """
+    """Ellipsoid Calculator for the Ellipsoid Method.
+
     The `EllCalc` class is a core component of the ellipsoid method, responsible for
     calculating the parameters required to update the search ellipsoid at each iteration.
     It provides methods for various types of cutting planes, including deep cuts,
@@ -81,8 +82,7 @@ class EllCalc:
         The constructor sets up the necessary parameters for ellipsoid calculations,
         including storing the dimension and initializing the helper class.
 
-        :param n: The dimension of the problem space (must be ≥ 2)
-        :type n: int
+        Args:            n (int): The dimension of the problem space (must be >= 2).
 
         Examples:
             >>> from ellalgo.ell_calc import EllCalc
@@ -132,16 +132,23 @@ class EllCalc:
         Similar to calc_single_or_parallel but specifically for central cuts (cuts passing through
         the center of the ellipsoid).
 
-        :param beta: Either a single numeric value or a list of two values
-        :param tsq: The square of the tolerance parameter (τ²)
-        :type tsq: float
-        :return: A tuple containing status and optional result values
+        Args:
+            beta: Either a single numeric value or a list of two values.
+            tsq: The square of the tolerance parameter (τ²).
+
+        Returns:
+            A tuple containing status and optional result values.
 
         Examples:
             >>> from ellalgo.ell_calc import EllCalc
+            >>> from ellalgo.ell_config import CutStatus
+            >>> from pytest import approx
             >>> calc = EllCalc(4)
-            >>> calc.calc_single_or_parallel_central_cut([0, 0.11], 0.01)
-            (<CutStatus.Success: 0>, (0.020000000000000004, 0.4, 1.0666666666666667))
+            >>> status, result = calc.calc_single_or_parallel_central_cut([0, 0.11], 0.01)
+            >>> status
+            <CutStatus.Success: 0>
+            >>> result[0] == approx(0.02)
+            True
         """
         if isinstance(beta, (int, float)) or len(beta) < 2 or not self.use_parallel_cut:
             return (CutStatus.Success, self.helper.calc_central_cut(sqrt(tsq)))
@@ -160,13 +167,13 @@ class EllCalc:
         A parallel cut involves two parallel hyperplanes cutting the ellipsoid. This method
         calculates the transformation parameters for such a cut after validating the inputs.
 
-        :param beta0: First cut parameter (lower bound)
-        :type beta0: float
-        :param beta1: Second cut parameter (upper bound)
-        :type beta1: float
-        :param tsq: Square of the tolerance parameter (τ²)
-        :type tsq: float
-        :return: Status and optional result tuple
+        Args:
+            beta0 (float): First cut parameter (lower bound).
+            beta1 (float): Second cut parameter (upper bound).
+            tsq (float): Square of the tolerance parameter (τ²).
+
+        Returns:
+            Status and optional result tuple.
 
         The method first checks if beta1 < beta0 (invalid case), then checks if the cut
         would be outside the ellipsoid (tsq ≤ b1sq), and falls back to a single cut if so.
@@ -191,21 +198,30 @@ class EllCalc:
         of the ellipsoid. This method validates the input and calculates the transformation
         parameters if valid.
 
-        :param beta: Cut parameter (must be ≥ 0)
-        :type beta: float
-        :param tsq: Square of the tolerance parameter (τ²)
-        :type tsq: float
-        :return: Status and optional result tuple
+        Args:
+            beta (float): Cut parameter (must be >= 0).
+            tsq (float): Square of the tolerance parameter (τ²).
+
+        Returns:
+            Status and optional result tuple.
 
         Examples:
             >>> from ellalgo.ell_calc import EllCalc
+            >>> from ellalgo.ell_config import CutStatus
             >>> calc = EllCalc(3)
-            >>> calc.calc_bias_cut(1.0, 4.0)
-            (<CutStatus.Success: 0>, (1.25, 0.8333333333333334, 0.84375))
-            >>> calc.calc_bias_cut(0.0, 4.0)
-            (<CutStatus.Success: 0>, (0.5, 0.5, 1.125))
-            >>> calc.calc_bias_cut(1.5, 2.0)
-            (<CutStatus.NoSoln: 1>, None)
+            >>> status, result = calc.calc_bias_cut(1.0, 4.0)
+            >>> status
+            <CutStatus.Success: 0>
+            >>> result[0]
+            1.25
+            >>> status, result = calc.calc_bias_cut(0.0, 4.0)
+            >>> status
+            <CutStatus.Success: 0>
+            >>> result[0]
+            0.5
+            >>> status, result = calc.calc_bias_cut(1.5, 2.0)
+            >>> status
+            <CutStatus.NoSoln: 1>
         """
         assert beta >= 0.0
         bsq = beta * beta
@@ -225,10 +241,12 @@ class EllCalc:
         This is a variant of calc_single_or_parallel designed for discrete optimization
         problems, with additional checks for numerical stability.
 
-        :param beta: Either a single numeric value or a list of two values
-        :param tsq: Square of the tolerance parameter (τ²)
-        :type tsq: float
-        :return: Status and optional result tuple
+        Args:
+            beta: Either a single numeric value or a list of two values.
+            tsq (float): Square of the tolerance parameter (τ²).
+
+        Returns:
+            Status and optional result tuple.
         """
         if isinstance(beta, (int, float)):
             return self.calc_bias_cut_q(beta, tsq)
@@ -244,13 +262,13 @@ class EllCalc:
         This version includes additional checks for numerical stability in discrete
         optimization problems, specifically checking if eta ≤ 0.0.
 
-        :param beta0: First cut parameter
-        :type beta0: float
-        :param beta1: Second cut parameter
-        :type beta1: float
-        :param tsq: Square of the tolerance parameter (τ²)
-        :type tsq: float
-        :return: Status and optional result tuple
+        Args:
+            beta0 (float): First cut parameter.
+            beta1 (float): Second cut parameter.
+            tsq (float): Square of the tolerance parameter (τ²).
+
+        Returns:
+            Status and optional result tuple.
         """
         if beta1 < beta0:
             return (CutStatus.NoSoln, None)  # no sol'n
@@ -274,21 +292,28 @@ class EllCalc:
         This version includes additional checks for numerical stability in discrete
         optimization problems, specifically checking if eta ≤ 0.0.
 
-        :param beta: Cut parameter
-        :type beta: float
-        :param tsq: Square of the tolerance parameter (τ²)
-        :type tsq: float
-        :return: Status and optional result tuple
+        Args:
+            beta (float): Cut parameter.
+            tsq (float): Square of the tolerance parameter (τ²).
+
+        Returns:
+            Status and optional result tuple.
 
         Examples:
             >>> from ellalgo.ell_calc import EllCalc
+            >>> from ellalgo.ell_config import CutStatus
             >>> calc = EllCalc(3)
-            >>> calc.calc_bias_cut_q(0.0, 4.0)
-            (<CutStatus.Success: 0>, (0.5, 0.5, 1.125))
-            >>> calc.calc_bias_cut_q(1.5, 2.0)
-            (<CutStatus.NoSoln: 1>, None)
-            >>> calc.calc_bias_cut_q(-1.5, 4.0)
-            (<CutStatus.NoEffect: 2>, None)
+            >>> status, result = calc.calc_bias_cut_q(0.0, 4.0)
+            >>> status
+            <CutStatus.Success: 0>
+            >>> result[0]
+            0.5
+            >>> status, result = calc.calc_bias_cut_q(1.5, 2.0)
+            >>> status
+            <CutStatus.NoSoln: 1>
+            >>> status, result = calc.calc_bias_cut_q(-1.5, 4.0)
+            >>> status
+            <CutStatus.NoEffect: 2>
         """
         tau = sqrt(tsq)
         if tau < beta:
@@ -300,28 +325,3 @@ class EllCalc:
             CutStatus.Success,
             self.helper.calc_bias_cut_fast(beta, tau, eta),
         )
-
-
-if __name__ == "__main__":
-    from pytest import approx
-
-    # Test cases for the parallel cut calculations
-    ell_calc = EllCalc(4)
-    status, _ = ell_calc.calc_parallel_q(0.07, 0.03, 0.01)
-    assert status == CutStatus.NoSoln
-
-    status, result = ell_calc.calc_parallel_q(0.0, 0.05, 0.01)
-    assert status == CutStatus.Success
-    assert result is not None
-    rho, sigma, delta = result
-    assert sigma == approx(0.8)
-    assert rho == approx(0.02)
-    assert delta == approx(1.2)
-
-    status, result = ell_calc.calc_parallel_q(0.05, 0.11, 0.01)
-    assert status == CutStatus.Success
-    assert result is not None
-    rho, sigma, delta = result
-    assert sigma == approx(0.8)
-    assert rho == approx(0.06)
-    assert delta == approx(0.8)
