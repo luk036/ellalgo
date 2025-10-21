@@ -25,6 +25,17 @@ class CutStatus(Enum):
       happen if the cut is redundant or lies outside the current search region.
     - `Unknown`: The status of the cut operation is unknown or could not be
       determined.
+
+    Examples:
+        >>> from ellalgo.ell_config import CutStatus
+        >>> CutStatus.Success
+        <CutStatus.Success: 0>
+        >>> CutStatus.NoSoln
+        <CutStatus.NoSoln: 1>
+        >>> CutStatus.NoEffect
+        <CutStatus.NoEffect: 2>
+        >>> CutStatus.Unknown
+        <CutStatus.Unknown: 3>
     """
 
     Success = 0
@@ -50,6 +61,17 @@ class Options:
             stops when the size of the search space (e.g., `tsq`) is smaller than
             this value, indicating that a solution has been found to the desired
             precision.
+
+    Examples:
+        >>> from ellalgo.ell_config import Options
+        >>> options = Options()
+        >>> options.max_iters
+        2000
+        >>> options.tolerance
+        1e-20
+        >>> options.max_iters = 1000
+        >>> options.max_iters
+        1000
     """
 
     max_iters: int = 2000  # maximum number of iterations
