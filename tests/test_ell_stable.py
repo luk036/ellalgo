@@ -20,7 +20,6 @@ def test_update_central_cut():
     status = ell.update_central_cut(cut)
     assert status == CutStatus.Success
     assert ell._xc == approx(-0.01 * np.ones(4))
-    # assert ell._mq == approx(np.eye(4) - 0.1 * np.ones((4, 4)))
     assert ell._kappa == approx(0.16 / 15.0)
     assert ell._tsq == 0.01
 
@@ -31,7 +30,6 @@ def test_update_bias_cut():
     status = ell.update_bias_cut(cut)
     assert status == CutStatus.Success
     assert ell._xc == approx(-0.03 * np.ones(4))
-    # assert ell._mq == approx(np.eye(4) - 0.2 * np.ones((4, 4)))
     assert ell._kappa == approx(0.008)
     assert ell._tsq == 0.01
 
@@ -42,7 +40,6 @@ def test_update_parallel_central_cut():
     status = ell.update_central_cut(cut)
     assert status == CutStatus.Success
     assert ell._xc == approx(-0.01 * np.ones(4))
-    # assert ell._mq == approx(np.eye(4) - 0.2 * np.ones((4, 4)))
     assert ell._kappa == approx(0.012)
     assert ell._tsq == 0.01
 
@@ -53,7 +50,6 @@ def test_update_parallel():
     status = ell.update_bias_cut(cut)
     assert status == CutStatus.Success
     assert ell._xc == approx(-0.0116 * np.ones(4))
-    # assert ell._mq == approx(np.eye(4) - 0.232 * np.ones((4, 4)))
     assert ell._kappa == approx(0.01232)
     assert ell._tsq == 0.01
 

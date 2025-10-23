@@ -43,7 +43,6 @@ from .ell_calc import EllCalc
 from .ell_config import CutStatus
 from .ell_typing import ArrayType, SearchSpace
 
-
 # Type aliases for better code readability
 Mat = np.ndarray
 CutChoice = Union[float, ArrayType]  # single or parallel cut

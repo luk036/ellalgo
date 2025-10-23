@@ -1,7 +1,8 @@
 """
 Cutting Plane Algorithm Implementation
 
-This code implements various cutting plane algorithms, which are optimization techniques used to solve convex optimization problems. The main purpose of these algorithms is to find optimal or feasible solutions within a given search space.
+This code implements various cutting plane algorithms, which are optimization techniques used to solve convex optimization problems. 
+The main purpose of these algorithms is to find optimal or feasible solutions within a given search space.
 
 The code defines several functions that take different inputs:
 
@@ -28,7 +29,7 @@ from typing import Any, MutableSequence, Optional, Tuple, Union
 
 from .ell_config import CutStatus, Options
 from .ell_typing import (
-    ArrayType,
+    ArrayType,  # OracleFeasQ,
     OracleBS,
     OracleFeas,
     OracleFeas2,
@@ -37,7 +38,7 @@ from .ell_typing import (
     SearchSpace,
     SearchSpace2,
     SearchSpaceQ,
-)  # OracleFeasQ,
+)
 
 CutChoice = Union[float, MutableSequence]  # Single cut or parallel cuts
 Cut = Tuple[ArrayType, CutChoice]  # Cut representation: (gradient, intercept)
