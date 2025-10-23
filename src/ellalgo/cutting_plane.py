@@ -1,7 +1,7 @@
 """
 Cutting Plane Algorithm Implementation
 
-This code implements various cutting plane algorithms, which are optimization techniques used to solve convex optimization problems. 
+This code implements various cutting plane algorithms, which are optimization techniques used to solve convex optimization problems.
 The main purpose of these algorithms is to find optimal or feasible solutions within a given search space.
 
 The code defines several functions that take different inputs:
