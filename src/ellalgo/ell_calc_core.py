@@ -568,7 +568,14 @@ class EllCalcCore:
         bavg = 0.5 * (beta0 + beta1)
         bavgsq = bavg * bavg
         h = 0.5 * (tsq + b0b1) + self._n_f * bavgsq
-        k = h + sqrt(h * h - self._n_plus_1 * eta * bavgsq)
+        gamma_q = h * h - self._n_plus_1 * eta * bavgsq
+        if gamma_q < 0.0:
+            gamma_q = 0.0
+        k = h + sqrt(gamma_q)
+
+        if k <= eta:
+            return self.calc_central_cut(sqrt(tsq))
+
         sigma = eta / k
         inv_mu = eta / (k - eta)
         rho = bavg * sigma
