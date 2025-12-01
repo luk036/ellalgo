@@ -14,6 +14,11 @@ Num = Union[float, int]
 
 class OracleFeas(Generic[ArrayType]):
     @abstractmethod
+    def __init__(self, mat_f: List[np.ndarray], mat_b: Optional[np.ndarray] = None) -> None:
+        """
+        Constructor for OracleFeas.
+        """
+    @abstractmethod
     def assess_feas(self, xc: ArrayType) -> Optional[Cut]:
         """
         The `assess_feas` function assesses the feasibility of a given input and returns a cut if it is
@@ -113,6 +118,11 @@ class OracleBS(ABC):
 # The `SearchSpace` class is an abstract base class that defines methods for updating deep-cut and
 # central cut, as well as accessing the xc and tsq attributes.
 class SearchSpace(Generic[ArrayType]):
+    @abstractmethod
+    def __init__(self, val: Union[float, ArrayType], xc: ArrayType) -> None:
+        """
+        Constructor for SearchSpace.
+        """
     @abstractmethod
     def update_bias_cut(self, cut: Cut) -> CutStatus:
         """

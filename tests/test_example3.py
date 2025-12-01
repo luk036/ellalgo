@@ -5,7 +5,7 @@ Test Example 3
 from __future__ import print_function
 
 import numpy as np
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 from ellalgo.cutting_plane import BSearchAdaptor, Options, bsearch
 from ellalgo.ell_stable import EllStable
@@ -22,6 +22,9 @@ class MyOracle3(OracleFeas2):
 
     idx = -1
     target = -1e100
+
+    def __init__(self, mat_f: List[np.ndarray], mat_b: Optional[np.ndarray] = None) -> None:
+        pass
 
     def assess_feas(self, xc: np.ndarray) -> Optional[Tuple[np.ndarray, float]]:
         """
@@ -79,7 +82,7 @@ def test_case_feasible() -> None:
     ellip = EllStable(100.0, xinit)
     options = Options()
     options.tolerance = 1e-8
-    adaptor = BSearchAdaptor(MyOracle3(), ellip, options)
+    adaptor = BSearchAdaptor(MyOracle3([], None), ellip, options)
     xbest, num_iters = bsearch(adaptor, (-100.0, 100.0), options)
     assert xbest is not None
     assert num_iters == 34

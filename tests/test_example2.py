@@ -5,7 +5,7 @@ Test Example 2
 from __future__ import print_function
 
 import numpy as np
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 from ellalgo.cutting_plane import cutting_plane_feas
 from ellalgo.ell import Ell
@@ -21,6 +21,9 @@ class MyOracle2(OracleFeas):
     """
 
     idx = -1  # for round robin
+
+    def __init__(self, mat_f: List[np.ndarray], mat_b: Optional[np.ndarray] = None) -> None:
+        pass
 
     def assess_feas(self, xc: np.ndarray) -> Optional[Tuple[np.ndarray, float]]:
         """
@@ -58,7 +61,7 @@ def test_case_feasible() -> None:
     """
     xinit = np.array([0.0, 0.0])  # initial guess
     ellip = Ell(10.0, xinit)
-    omega = MyOracle2()
+    omega = MyOracle2([], None)
     xfeas, num_iters = cutting_plane_feas(omega, ellip)
     assert xfeas is not None
     assert num_iters == 1
@@ -71,7 +74,7 @@ def test_case_infeasible() -> None:
     """
     xinit = np.array([100.0, 100.0])  # wrong initial guess
     ellip = Ell(10.0, xinit)
-    omega = MyOracle2()
+    omega = MyOracle2([], None)
     xfeas, num_iters = cutting_plane_feas(omega, ellip)
     assert xfeas is None
     assert num_iters == 0

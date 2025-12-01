@@ -4,7 +4,7 @@ Test Cutting Plane
 
 from __future__ import print_function
 
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pytest
@@ -30,6 +30,9 @@ def options() -> Options:
 class MyOracleFeas(OracleFeas):
     """Oracle for feasibility problem."""
 
+    def __init__(self, mat_f: List[np.ndarray], mat_b: Optional[np.ndarray] = None) -> None:
+        pass
+
     def assess_feas(self, xc: np.ndarray) -> Optional[Tuple[np.ndarray, float]]:
         """Assess feasibility of `xc`."""
         x, y = xc
@@ -40,6 +43,9 @@ class MyOracleFeas(OracleFeas):
 
 class MyOracleInfeas(OracleFeas):
     """Oracle for infeasibility problem."""
+
+    def __init__(self, mat_f: List[np.ndarray], mat_b: Optional[np.ndarray] = None) -> None:
+        pass
 
     def assess_feas(self, xc: np.ndarray) -> Optional[Tuple[np.ndarray, float]]:
         """Assess feasibility of `xc`."""
@@ -102,7 +108,7 @@ def test_cutting_plane_feas(options: Options) -> None:
     """Test cutting plane feasibility."""
     xinit = np.array([0.0, 0.0])
     ellip = Ell(10.0, xinit)
-    omega = MyOracleFeas()
+    omega = MyOracleFeas([], None)
     options.max_iters = 200
     xbest, num_iters = cutting_plane_feas(omega, ellip, options)
     assert xbest is not None
@@ -113,7 +119,7 @@ def test_cutting_plane_feas_no_soln(options: Options) -> None:
     """Test cutting plane feasibility with no solution."""
     xinit = np.array([0.0, 0.0])
     ellip = Ell(10.0, xinit)
-    omega = MyOracleInfeas()
+    omega = MyOracleInfeas([], None)
     options.max_iters = 200
     xbest, num_iters = cutting_plane_feas(omega, ellip, options)
     assert xbest is None

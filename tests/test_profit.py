@@ -32,7 +32,7 @@ def run_profit(E: Type[SearchSpace]) -> int:
     :return: The function `run_profit` returns the number of iterations (`num_iters`) performed during
         the optimization process.
     """
-    ellip = E(r, np.array([0.0, 0.0]))  # type: ignore
+    ellip = E(r, np.array([0.0, 0.0])) 
     omega = ProfitOracle(params, a, v)
     xbest, _, num_iters = cutting_plane_optim(omega, ellip, 0.0)
     assert xbest is not None
@@ -53,7 +53,7 @@ def run_profit_rb(E: Type[SearchSpace]) -> int:
     e1 = 0.003
     e2 = 0.007
     e3 = e4 = e5 = 1.0
-    ellip = E(r, np.array([0.0, 0.0]))  # type: ignore
+    ellip = E(r, np.array([0.0, 0.0])) 
     omega = ProfitRbOracle(params, a, v, (e1, e2, e3, e4, e5))
     xbest, _, num_iters = cutting_plane_optim(omega, ellip, 0.0)
     assert xbest is not None

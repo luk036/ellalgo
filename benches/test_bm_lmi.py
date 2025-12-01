@@ -2,17 +2,17 @@
 from __future__ import print_function
 
 # import time
-from typing import Any, Optional, Tuple, Type
+from typing import Any, Optional, Tuple, Type, List
 
 import numpy as np
 
 from ellalgo.cutting_plane import OracleOptim, cutting_plane_optim
 from ellalgo.ell import Ell
-from ellalgo.ell_typing import OracleFeas
+from ellalgo.ell_typing import CutChoice, OracleFeas
 from ellalgo.oracles.lmi_old_oracle import LMIOldOracle
 from ellalgo.oracles.lmi_oracle import LMIOracle
 
-Cut = Tuple[np.ndarray, float]
+Cut = Tuple[np.ndarray, CutChoice]
 
 
 class MyOracle(OracleOptim):
@@ -40,8 +40,8 @@ class MyOracle(OracleOptim):
         )
         B2_mat = np.array([[14.0, 9.0, 40.0], [9.0, 91.0, 10.0], [40.0, 10.0, 15.0]])
 
-        self.lmi1 = oracle([F1_mat], B1_mat)  # type: ignore
-        self.lmi2 = oracle([F2_mat], B2_mat)  # type: ignore
+        self.lmi1 = oracle([F1_mat[i] for i in range(F1_mat.shape[0])], B1_mat)
+        self.lmi2 = oracle([F2_mat[i] for i in range(F2_mat.shape[0])], B2_mat)
 
     def assess_optim(self, xc: np.ndarray, gamma: float) -> Tuple[Cut, Optional[float]]:
         """[summary]
@@ -53,17 +53,17 @@ class MyOracle(OracleOptim):
         Returns:
             Tuple[Cut, float]: [description]
         """
+        f0: Optional[float] = None
         if cut := self.lmi1.assess_feas(xc):
-            return cut, None  # type: ignore
+            return cut, None
 
         if cut := self.lmi2.assess_feas(xc):
-            return cut, None  # type: ignore
+            return cut, None
 
         f0 = self.c.dot(xc)
         if (fj := f0 - gamma) > 0.0:
             return (self.c, fj), None
         return (self.c, 0.0), f0
-
 
 def run_lmi(oracle: Type[OracleFeas]) -> int:
     """[summary]
