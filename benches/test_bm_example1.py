@@ -112,11 +112,11 @@ def run_example1(omega):
     return num_iters
 
 
-def test_bm_with_round_robin(benchmark):
+def test_bm_with_round_robin(benchmark) -> None:
     num_iters = benchmark(run_example1, MyOracle1)
     assert num_iters == 25
 
 
-def test_bm_without_round_robin(benchmark):
+def test_bm_without_round_robin(benchmark) -> None:
     num_iters = benchmark(run_example1, MyOracle2)
     assert num_iters == 25

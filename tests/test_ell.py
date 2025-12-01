@@ -6,7 +6,7 @@ from ellalgo.ell import Ell
 from ellalgo.ell_config import CutStatus
 
 
-def test_construct():
+def test_construct() -> None:
     ell = Ell(0.01, np.zeros(4))
     assert ell.no_defer_trick is False
     assert ell._kappa == 0.01
@@ -15,7 +15,7 @@ def test_construct():
     assert ell._tsq == 0.0
 
 
-def test_update_central_cut():
+def test_update_central_cut() -> None:
     ell = Ell(0.01, np.zeros(4))
     cut = 0.5 * np.ones(4), 0.0
     status = ell.update_central_cut(cut)
@@ -26,7 +26,7 @@ def test_update_central_cut():
     assert ell._tsq == 0.01
 
 
-def test_update_bias_cut():
+def test_update_bias_cut() -> None:
     ell = Ell(0.01, np.zeros(4))
     cut = 0.5 * np.ones(4), 0.05
     status = ell.update_bias_cut(cut)
@@ -37,7 +37,7 @@ def test_update_bias_cut():
     assert ell._tsq == 0.01
 
 
-def test_update_parallel_central_cut():
+def test_update_parallel_central_cut() -> None:
     ell = Ell(0.01, np.zeros(4))
     cut = 0.5 * np.ones(4), [0.0, 0.05]
     status = ell.update_central_cut(cut)
@@ -48,7 +48,7 @@ def test_update_parallel_central_cut():
     assert ell._tsq == 0.01
 
 
-def test_update_parallel():
+def test_update_parallel() -> None:
     ell = Ell(0.01, np.zeros(4))
     cut = 0.5 * np.ones(4), [0.01, 0.04]
     status = ell.update_bias_cut(cut)
@@ -59,7 +59,7 @@ def test_update_parallel():
     assert ell._tsq == 0.01
 
 
-def test_update_parallel_no_effect():
+def test_update_parallel_no_effect() -> None:
     ell = Ell(0.01, np.zeros(4))
     cut = 0.5 * np.ones(4), [-0.04, 0.0625]
     status = ell.update_bias_cut(cut)
@@ -69,7 +69,7 @@ def test_update_parallel_no_effect():
     assert ell._kappa == approx(0.01)
 
 
-def test_update_q_no_effect():
+def test_update_q_no_effect() -> None:
     ell = Ell(0.01, np.zeros(4))
     cut = 0.5 * np.ones(4), [-0.04, 0.0625]
     status = ell.update_q(cut)
@@ -79,7 +79,7 @@ def test_update_q_no_effect():
     assert ell._kappa == approx(0.01)
 
 
-def test_update_q_with_effect():
+def test_update_q_with_effect() -> None:
     ell = Ell(0.01, np.zeros(4))
     cut = 0.5 * np.ones(4), [0.01, 0.04]
     status = ell.update_q(cut)
@@ -90,14 +90,14 @@ def test_update_q_with_effect():
     assert ell._tsq == 0.01
 
 
-def test_update_central_cut_with_zero_g():
+def test_update_central_cut_with_zero_g() -> None:
     ell = Ell(0.01, np.zeros(4))
     cut = np.zeros(4), 0.0
     with pytest.raises(ValueError):
         ell.update_central_cut(cut)
 
 
-def test_no_defer_trick():
+def test_no_defer_trick() -> None:
     ell = Ell(0.01, np.zeros(4))
     ell.no_defer_trick = True
     cut = 0.5 * np.ones(4), 0.05

@@ -95,7 +95,7 @@ class MyOracleBS(OracleBS):
         return gamma > 0
 
 
-def test_cutting_plane_feas(options):
+def test_cutting_plane_feas(options) -> None:
     """Test cutting plane feasibility."""
     xinit = np.array([0.0, 0.0])
     ellip = Ell(10.0, xinit)
@@ -106,7 +106,7 @@ def test_cutting_plane_feas(options):
     assert num_iters == 0
 
 
-def test_cutting_plane_feas_no_soln(options):
+def test_cutting_plane_feas_no_soln(options) -> None:
     """Test cutting plane feasibility with no solution."""
     xinit = np.array([0.0, 0.0])
     ellip = Ell(10.0, xinit)
@@ -117,7 +117,7 @@ def test_cutting_plane_feas_no_soln(options):
     assert num_iters == 2
 
 
-def test_cutting_plane_optim(options):
+def test_cutting_plane_optim(options) -> None:
     """Test cutting plane optimization."""
     xinit = np.array([0.0, 0.0])
     ellip = Ell(10.0, xinit)
@@ -129,7 +129,7 @@ def test_cutting_plane_optim(options):
     assert num_iters == 145
 
 
-def test_cutting_plane_optim_no_soln(options):
+def test_cutting_plane_optim_no_soln(options) -> None:
     """Test cutting plane optimization with no solution."""
     xinit = np.array([0.0, 0.0])
     ellip = Ell(10.0, xinit)
@@ -140,7 +140,7 @@ def test_cutting_plane_optim_no_soln(options):
     assert num_iters == 0
 
 
-def test_cutting_plane_optim_q(options):
+def test_cutting_plane_optim_q(options) -> None:
     """Test cutting plane optimization with quantization."""
     xinit = np.array([0.0, 0.0])
     ellip = Ell(10.0, xinit)
@@ -152,7 +152,7 @@ def test_cutting_plane_optim_q(options):
     assert num_iters == 145
 
 
-def test_cutting_plane_optim_q_no_soln(options):
+def test_cutting_plane_optim_q_no_soln(options) -> None:
     """Test cutting plane optimization with quantization and no solution."""
     xinit = np.array([0.0, 0.0])
     ellip = Ell(10.0, xinit)
@@ -163,7 +163,7 @@ def test_cutting_plane_optim_q_no_soln(options):
     assert num_iters == 0
 
 
-def test_bsearch(options):
+def test_bsearch(options) -> None:
     """Test binary search."""
     omega = MyOracleBS()
     options.tolerance = 1e-7
@@ -173,7 +173,7 @@ def test_bsearch(options):
     assert num_iters == 30
 
 
-def test_bsearch_no_soln(options):
+def test_bsearch_no_soln(options) -> None:
     """Test binary search with no solution."""
     omega = MyOracleBS()
     options.max_iters = 20

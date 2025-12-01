@@ -59,7 +59,7 @@ class MyOracle1(OracleOptim):
         return ((np.array([-1.0, -1.0]), 0.0), f0)
 
 
-def test_case_feasible():
+def test_case_feasible() -> None:
     """
     The function `test_case_feasible` sets up a test case for a cutting plane optimization algorithm
     with specific parameters and asserts the expected outcome.
@@ -74,7 +74,7 @@ def test_case_feasible():
     assert num_iters == 25
 
 
-def test_case_infeasible1():
+def test_case_infeasible1() -> None:
     """
     The function `test_case_infeasible1` tests for infeasibility by providing a wrong initial guess or
     an ellipsoid that is too small.
@@ -86,7 +86,7 @@ def test_case_infeasible1():
     assert xbest is None
 
 
-def test_case_infeasible2():
+def test_case_infeasible2() -> None:
     """
     The function `test_case_infeasible2` initializes variables and asserts that the best solution is
     None.

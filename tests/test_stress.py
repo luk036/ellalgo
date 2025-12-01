@@ -9,7 +9,7 @@ from ellalgo.ell import Ell
 from ellalgo.oracles.lowpass_oracle import create_lowpass_case
 
 
-def test_stress_lowpass_high_dimension():
+def test_stress_lowpass_high_dimension() -> None:
     """
     Test with a high-dimensional problem for LowpassOracle.
     """
@@ -20,7 +20,7 @@ def test_stress_lowpass_high_dimension():
     assert feasible
 
 
-def test_stress_lowpass_many_iterations():
+def test_stress_lowpass_many_iterations() -> None:
     """
     Test with a small tolerance to force many iterations for LowpassOracle.
     """

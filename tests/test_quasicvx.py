@@ -103,7 +103,7 @@ class MyQuasicvxOracle(OracleOptim):
         return (np.array([-1.0, sqrtx]), 0), gamma
 
 
-def test_case_feasible():
+def test_case_feasible() -> None:
     """
     The function `test_case_feasible` sets up a test case for optimization using cutting plane method
     and asserts the expected results.
@@ -121,7 +121,7 @@ def test_case_feasible():
     assert math.exp(xbest[1]) == approx(1.6430639574974657)
 
 
-def test_case_infeasible1():
+def test_case_infeasible1() -> None:
     """
     The function `test_case_infeasible1` tests for infeasibility in an optimization problem.
     """
@@ -132,7 +132,7 @@ def test_case_infeasible1():
     assert xbest is None
 
 
-def test_case_infeasible2():
+def test_case_infeasible2() -> None:
     """
     The function `test_case_infeasible2` initializes variables and asserts that the result is None.
     """
@@ -143,7 +143,7 @@ def test_case_infeasible2():
     assert xbest is None
 
 
-def test_case_feasible_stable():
+def test_case_feasible_stable() -> None:
     """
     The function `test_case_feasible_stable` tests the optimization of a convex function using cutting
     plane method with specific assertions.
@@ -158,7 +158,7 @@ def test_case_feasible_stable():
     assert math.exp(xbest[1]) == approx(1.6487213178704083)
 
 
-def test_case_infeasible1_stable():
+def test_case_infeasible1_stable() -> None:
     """
     The function `test_case_infeasible1_stable` tests for infeasibility by using a wrong initial guess
     or an ellipsoid that is too small.
@@ -170,7 +170,7 @@ def test_case_infeasible1_stable():
     assert xbest is None
 
 
-def test_case_infeasible2_stable():
+def test_case_infeasible2_stable() -> None:
     """
     The function `test_case_infeasible2_stable` initializes variables and performs optimization using
     cutting plane method, asserting that the result is `None`.

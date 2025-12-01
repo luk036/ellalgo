@@ -69,7 +69,7 @@ class MyOracle3(OracleFeas2):
         self.target = gamma
 
 
-def test_case_feasible():
+def test_case_feasible() -> None:
     """
     The function `test_case_feasible` sets up a test case for binary search with specific parameters and
     asserts the expected outcome.

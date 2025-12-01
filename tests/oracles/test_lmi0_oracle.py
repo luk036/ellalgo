@@ -7,7 +7,7 @@ import numpy as np
 from ellalgo.oracles.lmi0_oracle import LMI0Oracle
 
 
-def test_lmi0_oracle_feasible():
+def test_lmi0_oracle_feasible() -> None:
     """
     The function `test_lmi0_oracle_feasible` tests the feasibility of a Linear Matrix Inequality (LMI)
     oracle.
@@ -23,7 +23,7 @@ def test_lmi0_oracle_feasible():
     assert cut is None
 
 
-def test_lmi0_oracle_infeasible():
+def test_lmi0_oracle_infeasible() -> None:
     """
     The function `test_lmi0_oracle_infeasible` tests the case where the LMI oracle is infeasible.
     """
@@ -40,7 +40,7 @@ def test_lmi0_oracle_infeasible():
     assert cut[1] == 1.0
 
 
-def test_lmi0_oracle_infeasible2():
+def test_lmi0_oracle_infeasible2() -> None:
     """
     The function `test_lmi0_oracle_infeasible2` tests the case where the LMI oracle is infeasible.
     """
@@ -55,7 +55,7 @@ def test_lmi0_oracle_infeasible2():
     assert cut is not None
 
 
-def test_lmi0_oracle_infeasible3():
+def test_lmi0_oracle_infeasible3() -> None:
     """
     The function `test_lmi0_oracle_infeasible3` tests the case where the LMI oracle is infeasible.
     """

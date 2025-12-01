@@ -5,7 +5,7 @@ import numpy as np
 from ellalgo.conjugate_gradient import conjugate_gradient
 
 
-def test_conjugate_gradient_simple():
+def test_conjugate_gradient_simple() -> None:
     A = np.array([[4.0, 1.0], [1.0, 3.0]])
     b = np.array([1.0, 2.0])
     x_expected = np.array([0.0909091, 0.6363636])
@@ -15,7 +15,7 @@ def test_conjugate_gradient_simple():
     assert np.allclose(x, x_expected, rtol=1e-5)
 
 
-# def test_conjugate_gradient_larger():
+# def test_conjugate_gradient_larger() -> None:
 #     n = 100
 #     A = np.diag(np.arange(1, n + 1))
 #     x_true = np.random.rand(n)
@@ -26,7 +26,7 @@ def test_conjugate_gradient_simple():
 #     assert np.allclose(x, x_true, rtol=1e-5)
 
 
-def test_conjugate_gradient_with_initial_guess():
+def test_conjugate_gradient_with_initial_guess() -> None:
     A = np.array([[4.0, 1.0], [1.0, 3.0]])
     b = np.array([1.0, 2.0])
     x0 = np.array([1.0, 1.0])
@@ -37,7 +37,7 @@ def test_conjugate_gradient_with_initial_guess():
     assert np.allclose(x, x_expected, rtol=1e-5)
 
 
-# def test_conjugate_gradient_non_convergence():
+# def test_conjugate_gradient_non_convergence() -> None:
 #     A = np.array([[1.0, 2.0], [2.0, 1.0]])  # Not positive definite
 #     b = np.array([1.0, 1.0])
 #
@@ -45,7 +45,7 @@ def test_conjugate_gradient_with_initial_guess():
 #         conjugate_gradient(A, b, max_iter=10)
 
 
-def test_conjugate_gradient_tolerance():
+def test_conjugate_gradient_tolerance() -> None:
     A = np.array([[4.0, 1.0], [1.0, 3.0]])
     b = np.array([1.0, 2.0])
     tol = 1e-10

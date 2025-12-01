@@ -3,14 +3,14 @@ import numpy as np
 from ellalgo.oracles.ldlt_mgr import LDLTMgr
 
 
-def test_chol1():
+def test_chol1() -> None:
     l1 = [[25.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 11.0]]
     m1 = np.array(l1)
     ldlt_mgr = LDLTMgr(len(m1))
     assert ldlt_mgr.factorize(m1)
 
 
-def test_chol2():
+def test_chol2() -> None:
     l2 = [
         [18.0, 22.0, 54.0, 42.0],
         [22.0, -70.0, 86.0, 62.0],
@@ -25,7 +25,7 @@ def test_chol2():
     # assert ep == 1.0
 
 
-def test_chol3():
+def test_chol3() -> None:
     l3 = [[0.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 11.0]]
     m3 = np.array(l3)
     ldlt_mgr = LDLTMgr(len(m3))
@@ -36,7 +36,7 @@ def test_chol3():
     assert ep == 0.0
 
 
-def test_chol4():
+def test_chol4() -> None:
     l1 = [[25.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 11.0]]
     m1 = np.array(l1)
     Q1 = LDLTMgr(len(m1))
@@ -44,7 +44,7 @@ def test_chol4():
     assert Q1.factorize(m1)
 
 
-def test_chol5():
+def test_chol5() -> None:
     l2 = [
         [18.0, 22.0, 54.0, 42.0],
         [22.0, -70.0, 86.0, 62.0],
@@ -60,7 +60,7 @@ def test_chol5():
     # assert ep == 1.0
 
 
-def test_chol6():
+def test_chol6() -> None:
     l3 = [[0.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 11.0]]
     m3 = np.array(l3)
     ldlt_mgr = LDLTMgr(len(m3))
@@ -68,7 +68,7 @@ def test_chol6():
     assert ldlt_mgr.factor_with_allow_semidefinite(lambda i, j: m3[i, j])
 
 
-def test_chol7():
+def test_chol7() -> None:
     l3 = [[0.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, -20.0]]
     m3 = np.array(l3)
     ldlt_mgr = LDLTMgr(len(m3))
@@ -79,7 +79,7 @@ def test_chol7():
     assert ep == 20.0
 
 
-def test_chol8():
+def test_chol8() -> None:
     l3 = [[0.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 20.0]]
     m3 = np.array(l3)
     ldlt_mgr = LDLTMgr(len(m3))
@@ -87,7 +87,7 @@ def test_chol8():
     assert not ldlt_mgr.factorize(m3)
 
 
-def test_chol9():
+def test_chol9() -> None:
     l3 = [[0.0, 15.0, -5.0], [15.0, 18.0, 0.0], [-5.0, 0.0, 20.0]]
     m3 = np.array(l3)
     ldlt_mgr = LDLTMgr(len(m3))
@@ -96,7 +96,7 @@ def test_chol9():
     assert ldlt_mgr.factor_with_allow_semidefinite(lambda i, j: m3[i, j])
 
 
-def test_ldlt_mgr_sqrt():
+def test_ldlt_mgr_sqrt() -> None:
     A = np.array([[1.0, 0.5, 0.5], [0.5, 1.25, 0.75], [0.5, 0.75, 1.5]])
     ldlt_mgr = LDLTMgr(3)
     ldlt_mgr.factor(lambda i, j: A[i, j])

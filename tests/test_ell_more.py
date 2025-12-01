@@ -3,7 +3,7 @@ import numpy as np
 from ellalgo.ell import Ell
 
 
-def test_ell_initialization_with_list():
+def test_ell_initialization_with_list() -> None:
     """Test ellipsoid initialization with a list of values."""
     val = [1.0, 2.0, 3.0]
     xc = np.array([0.0, 0.0, 0.0])
@@ -14,7 +14,7 @@ def test_ell_initialization_with_list():
     assert ell.tsq() == 0.0
 
 
-def test_ell_xc_setter_and_getter():
+def test_ell_xc_setter_and_getter() -> None:
     """Test the xc getter and setter methods."""
     ell = Ell(1.0, np.array([0.0, 0.0]))
     new_xc = np.array([1.0, 2.0])
@@ -22,13 +22,13 @@ def test_ell_xc_setter_and_getter():
     assert np.array_equal(ell.xc(), new_xc)
 
 
-def test_ell_tsq_getter():
+def test_ell_tsq_getter() -> None:
     """Test the tsq getter method."""
     ell = Ell(1.0, np.array([0.0, 0.0]))
     assert ell.tsq() == 0.0
 
 
-def test_ell_no_defer_trick():
+def test_ell_no_defer_trick() -> None:
     """Test the no_defer_trick functionality."""
     ell = Ell(1.0, np.array([0.0, 0.0]))
     ell.no_defer_trick = True

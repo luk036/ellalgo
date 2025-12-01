@@ -51,7 +51,7 @@ class MyOracle2(OracleFeas):
         return None
 
 
-def test_case_feasible():
+def test_case_feasible() -> None:
     """
     The function `test_case_feasible` tests the feasibility of a solution using cutting plane method.
     """
@@ -63,7 +63,7 @@ def test_case_feasible():
     assert num_iters == 1
 
 
-def test_case_infeasible():
+def test_case_infeasible() -> None:
     """
     The function `test_case_infeasible` tests the behavior of a cutting-plane algorithm with an
     infeasible initial guess.

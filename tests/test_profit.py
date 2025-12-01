@@ -74,7 +74,7 @@ def run_profit_q(E):
     return num_iters
 
 
-def test_profit_oracle():
+def test_profit_oracle() -> None:
     e1 = 0.003
     e2 = 0.007
     e3 = e4 = e5 = 1.0
@@ -84,7 +84,7 @@ def test_profit_oracle():
     assert cut is not None
 
 
-def test_profit_ell():
+def test_profit_ell() -> None:
     """
     The function `test_profit_ell` checks if the number of iterations required to run the `run_profit`
     function with the `Ell` parameter is equal to 83.
@@ -93,7 +93,7 @@ def test_profit_ell():
     assert num_iters == 83
 
 
-def test_profit_ell_stable():
+def test_profit_ell_stable() -> None:
     """
     The function `test_profit_ell_stable` tests the number of iterations required to run the `EllStable`
     algorithm for profit calculation.
@@ -102,7 +102,7 @@ def test_profit_ell_stable():
     assert num_iters == 83
 
 
-def test_profit_rb_ell():
+def test_profit_rb_ell() -> None:
     """
     The function `test_profit_rb_ell` tests the number of iterations required to run a profit
     calculation using a specific method.
@@ -111,7 +111,7 @@ def test_profit_rb_ell():
     assert num_iters == 90
 
 
-def test_profit_rb_ell_stable():
+def test_profit_rb_ell_stable() -> None:
     """
     The function `test_profit_rb_ell_stable` tests the number of iterations required for a specific
     profit calculation algorithm to converge using the EllStable method.
@@ -120,7 +120,7 @@ def test_profit_rb_ell_stable():
     assert num_iters == 90
 
 
-def test_profit_q_ell():
+def test_profit_q_ell() -> None:
     """
     The function `test_profit_q_ell` tests the number of iterations required to run a profit calculation
     using a specific parameter.
@@ -129,7 +129,7 @@ def test_profit_q_ell():
     assert num_iters == 29
 
 
-def test_profit_q_ell_stable():
+def test_profit_q_ell_stable() -> None:
     """
     The function `test_profit_q_ell_stable` tests the number of iterations required to run a profit
     calculation using the `EllStable` algorithm.

@@ -34,7 +34,7 @@ def run_lowpass(use_parallel_cut: bool, duration=0.000001):
     return num_iters, h is not None
 
 
-def test_lowpass(benchmark):
+def test_lowpass(benchmark) -> None:
     """Test the lowpass case with parallel cut"""
     result, feasible = benchmark(run_lowpass, True)
     assert feasible
@@ -42,7 +42,7 @@ def test_lowpass(benchmark):
     assert result <= 12600
 
 
-def test_no_parallel_cut(benchmark):
+def test_no_parallel_cut(benchmark) -> None:
     """Test the lowpass case with no parallel cut"""
     result, feasible = benchmark(run_lowpass, False)
     assert feasible

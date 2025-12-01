@@ -65,7 +65,7 @@ class MyQuasicvxOracle(OracleOptim):
         return (np.array([-0.5 / tmp2, gamma]), 0.0), gamma
 
 
-def test_case_feasible():
+def test_case_feasible() -> None:
     """
     The function `test_case_feasible` tests the feasibility of a specific optimization problem using
     cutting plane optimization.
@@ -77,7 +77,7 @@ def test_case_feasible():
     assert xbest is not None
 
 
-def test_case_infeasible1():
+def test_case_infeasible1() -> None:
     """
     The function `test_case_infeasible1` tests for infeasibility in an optimization problem.
     """
@@ -88,7 +88,7 @@ def test_case_infeasible1():
     assert xbest is None
 
 
-def test_case_infeasible2():
+def test_case_infeasible2() -> None:
     """
     The function `test_case_infeasible2` initializes variables and asserts that the result is None.
     """

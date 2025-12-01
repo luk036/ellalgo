@@ -33,7 +33,7 @@ def run_lowpass(use_parallel_cut: bool):
     return h is not None, num_iters
 
 
-def test_lowpass_oracle():
+def test_lowpass_oracle() -> None:
     """
     The function `test_lowpass_oracle` tests the `LowpassOracle` class.
     """
@@ -47,7 +47,7 @@ def test_lowpass_oracle():
     # assert cut[1] < 0.0
 
 
-def test_lowpass():
+def test_lowpass() -> None:
     """
     The `test_lowpass` function tests the lowpass case with parallel cut by checking if the solution is
     feasible and the number of iterations falls within a specific range.

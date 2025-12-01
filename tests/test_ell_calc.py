@@ -4,13 +4,13 @@ from ellalgo.ell_calc import EllCalc
 from ellalgo.ell_config import CutStatus
 
 
-def test_construct():
+def test_construct() -> None:
     ell_calc = EllCalc(4)
     assert ell_calc.use_parallel_cut is True
     assert ell_calc._n_f == 4.0
 
 
-def test_calc_central_cut():
+def test_calc_central_cut() -> None:
     ell_calc = EllCalc(4)
     status, result = ell_calc.calc_single_or_parallel_central_cut([0, 0.05], 0.01)
     assert status == CutStatus.Success
@@ -21,7 +21,7 @@ def test_calc_central_cut():
     assert delta == approx(1.2)
 
 
-def test_calc_bias_cut():
+def test_calc_bias_cut() -> None:
     ell_calc = EllCalc(4)
     status, result = ell_calc.calc_bias_cut(0.11, 0.01)
     assert status == CutStatus.NoSoln
@@ -39,7 +39,7 @@ def test_calc_bias_cut():
     assert delta == approx(0.8)
 
 
-def test_calc_parallel_central_cut():
+def test_calc_parallel_central_cut() -> None:
     ell_calc = EllCalc(4)
     status, result = ell_calc.calc_single_or_parallel_central_cut([0, 0.05], 0.01)
     assert status == CutStatus.Success
@@ -50,7 +50,7 @@ def test_calc_parallel_central_cut():
     assert delta == approx(1.2)
 
 
-def test_calc_parallel():
+def test_calc_parallel() -> None:
     ell_calc = EllCalc(4)
     status, result = ell_calc.calc_parallel(0.07, 0.03, 0.01)
     assert status == CutStatus.NoSoln
@@ -81,7 +81,7 @@ def test_calc_parallel():
     assert delta == approx(1.232)
 
 
-def test_calc_bias_cut_q():
+def test_calc_bias_cut_q() -> None:
     ell_calc_q = EllCalc(4)
     status, result = ell_calc_q.calc_bias_cut_q(0.11, 0.01)
     assert status == CutStatus.NoSoln
@@ -101,7 +101,7 @@ def test_calc_bias_cut_q():
     assert delta == approx(0.8)
 
 
-def test_calc_parallel_q():
+def test_calc_parallel_q() -> None:
     ell_calc = EllCalc(4)
     status, result = ell_calc.calc_parallel_q(0.07, 0.03, 0.01)
     assert status == CutStatus.NoSoln

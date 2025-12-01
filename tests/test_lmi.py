@@ -101,7 +101,7 @@ def run_lmi(oracle, space):
     return num_iters
 
 
-def test_lmi_oracle():
+def test_lmi_oracle() -> None:
     F1 = np.array(
         [
             [[-7.0, -11.0], [-11.0, 3.0]],
@@ -115,7 +115,7 @@ def test_lmi_oracle():
     assert cut is None
 
 
-def test_lmi0_oracle():
+def test_lmi0_oracle() -> None:
     F1 = np.array(
         [
             [[-7.0, -11.0], [-11.0, 3.0]],
@@ -128,7 +128,7 @@ def test_lmi0_oracle():
     assert cut is not None
 
 
-def test_lmi_lazy():
+def test_lmi_lazy() -> None:
     """
     The function `test_lmi_lazy` runs a specific function and asserts that the result is equal to 281.
     """
@@ -136,7 +136,7 @@ def test_lmi_lazy():
     assert result == 281
 
 
-def test_lmi_old():
+def test_lmi_old() -> None:
     """
     The function `test_lmi_old` runs a test using an old oracle and asserts the result to be 281.
     """
@@ -144,7 +144,7 @@ def test_lmi_old():
     assert result == 281
 
 
-def test_lmi_lazy_stable():
+def test_lmi_lazy_stable() -> None:
     """
     The function `test_lmi_lazy_stable` runs a specific test and asserts the result to be equal to 281.
     """
@@ -152,7 +152,7 @@ def test_lmi_lazy_stable():
     assert result == 281
 
 
-def test_lmi_old_stable():
+def test_lmi_old_stable() -> None:
     """
     The function `test_lmi_old_stable` runs a specific test and asserts the result to be equal to 281.
     """

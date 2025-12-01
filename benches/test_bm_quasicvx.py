@@ -109,11 +109,11 @@ def run_quasicvx(omega):
     return num_iters
 
 
-def test_bm_with_round_robin(benchmark):
+def test_bm_with_round_robin(benchmark) -> None:
     num_iters = benchmark(run_quasicvx, MyQuasicvxOracle)
     assert num_iters == 83
 
 
-def test_bm_without_round_robin(benchmark):
+def test_bm_without_round_robin(benchmark) -> None:
     num_iters = benchmark(run_quasicvx, MyQuasicvxOracle2)
     assert num_iters == 98
