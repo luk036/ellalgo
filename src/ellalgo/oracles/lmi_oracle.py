@@ -41,7 +41,7 @@ the solution doesn't work. This could be useful in optimization problems where
 you're trying to find a solution that satisfies certain mathematical conditions.
 """
 
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 
@@ -71,7 +71,7 @@ class LMIOracle(OracleFeas):
     the feasible set.
     """
 
-    def __init__(self, mat_f, mat_b):
+    def __init__(self, mat_f: List[np.ndarray], mat_b: np.ndarray):
         """Initialize LMI Oracle with problem matrices.
 
         The constructor sets up the LMI constraint structure:
@@ -105,7 +105,7 @@ class LMIOracle(OracleFeas):
             the measure of violation.
         """
 
-        def get_elem(i, j):
+        def get_elem(i: int, j: int) -> float:
             """Construct element (i,j) of M(xc) = B - ∑ F_k*xc_k.
 
             Implements the LMI matrix construction element-wise for factorization.

@@ -1,12 +1,13 @@
+from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Generic, MutableSequence, Optional, Tuple, TypeVar, Union
+from typing import Any, Generic, List, Optional, Tuple, TypeVar, Union
 
 import numpy as np
 
 from .ell_config import CutStatus
 
 ArrayType = TypeVar("ArrayType", bound=np.ndarray)
-CutChoice = Union[float, MutableSequence]  # single or parallel
+CutChoice = Union[float, List[float], Tuple[float, ...]]  # single or parallel
 Cut = Tuple[ArrayType, CutChoice]
 Num = Union[float, int]
 
@@ -25,7 +26,7 @@ class OracleFeas(Generic[ArrayType]):
 
 class OracleFeas2(OracleFeas[ArrayType]):
     @abstractmethod
-    def update(self, gamma) -> None:
+    def update(self, gamma: Any) -> None:
         """
         The `update` function updates a gamma object.
 
@@ -36,7 +37,7 @@ class OracleFeas2(OracleFeas[ArrayType]):
 
 class OracleOptim(Generic[ArrayType]):
     @abstractmethod
-    def assess_optim(self, xc: ArrayType, gamma) -> Tuple[Cut, Optional[float]]:
+    def assess_optim(self, xc: ArrayType, gamma: Any) -> Tuple[Cut, Optional[float]]:
         """
         The `assess_optim` function assesses the feasibility based on the given `xc` and `gamma`
         parameters.
@@ -76,7 +77,7 @@ class OracleOptim(Generic[ArrayType]):
 class OracleOptimQ(Generic[ArrayType]):
     @abstractmethod
     def assess_optim_q(
-        self, xc: ArrayType, gamma, retry: bool
+        self, xc: ArrayType, gamma: Any, retry: bool
     ) -> Tuple[Cut, ArrayType, Optional[float], bool]:
         """assessment of optimization (discrete)
 
@@ -100,7 +101,7 @@ class OracleOptimQ(Generic[ArrayType]):
 
 class OracleBS(ABC):
     @abstractmethod
-    def assess_bs(self, gamma) -> bool:
+    def assess_bs(self, gamma: Any) -> bool:
         """
         The `assess_bs` function is a binary search assessment function that takes a gamma value as input
         and returns a boolean value.

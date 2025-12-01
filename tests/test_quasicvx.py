@@ -5,6 +5,7 @@ Test Quasiconvex (with Round Robin)
 from __future__ import print_function
 
 import math
+from typing import Any, Optional, Tuple
 
 import numpy as np
 from pytest import approx
@@ -20,14 +21,14 @@ class MyQuasicvxOracle(OracleOptim):
     y: float
     tmp3: float
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         The function initializes two tuples containing function and gradient references.
         """
         self.fns = (self.fn1, self.fn2)
         self.grads = (self.grad1, self.grad2)
 
-    def fn1(self, sqrtx, logy, _):
+    def fn1(self, sqrtx: float, logy: float, _: Any) -> float:
         """
         The function calculates the difference between the square of a given value and another value.
 
@@ -40,7 +41,7 @@ class MyQuasicvxOracle(OracleOptim):
         """
         return sqrtx * sqrtx - logy
 
-    def fn2(self, sqrtx, logy, gamma):
+    def fn2(self, sqrtx: float, logy: float, gamma: float) -> float:
         """
         The function calculates the value of -sqrt(x) plus gamma times the exponential of y.
 
@@ -53,7 +54,7 @@ class MyQuasicvxOracle(OracleOptim):
         self.tmp3 = gamma * self.y
         return -sqrtx + self.tmp3
 
-    def grad1(self, sqrtx):
+    def grad1(self, sqrtx: float) -> np.ndarray:
         """
         The function `grad1` calculates the gradient of a function with respect to the input `sqrtx`.
 
@@ -65,7 +66,7 @@ class MyQuasicvxOracle(OracleOptim):
         """
         return np.array([2 * sqrtx, -1.0])
 
-    def grad2(self, _):
+    def grad2(self, _: Any) -> np.ndarray:
         """
         The `grad2` function returns a NumPy array with values -1.0 and the value of `self.tmp3`.
 
@@ -76,7 +77,9 @@ class MyQuasicvxOracle(OracleOptim):
         """
         return np.array([-1.0, self.tmp3])
 
-    def assess_optim(self, xc, gamma: float):
+    def assess_optim(
+        self, xc: Tuple[float, float], gamma: float
+    ) -> Tuple[Tuple[np.ndarray, float], Optional[float]]:
         """
         The function assess_optim takes input parameters xc and gamma, iterates through a loop, and returns a
         tuple based on certain conditions.

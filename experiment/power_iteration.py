@@ -1,4 +1,5 @@
 import numpy as np
+from typing import Tuple
 
 """
 Power method for finding the largest eigenvalue of a square matrix
@@ -6,16 +7,18 @@ Power method for finding the largest eigenvalue of a square matrix
 
 
 class Options:
-    def __init__(self, max_iters, tolerance):
+    def __init__(self, max_iters: int, tolerance: float) -> None:
         self.max_iters = max_iters
         self.tolerance = tolerance
 
 
-def norm_l1(x):
+def norm_l1(x: np.ndarray) -> float:
     return np.sum(np.abs(x))
 
 
-def power_iteration(A, x, options):
+def power_iteration(
+    A: np.ndarray, x: np.ndarray, options: Options
+) -> Tuple[np.ndarray, float, int]:
     """Power iteration method
 
     Performs the power iteration algorithm to find the largest eigenvalue and corresponding eigenvector of the input matrix A.
@@ -40,7 +43,9 @@ def power_iteration(A, x, options):
     return x, x @ (A @ x), options.max_iters
 
 
-def power_iteration4(A, x, options):
+def power_iteration4(
+    A: np.ndarray, x: np.ndarray, options: Options
+) -> Tuple[np.ndarray, float, int]:
     """Power iteration method
 
     Performs the power iteration algorithm to find the largest eigenvalue and corresponding eigenvector of the input matrix A.
@@ -67,7 +72,9 @@ def power_iteration4(A, x, options):
     return x, x @ (A @ x), options.max_iters
 
 
-def power_iteration2(A, x, options):
+def power_iteration2(
+    A: np.ndarray, x: np.ndarray, options: Options
+) -> Tuple[np.ndarray, float, int]:
     """Power iteration method
 
     Performs the power iteration algorithm to find the largest eigenvalue and corresponding eigenvector of the input matrix A.
@@ -96,7 +103,9 @@ def power_iteration2(A, x, options):
     return x, ld, options.max_iters
 
 
-def power_iteration3(A, x, options):
+def power_iteration3(
+    A: np.ndarray, x: np.ndarray, options: Options
+) -> Tuple[np.ndarray, float, int]:
     """Power iteration method
 
     Performs the power iteration algorithm to find the largest eigenvalue and corresponding eigenvector of the input matrix A.

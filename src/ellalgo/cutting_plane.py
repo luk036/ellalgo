@@ -25,6 +25,7 @@ In summary, this code provides a toolkit for solving different types of optimiza
 """
 
 import copy
+import numpy as np
 from typing import Any, MutableSequence, Optional, Tuple, Union
 
 from .ell_config import CutStatus, Options
@@ -49,7 +50,7 @@ Num = Union[float, int]
 def cutting_plane_feas(
     omega: OracleFeas[ArrayType],
     space: SearchSpace[ArrayType],
-    options=Options(),
+    options: Options = Options(),
 ) -> Tuple[Optional[ArrayType], int]:
     r"""Cutting-plane algorithm for convex feasibility problems.
 
@@ -140,7 +141,7 @@ def cutting_plane_optim(
     omega: OracleOptim[ArrayType],
     space: SearchSpace[ArrayType],
     gamma: float,
-    options=Options(),
+    options: Options = Options(),
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for convex optimization problems.
 
@@ -256,7 +257,7 @@ def cutting_plane_optim_q(
     omega: OracleOptimQ[ArrayType],
     space_q: SearchSpaceQ[ArrayType],
     gamma: float,
-    options=Options(),
+    options: Options = Options(),
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for discrete convex optimization.
 
@@ -304,7 +305,7 @@ def cutting_plane_optim_q(
 
 
 def bsearch(
-    omega: OracleBS, intrvl: Tuple[Any, Any], options=Options()
+    omega: OracleBS, intrvl: Tuple[Any, Any], options: Options = Options()
 ) -> Tuple[Any, int]:
     """Binary search with feasibility oracle.
 
@@ -357,7 +358,7 @@ class BSearchAdaptor(OracleBS):
     """
 
     def __init__(
-        self, omega: OracleFeas2, space: SearchSpace2, options=Options()
+        self, omega: OracleFeas2, space: SearchSpace2, options: Options = Options()
     ) -> None:
         """
         :param omega: g-parameterized feasibility oracle
@@ -369,7 +370,7 @@ class BSearchAdaptor(OracleBS):
         self.options = options  # Subproblem solver parameters
 
     @property
-    def x_best(self):
+    def x_best(self) -> np.ndarray:
         """Current best feasible solution candidate."""
         return self.space.xc()
 

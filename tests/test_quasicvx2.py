@@ -5,6 +5,7 @@ Test Quasiconvex (without Round Robin)
 from __future__ import print_function
 
 import math
+from typing import Optional, Tuple
 
 import numpy as np
 
@@ -20,7 +21,9 @@ class MyQuasicvxOracle(OracleOptim):
 
     idx = -1  # for round robin
 
-    def assess_optim(self, xc, gamma: float):
+    def assess_optim(
+        self, xc: np.ndarray, gamma: float
+    ) -> Tuple[Tuple[np.ndarray, float], Optional[float]]:
         """
         This Python function assesses the optimality of a given point based on constraints and an objective
         function.

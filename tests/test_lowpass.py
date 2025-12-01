@@ -3,13 +3,14 @@ Test Lowpass
 """
 
 import numpy as np
+from typing import Tuple
 
 from ellalgo.cutting_plane import Options, cutting_plane_optim
 from ellalgo.ell import Ell
 from ellalgo.oracles.lowpass_oracle import create_lowpass_case
 
 
-def run_lowpass(use_parallel_cut: bool):
+def run_lowpass(use_parallel_cut: bool) -> Tuple[bool, int]:
     """
     This Python function runs a lowpass filter optimization using cutting plane method.
 

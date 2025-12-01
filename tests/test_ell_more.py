@@ -5,7 +5,7 @@ from ellalgo.ell import Ell
 
 def test_ell_initialization_with_list() -> None:
     """Test ellipsoid initialization with a list of values."""
-    val = [1.0, 2.0, 3.0]
+    val = np.array([1.0, 2.0, 3.0])
     xc = np.array([0.0, 0.0, 0.0])
     ell = Ell(val, xc)
     assert ell._kappa == 1.0

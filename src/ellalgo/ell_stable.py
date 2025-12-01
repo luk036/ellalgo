@@ -4,7 +4,7 @@ import numpy as np
 
 from .ell_calc import EllCalc
 from .ell_config import CutStatus
-from .ell_typing import ArrayType, SearchSpace, SearchSpaceQ
+from .ell_typing import ArrayType, SearchSpace2, SearchSpaceQ
 
 Matrix = np.ndarray
 CutChoice = Union[float, ArrayType]  # single or parallel
@@ -12,7 +12,7 @@ Cut = Tuple[ArrayType, CutChoice]
 
 
 # The `EllStable` class represents an ellipsoidal search space with stability properties.
-class EllStable(SearchSpace[ArrayType], SearchSpaceQ[ArrayType]):
+class EllStable(SearchSpaceQ[ArrayType], SearchSpace2[ArrayType]):
     """Ellipsoid Search Space
 
     The `EllStable` class represents an ellipsoidal search space with stability properties.
@@ -36,7 +36,7 @@ class EllStable(SearchSpace[ArrayType], SearchSpaceQ[ArrayType]):
     _ndim: int
     helper: EllCalc
 
-    def __init__(self, val, xc: ArrayType) -> None:
+    def __init__(self, val: Union[float, ArrayType], xc: ArrayType) -> None:
         """
         The function initializes an object with given values and attributes.
 
@@ -85,7 +85,7 @@ class EllStable(SearchSpace[ArrayType], SearchSpaceQ[ArrayType]):
         """
         return self._tsq
 
-    def update_bias_cut(self, cut) -> CutStatus:
+    def update_bias_cut(self, cut: Cut) -> CutStatus:
         """
         The function `update_bias_cut` is an implementation of the `SearchSpace` interface that updates the
         cut status based on a given cut.
@@ -102,7 +102,7 @@ class EllStable(SearchSpace[ArrayType], SearchSpaceQ[ArrayType]):
         """
         return self._update_core(cut, self.helper.calc_single_or_parallel)
 
-    def update_central_cut(self, cut) -> CutStatus:
+    def update_central_cut(self, cut: Cut) -> CutStatus:
         """
         The function `update_central_cut` is an implementation of the `SearchSpace` interface that updates the
         cut status based on a given cut.
@@ -119,7 +119,7 @@ class EllStable(SearchSpace[ArrayType], SearchSpaceQ[ArrayType]):
         """
         return self._update_core(cut, self.helper.calc_single_or_parallel_central_cut)
 
-    def update_q(self, cut) -> CutStatus:
+    def update_q(self, cut: Cut) -> CutStatus:
         """
         The function `update_q` is an implementation of the `SearchSpaceQ` interface that updates the
         cut status based on a given cut.
@@ -139,7 +139,7 @@ class EllStable(SearchSpace[ArrayType], SearchSpaceQ[ArrayType]):
 
     # private:
 
-    def _update_core(self, cut, cut_strategy: Callable) -> CutStatus:
+    def _update_core(self, cut: Cut, cut_strategy: Callable) -> CutStatus:
         """
         The `_update_core` function updates an ellipsoid by applying a cut and a cut strategy.
 

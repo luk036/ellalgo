@@ -5,6 +5,7 @@ Test Example 1 (with round robin)
 from __future__ import print_function
 
 import numpy as np
+from typing import Optional, Tuple
 
 from ellalgo.cutting_plane import Options, cutting_plane_optim
 from ellalgo.ell import Ell
@@ -21,7 +22,9 @@ class MyOracle1(OracleOptim):
 
     idx = -1  # for round robin
 
-    def assess_optim(self, xc, gamma: float):
+    def assess_optim(
+        self, xc: np.ndarray, gamma: float
+    ) -> Tuple[Tuple[np.ndarray, float], Optional[float]]:
         """
         The function assess_optim assesses feasibility and optimality of a given point based on a specified
         gamma value.

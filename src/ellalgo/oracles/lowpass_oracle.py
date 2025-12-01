@@ -41,14 +41,14 @@ satisfactory filter design is achieved.
 """
 
 from math import floor
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 import numpy as np
 
-from ellalgo.ell_typing import OracleOptim
+from ellalgo.ell_typing import CutChoice, OracleOptim
 
 Arr = np.ndarray
-ParallelCut = Tuple[Arr, Union[float, Tuple[float, float]]]
+ParallelCut = Tuple[Arr, CutChoice]
 
 
 # Modified from CVX code by Almir Mutapcic in 2006.
@@ -243,7 +243,9 @@ class LowpassOracle(OracleOptim):
         # If all checks pass, return None (no violations)
         return None
 
-    def assess_optim(self, xc: Arr, gamma: float):
+    def assess_optim(
+        self, xc: Arr, gamma: float
+    ) -> Tuple[ParallelCut, Optional[float]]:
         """
         Assess the optimality of the current filter coefficients for the stopband.
 
@@ -275,7 +277,7 @@ class LowpassOracle(OracleOptim):
 # filter specs (for a low-pass filter)
 # *********************************************************************
 # number of FIR coefficients (including zeroth)
-def create_lowpass_case(ndim=48):
+def create_lowpass_case(ndim: int = 48) -> "LowpassOracle":
     """
     Creates a standard low-pass filter design case with typical parameters.
 

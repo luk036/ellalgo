@@ -17,11 +17,12 @@ from ellalgo.cutting_plane import (
     cutting_plane_optim_q,
 )
 from ellalgo.ell import Ell
+from ellalgo.ell_stable import EllStable
 from ellalgo.ell_typing import OracleBS, OracleFeas, OracleOptim, OracleOptimQ
 
 
 @pytest.fixture
-def options():
+def options() -> Options:
     """Set up options for cutting plane tests."""
     return Options()
 
@@ -29,7 +30,7 @@ def options():
 class MyOracleFeas(OracleFeas):
     """Oracle for feasibility problem."""
 
-    def assess_feas(self, xc) -> Optional[Tuple[np.ndarray, float]]:
+    def assess_feas(self, xc: np.ndarray) -> Optional[Tuple[np.ndarray, float]]:
         """Assess feasibility of `xc`."""
         x, y = xc
         if (fj := x + y - 3.0) > 0.0:
@@ -40,7 +41,7 @@ class MyOracleFeas(OracleFeas):
 class MyOracleInfeas(OracleFeas):
     """Oracle for infeasibility problem."""
 
-    def assess_feas(self, xc) -> Optional[Tuple[np.ndarray, float]]:
+    def assess_feas(self, xc: np.ndarray) -> Optional[Tuple[np.ndarray, float]]:
         """Assess feasibility of `xc`."""
         return (np.array([1.0, 1.0]), 1.0)
 
@@ -49,7 +50,7 @@ class MyOracleOptim(OracleOptim):
     """Oracle for optimization problem."""
 
     def assess_optim(
-        self, xc, gamma: float
+        self, xc: np.ndarray, gamma: float
     ) -> Tuple[Tuple[np.ndarray, float], Optional[float]]:
         """Assess optimality of `xc`."""
         x, y = xc
@@ -66,7 +67,9 @@ class MyOracleOptim(OracleOptim):
 class MyOracleOptimQ(OracleOptimQ):
     """Oracle for quantized optimization problem."""
 
-    def assess_optim_q(self, xc, gamma: float, retry: bool):
+    def assess_optim_q(
+        self, xc: np.ndarray, gamma: float, retry: bool
+    ) -> Tuple[Tuple[np.ndarray, float], Optional[np.ndarray], Optional[float], bool]:
         """Assess optimality of `xc`."""
         x, y = xc
         f0 = x + y
@@ -95,7 +98,7 @@ class MyOracleBS(OracleBS):
         return gamma > 0
 
 
-def test_cutting_plane_feas(options) -> None:
+def test_cutting_plane_feas(options: Options) -> None:
     """Test cutting plane feasibility."""
     xinit = np.array([0.0, 0.0])
     ellip = Ell(10.0, xinit)
@@ -106,7 +109,7 @@ def test_cutting_plane_feas(options) -> None:
     assert num_iters == 0
 
 
-def test_cutting_plane_feas_no_soln(options) -> None:
+def test_cutting_plane_feas_no_soln(options: Options) -> None:
     """Test cutting plane feasibility with no solution."""
     xinit = np.array([0.0, 0.0])
     ellip = Ell(10.0, xinit)
@@ -117,7 +120,7 @@ def test_cutting_plane_feas_no_soln(options) -> None:
     assert num_iters == 2
 
 
-def test_cutting_plane_optim(options) -> None:
+def test_cutting_plane_optim(options: Options) -> None:
     """Test cutting plane optimization."""
     xinit = np.array([0.0, 0.0])
     ellip = Ell(10.0, xinit)
@@ -129,7 +132,7 @@ def test_cutting_plane_optim(options) -> None:
     assert num_iters == 145
 
 
-def test_cutting_plane_optim_no_soln(options) -> None:
+def test_cutting_plane_optim_no_soln(options: Options) -> None:
     """Test cutting plane optimization with no solution."""
     xinit = np.array([0.0, 0.0])
     ellip = Ell(10.0, xinit)
@@ -140,10 +143,10 @@ def test_cutting_plane_optim_no_soln(options) -> None:
     assert num_iters == 0
 
 
-def test_cutting_plane_optim_q(options) -> None:
+def test_cutting_plane_optim_q(options: Options) -> None:
     """Test cutting plane optimization with quantization."""
     xinit = np.array([0.0, 0.0])
-    ellip = Ell(10.0, xinit)
+    ellip = EllStable(10.0, xinit)
     omega = MyOracleOptimQ()
     options.max_iters = 200
     xbest, fbest, num_iters = cutting_plane_optim_q(omega, ellip, 0.0, options)
@@ -152,10 +155,10 @@ def test_cutting_plane_optim_q(options) -> None:
     assert num_iters == 145
 
 
-def test_cutting_plane_optim_q_no_soln(options) -> None:
+def test_cutting_plane_optim_q_no_soln(options: Options) -> None:
     """Test cutting plane optimization with quantization and no solution."""
     xinit = np.array([0.0, 0.0])
-    ellip = Ell(10.0, xinit)
+    ellip = EllStable(10.0, xinit)
     omega = MyOracleOptimQ()
     options.max_iters = 20
     xbest, _, num_iters = cutting_plane_optim_q(omega, ellip, 100.0, options)
@@ -163,7 +166,7 @@ def test_cutting_plane_optim_q_no_soln(options) -> None:
     assert num_iters == 0
 
 
-def test_bsearch(options) -> None:
+def test_bsearch(options: Options) -> None:
     """Test binary search."""
     omega = MyOracleBS()
     options.tolerance = 1e-7
@@ -173,7 +176,7 @@ def test_bsearch(options) -> None:
     assert num_iters == 30
 
 
-def test_bsearch_no_soln(options) -> None:
+def test_bsearch_no_soln(options: Options) -> None:
     """Test binary search with no solution."""
     omega = MyOracleBS()
     options.max_iters = 20

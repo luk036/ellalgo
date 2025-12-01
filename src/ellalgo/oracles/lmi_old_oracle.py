@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 
@@ -18,7 +18,7 @@ class LMIOldOracle(OracleFeas):
 
     """
 
-    def __init__(self, mat_f, mat_b):
+    def __init__(self, mat_f: List[np.ndarray], mat_b: np.ndarray):
         """
         The function initializes the class with two matrices and creates an instance of the LDLTMgr class.
 

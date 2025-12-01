@@ -2,12 +2,13 @@
 from __future__ import print_function
 
 # import time
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple, Type
 
 import numpy as np
 
 from ellalgo.cutting_plane import OracleOptim, cutting_plane_optim
 from ellalgo.ell import Ell
+from ellalgo.ell_typing import OracleFeas
 from ellalgo.oracles.lmi_old_oracle import LMIOldOracle
 from ellalgo.oracles.lmi_oracle import LMIOracle
 
@@ -15,31 +16,32 @@ Cut = Tuple[np.ndarray, float]
 
 
 class MyOracle(OracleOptim):
-    def __init__(self, oracle):
+    def __init__(self, oracle: Type[OracleFeas]) -> None:
         """[summary]
 
         Arguments:
             oracle ([type]): [description]
         """
         self.c = np.array([1.0, -1.0, 1.0])
-        F1 = np.array(
+        F1_mat = np.array(
             [
                 [[-7.0, -11.0], [-11.0, 3.0]],
                 [[7.0, -18.0], [-18.0, 8.0]],
                 [[-2.0, -8.0], [-8.0, 1.0]],
             ]
         )
-        B1 = np.array([[33.0, -9.0], [-9.0, 26.0]])
-        F2 = np.array(
+        B1_mat = np.array([[33.0, -9.0], [-9.0, 26.0]])
+        F2_mat = np.array(
             [
                 [[-21.0, -11.0, 0.0], [-11.0, 10.0, 8.0], [0.0, 8.0, 5.0]],
                 [[0.0, 10.0, 16.0], [10.0, -10.0, -10.0], [16.0, -10.0, 3.0]],
                 [[-5.0, 2.0, -17.0], [2.0, -6.0, 8.0], [-17.0, 8.0, 6.0]],
             ]
         )
-        B2 = np.array([[14.0, 9.0, 40.0], [9.0, 91.0, 10.0], [40.0, 10.0, 15.0]])
-        self.lmi1 = oracle(F1, B1)
-        self.lmi2 = oracle(F2, B2)
+        B2_mat = np.array([[14.0, 9.0, 40.0], [9.0, 91.0, 10.0], [40.0, 10.0, 15.0]])
+
+        self.lmi1 = oracle([F1_mat], B1_mat)  # type: ignore
+        self.lmi2 = oracle([F2_mat], B2_mat)  # type: ignore
 
     def assess_optim(self, xc: np.ndarray, gamma: float) -> Tuple[Cut, Optional[float]]:
         """[summary]
@@ -52,10 +54,10 @@ class MyOracle(OracleOptim):
             Tuple[Cut, float]: [description]
         """
         if cut := self.lmi1.assess_feas(xc):
-            return cut, None
+            return cut, None  # type: ignore
 
         if cut := self.lmi2.assess_feas(xc):
-            return cut, None
+            return cut, None  # type: ignore
 
         f0 = self.c.dot(xc)
         if (fj := f0 - gamma) > 0.0:
@@ -63,7 +65,7 @@ class MyOracle(OracleOptim):
         return (self.c, 0.0), f0
 
 
-def run_lmi(oracle):
+def run_lmi(oracle: Type[OracleFeas]) -> int:
     """[summary]
 
     Arguments:
@@ -88,7 +90,7 @@ def run_lmi(oracle):
     return num_iters
 
 
-def test_bm_lmi_lazy(benchmark) -> None:
+def test_bm_lmi_lazy(benchmark: Any) -> None:
     """[summary]
 
     Arguments:
@@ -98,7 +100,7 @@ def test_bm_lmi_lazy(benchmark) -> None:
     assert result == 281
 
 
-def test_bm_lmi_old(benchmark) -> None:
+def test_bm_lmi_old(benchmark: Any) -> None:
     """[summary]
 
     Arguments:

@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 
@@ -25,7 +25,7 @@ class LMI0Oracle:
     the feasible set.
     """
 
-    def __init__(self, mat_f):
+    def __init__(self, mat_f: List[np.ndarray]):
         """Initialize LMI oracle with coefficient matrices
 
         Args:
@@ -56,7 +56,7 @@ class LMI0Oracle:
             the measure of violation.
         """
 
-        def get_elem(i, j):
+        def get_elem(i: int, j: int) -> float:
             """Construct element (i,j) of F(x) = ∑ x_k F_k
 
             Enables on-demand element computation without full matrix construction.

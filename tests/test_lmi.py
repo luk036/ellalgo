@@ -2,13 +2,15 @@
 Test LMI
 """
 
-from typing import Optional, Tuple
+from __future__ import annotations
+from typing import Generic, Optional, Tuple, Type, TypeVar
 
 import numpy as np
 
 from ellalgo.cutting_plane import OracleOptim, cutting_plane_optim
 from ellalgo.ell import Ell
 from ellalgo.ell_stable import EllStable
+from ellalgo.ell_typing import OracleFeas, SearchSpace
 from ellalgo.oracles.lmi0_oracle import LMI0Oracle
 from ellalgo.oracles.lmi_old_oracle import LMIOldOracle
 from ellalgo.oracles.lmi_oracle import LMIOracle
@@ -16,10 +18,15 @@ from ellalgo.oracles.lmi_oracle import LMIOracle
 Cut = Tuple[np.ndarray, float]
 
 
-class MyOracle(OracleOptim):
-    idx = -1
+OracleType = TypeVar("OracleType", bound=OracleFeas)
 
-    def __init__(self, oracle):
+
+class MyOracle(OracleOptim, Generic[OracleType]):
+    idx = -1
+    lmi1: OracleFeas
+    lmi2: OracleFeas
+
+    def __init__(self, oracle: Type[OracleType]):
         """
         The function initializes arrays and matrices using numpy and assigns them to variables in the class
         instance.
@@ -29,24 +36,24 @@ class MyOracle(OracleOptim):
             used to create two instances `lmi1` and `lmi2`
         """
         self.c = np.array([1.0, -1.0, 1.0])
-        F1 = np.array(
+        F1_mat = np.array(
             [
                 [[-7.0, -11.0], [-11.0, 3.0]],
                 [[7.0, -18.0], [-18.0, 8.0]],
                 [[-2.0, -8.0], [-8.0, 1.0]],
             ]
         )
-        B1 = np.array([[33.0, -9.0], [-9.0, 26.0]])
-        F2 = np.array(
+        B1_mat = np.array([[33.0, -9.0], [-9.0, 26.0]])
+        F2_mat = np.array(
             [
                 [[-21.0, -11.0, 0.0], [-11.0, 10.0, 8.0], [0.0, 8.0, 5.0]],
                 [[0.0, 10.0, 16.0], [10.0, -10.0, -10.0], [16.0, -10.0, 3.0]],
                 [[-5.0, 2.0, -17.0], [2.0, -6.0, 8.0], [-17.0, 8.0, 6.0]],
             ]
         )
-        B2 = np.array([[14.0, 9.0, 40.0], [9.0, 91.0, 10.0], [40.0, 10.0, 15.0]])
-        self.lmi1 = oracle(F1, B1)
-        self.lmi2 = oracle(F2, B2)
+        B2_mat = np.array([[14.0, 9.0, 40.0], [9.0, 91.0, 10.0], [40.0, 10.0, 15.0]])
+        self.lmi1 = oracle(F1_mat, B1_mat)  # type: ignore
+        self.lmi2 = oracle(F2_mat, B2_mat)  # type: ignore
 
     def assess_optim(self, xc: np.ndarray, gamma: float) -> Tuple[Cut, Optional[float]]:
         """
@@ -68,18 +75,18 @@ class MyOracle(OracleOptim):
 
             if self.idx == 0:
                 if cut := self.lmi1.assess_feas(xc):
-                    return cut, None
+                    return cut, None  # type: ignore
             elif self.idx == 1:
                 if cut := self.lmi2.assess_feas(xc):
-                    return cut, None
+                    return cut, None  # type: ignore
             elif self.idx == 2:
                 f0 = self.c.dot(xc)
                 if (fj := f0 - gamma) > 0.0:
                     return (self.c, fj), None
-        return (self.c, 0.0), f0
+        return (self.c, 0.0), f0  # type: ignore
 
 
-def run_lmi(oracle, space):
+def run_lmi(oracle: Type[OracleFeas], space: Type[SearchSpace]) -> int:
     """
     The `run_lmi` function takes an oracle and a Space object as input, initializes variables, performs
     optimization using cutting plane method, and returns the number of iterations.
@@ -90,11 +97,11 @@ def run_lmi(oracle, space):
     :param Space: The `Space` parameter in the `run_lmi` function seems to be a class or function that
         takes two arguments - a float value `10.0` and an array `xinit`. It likely initializes some kind of
         space or environment based on these inputs
-    :return: The function `run_lmi` returns the number of iterations (`num_iters`) after running the
-        cutting plane optimization algorithm.
+    :return: The function `run_lmi` returns the number of iterations (`num_iters`) performed during
+        the optimization process.
     """
     xinit = np.array([0.0, 0.0, 0.0])  # initial xinit
-    ellip = space(10.0, xinit)
+    ellip = space(10.0, xinit)  # type: ignore
     omega = MyOracle(oracle)
     xbest, _, num_iters = cutting_plane_optim(omega, ellip, float("inf"))
     assert xbest is not None
@@ -110,7 +117,7 @@ def test_lmi_oracle() -> None:
         ]
     )
     B1 = np.array([[33.0, -9.0], [-9.0, 26.0]])
-    lmi1 = LMIOracle(F1, B1)
+    lmi1 = LMIOracle(F1, B1)  # type: ignore
     cut = lmi1.assess_feas(np.array([0.0, 0.0, 0.0]))
     assert cut is None
 
@@ -123,7 +130,7 @@ def test_lmi0_oracle() -> None:
             [[-2.0, -8.0], [-8.0, 1.0]],
         ]
     )
-    lmi1 = LMI0Oracle(F1)
+    lmi1 = LMI0Oracle(F1)  # type: ignore
     cut = lmi1.assess_feas(np.array([0.0, 0.0, 0.0]))
     assert cut is not None
 

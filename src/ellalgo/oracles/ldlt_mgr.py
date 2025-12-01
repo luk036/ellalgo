@@ -198,7 +198,7 @@ class LDLTMgr:
                 start = i + 1  # T[i, i] == 0 (very unlikely), restart at i+1
         return self.is_spd()
 
-    def is_spd(self):
+    def is_spd(self) -> bool:
         """
         Checks if the matrix is symmetric positive definite (SPD).
 
@@ -248,7 +248,7 @@ class LDLTMgr:
             self.wit[i - 1] = -self._storage[i:pos, i - 1].dot(self.wit[i:pos])
         return -self._storage[m, m]
 
-    def sym_quad(self, mat: np.ndarray):
+    def sym_quad(self, mat: np.ndarray) -> float:
         """
         Computes the quadratic form v^T M v using the witness vector.
 

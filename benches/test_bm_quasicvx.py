@@ -2,6 +2,7 @@
 from __future__ import print_function
 
 import math
+from typing import Any, Optional, Tuple, Type
 
 import numpy as np
 
@@ -15,27 +16,29 @@ class MyQuasicvxOracle(OracleOptim):
     y: float
     tmp3: float
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.fns = (self.fn1, self.fn2)
         self.grads = (self.grad1, self.grad2)
 
     # constraint 1: exp(x) <= y, or sqrtx**2 <= logy
-    def fn1(self, sqrtx, logy, _):
+    def fn1(self, sqrtx: float, logy: float, _: Any) -> float:
         return sqrtx * sqrtx - logy
 
     # objective: minimize -sqrt(x) / y
-    def fn2(self, sqrtx, logy, gamma):
+    def fn2(self, sqrtx: float, logy: float, gamma: float) -> float:
         self.y = math.exp(logy)
         self.tmp3 = gamma * self.y
         return -sqrtx + self.tmp3
 
-    def grad1(self, sqrtx):
+    def grad1(self, sqrtx: float) -> np.ndarray:
         return np.array([2 * sqrtx, -1.0])
 
-    def grad2(self, _):
+    def grad2(self, _: Any) -> np.ndarray:
         return np.array([-1.0, self.tmp3])
 
-    def assess_optim(self, z, gamma: float):
+    def assess_optim(
+        self, z: Tuple[float, float], gamma: float
+    ) -> Tuple[Tuple[np.ndarray, float], Optional[float]]:
         """[summary]
 
         Arguments:
@@ -61,27 +64,29 @@ class MyQuasicvxOracle2(OracleOptim):
     y: float
     tmp3: float
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.fns = (self.fn1, self.fn2)
         self.grads = (self.grad1, self.grad2)
 
     # constraint 1: exp(x) <= y, or sqrtx**2 <= logy
-    def fn1(self, sqrtx, logy, _):
+    def fn1(self, sqrtx: float, logy: float, _: Any) -> float:
         return sqrtx * sqrtx - logy
 
     # objective: minimize -sqrt(x) / y
-    def fn2(self, sqrtx, logy, gamma):
+    def fn2(self, sqrtx: float, logy: float, gamma: float) -> float:
         self.y = math.exp(logy)
         self.tmp3 = gamma * self.y
         return -sqrtx + self.tmp3
 
-    def grad1(self, sqrtx):
+    def grad1(self, sqrtx: float) -> np.ndarray:
         return np.array([2 * sqrtx, -1.0])
 
-    def grad2(self, _):
+    def grad2(self, _: Any) -> np.ndarray:
         return np.array([-1.0, self.tmp3])
 
-    def assess_optim(self, z, gamma: float):
+    def assess_optim(
+        self, z: Tuple[float, float], gamma: float
+    ) -> Tuple[Tuple[np.ndarray, float], Optional[float]]:
         """[summary]
 
         Arguments:
@@ -101,7 +106,7 @@ class MyQuasicvxOracle2(OracleOptim):
         return (np.array([-1.0, sqrtx]), 0), gamma
 
 
-def run_quasicvx(omega):
+def run_quasicvx(omega: Type[OracleOptim]) -> int:
     xinit = np.array([0.0, 0.0])  # initial xinit
     ellip = Ell(10.0, xinit)
     xbest, _, num_iters = cutting_plane_optim(omega(), ellip, 0.0)
@@ -109,11 +114,11 @@ def run_quasicvx(omega):
     return num_iters
 
 
-def test_bm_with_round_robin(benchmark) -> None:
+def test_bm_with_round_robin(benchmark: Any) -> None:
     num_iters = benchmark(run_quasicvx, MyQuasicvxOracle)
     assert num_iters == 83
 
 
-def test_bm_without_round_robin(benchmark) -> None:
+def test_bm_without_round_robin(benchmark: Any) -> None:
     num_iters = benchmark(run_quasicvx, MyQuasicvxOracle2)
     assert num_iters == 98

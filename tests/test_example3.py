@@ -5,9 +5,10 @@ Test Example 3
 from __future__ import print_function
 
 import numpy as np
+from typing import Optional, Tuple
 
 from ellalgo.cutting_plane import BSearchAdaptor, Options, bsearch
-from ellalgo.ell import Ell
+from ellalgo.ell_stable import EllStable
 from ellalgo.ell_typing import OracleFeas2
 
 num_constraints = 4
@@ -22,7 +23,7 @@ class MyOracle3(OracleFeas2):
     idx = -1
     target = -1e100
 
-    def assess_feas(self, xc):
+    def assess_feas(self, xc: np.ndarray) -> Optional[Tuple[np.ndarray, float]]:
         """
         The `assess_feas` function iterates through a list of functions and returns the result of the first
         function that returns a positive value along with its corresponding gradient.
@@ -57,7 +58,7 @@ class MyOracle3(OracleFeas2):
 
         return None
 
-    def update(self, gamma):
+    def update(self, gamma: float) -> None:
         """
         The `update` function sets the `target` attribute to the value of the `gamma` parameter.
 
@@ -75,7 +76,7 @@ def test_case_feasible() -> None:
     asserts the expected outcome.
     """
     xinit = np.array([0.0, 0.0])  # initial xinit
-    ellip = Ell(100.0, xinit)
+    ellip = EllStable(100.0, xinit)
     options = Options()
     options.tolerance = 1e-8
     adaptor = BSearchAdaptor(MyOracle3(), ellip, options)

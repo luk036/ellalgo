@@ -285,14 +285,16 @@ class ProfitQOracle(OracleOptimQ):
 
     xd: np.ndarray  # Discrete candidate solution in log-space
 
-    def __init__(self, params, elasticities, price_out) -> None:
+    def __init__(
+        self, params: Tuple[float, float, float], elasticities: Arr, price_out: Arr
+    ) -> None:
         """Initialize discrete oracle with underlying continuous oracle."""
         self.omega = ProfitOracle(params, elasticities, price_out)
         self.xd = np.array([0.0, 0.0])  # Initial discrete solution
 
     def assess_optim_q(
-        self, xc: Arr, gamma: float, retry: bool
-    ) -> Tuple[Cut, Arr, Optional[float], bool]:
+        self, xc: np.ndarray, gamma: float, retry: bool
+    ) -> Tuple[Tuple[np.ndarray, float], np.ndarray, Optional[float], bool]:
         """Discrete optimization assessment with rounding mechanism.
 
         Workflow:

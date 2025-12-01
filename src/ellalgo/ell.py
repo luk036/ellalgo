@@ -69,7 +69,7 @@ class Ell(SearchSpace[ArrayType]):
     _tsq: float  # Measure of distance between current center and optimal point
     helper: EllCalc  # Helper object for ellipsoid calculations
 
-    def __init__(self, val, xc: ArrayType) -> None:
+    def __init__(self, val: Union[float, ArrayType], xc: ArrayType) -> None:
         """
         Initialize the ellipsoid with given parameters.
 
@@ -108,7 +108,7 @@ class Ell(SearchSpace[ArrayType]):
             self._kappa = 1.0
             self._mq = np.diag(val)
 
-    def xc(self) -> np.ndarray:
+    def xc(self) -> ArrayType:
         """
         Getter method for the ellipsoid's center point.
 
@@ -138,7 +138,7 @@ class Ell(SearchSpace[ArrayType]):
         """
         return self._tsq
 
-    def update_bias_cut(self, cut) -> CutStatus:
+    def update_bias_cut(self, cut: Cut) -> CutStatus:
         """
         Update the ellipsoid using a bias cut (deep cut) strategy.
 
@@ -163,7 +163,7 @@ class Ell(SearchSpace[ArrayType]):
         """
         return self._update_core(cut, self.helper.calc_single_or_parallel)
 
-    def update_central_cut(self, cut) -> CutStatus:
+    def update_central_cut(self, cut: Cut) -> CutStatus:
         """
         Update the ellipsoid using a central cut strategy.
 
@@ -188,7 +188,7 @@ class Ell(SearchSpace[ArrayType]):
         """
         return self._update_core(cut, self.helper.calc_single_or_parallel_central_cut)
 
-    def update_q(self, cut) -> CutStatus:
+    def update_q(self, cut: Cut) -> CutStatus:
         """
         Update the ellipsoid using a non-central cut strategy for Q.
 
@@ -214,7 +214,7 @@ class Ell(SearchSpace[ArrayType]):
 
     # private:
 
-    def _update_core(self, cut, cut_strategy: Callable) -> CutStatus:
+    def _update_core(self, cut: Cut, cut_strategy: Callable) -> CutStatus:
         """
         Core method for updating the ellipsoid based on a cut and strategy.
 

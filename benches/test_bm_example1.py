@@ -2,6 +2,7 @@
 from __future__ import print_function
 
 import numpy as np
+from typing import Any, Optional, Tuple, Type
 
 from ellalgo.cutting_plane import Options, cutting_plane_optim
 from ellalgo.ell import Ell
@@ -14,7 +15,7 @@ class MyOracle1(OracleOptim):
     given parameters and returns specific values accordingly.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Creates a new `MyOracle` instance with the `idx` field initialized to 0.
 
@@ -28,7 +29,9 @@ class MyOracle1(OracleOptim):
         """
         self.idx = -1
 
-    def assess_optim(self, xc, gamma: float):
+    def assess_optim(
+        self, xc: np.ndarray, gamma: float
+    ) -> Tuple[Tuple[np.ndarray, float], Optional[float]]:
         """
         The function assess_optim assesses feasibility and optimality of a given point based on a specified
         gamma value.
@@ -76,7 +79,9 @@ class MyOracle2(OracleOptim):
     given parameters and returns specific values accordingly.
     """
 
-    def assess_optim(self, xc, gamma: float):
+    def assess_optim(
+        self, xc: np.ndarray, gamma: float
+    ) -> Tuple[Tuple[np.ndarray, float], Optional[float]]:
         """
         The function assess_optim assesses feasibility and optimality of a given point based on a specified
         gamma value.
@@ -102,7 +107,7 @@ class MyOracle2(OracleOptim):
         return ((np.array([-1.0, -1.0]), 0.0), f0)
 
 
-def run_example1(omega):
+def run_example1(omega: Type[OracleOptim]) -> int:
     xinit = np.array([0.0, 0.0])  # initial xinit
     ellip = Ell(10.0, xinit)
     options = Options()
@@ -112,11 +117,11 @@ def run_example1(omega):
     return num_iters
 
 
-def test_bm_with_round_robin(benchmark) -> None:
+def test_bm_with_round_robin(benchmark: Any) -> None:
     num_iters = benchmark(run_example1, MyOracle1)
     assert num_iters == 25
 
 
-def test_bm_without_round_robin(benchmark) -> None:
+def test_bm_without_round_robin(benchmark: Any) -> None:
     num_iters = benchmark(run_example1, MyOracle2)
     assert num_iters == 25

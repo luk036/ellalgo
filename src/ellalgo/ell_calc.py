@@ -49,6 +49,7 @@ from typing import Optional, Tuple
 
 from .ell_calc_core import EllCalcCore
 from .ell_config import CutStatus
+from .ell_typing import CutChoice
 
 
 class EllCalc:
@@ -95,7 +96,7 @@ class EllCalc:
         self.helper = EllCalcCore(n)
 
     def calc_single_or_parallel(
-        self, beta, tsq: float
+        self, beta: CutChoice, tsq: float
     ) -> Tuple[CutStatus, Optional[Tuple[float, float, float]]]:
         """
         Calculates the parameters for either a single deep cut or a parallel cut.
@@ -125,7 +126,7 @@ class EllCalc:
         return self.calc_parallel(beta[0], beta[1], tsq)
 
     def calc_single_or_parallel_central_cut(
-        self, beta, tsq: float
+        self, beta: CutChoice, tsq: float
     ) -> Tuple[CutStatus, Optional[Tuple[float, float, float]]]:
         """Calculate either a single central cut or a parallel central cut.
 
@@ -234,7 +235,7 @@ class EllCalc:
         )
 
     def calc_single_or_parallel_q(
-        self, beta, tsq: float
+        self, beta: CutChoice, tsq: float
     ) -> Tuple[CutStatus, Optional[Tuple[float, float, float]]]:
         """Calculate either single or parallel deep cut (discrete version).
 

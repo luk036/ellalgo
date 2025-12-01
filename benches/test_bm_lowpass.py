@@ -1,4 +1,5 @@
 import time
+from typing import Any, Tuple
 
 import numpy as np
 
@@ -7,7 +8,7 @@ from ellalgo.ell import Ell
 from ellalgo.oracles.lowpass_oracle import create_lowpass_case
 
 
-def run_lowpass(use_parallel_cut: bool, duration=0.000001):
+def run_lowpass(use_parallel_cut: bool, duration: float = 0.000001) -> Tuple[int, bool]:
     """[summary]
 
     Arguments:
@@ -34,7 +35,7 @@ def run_lowpass(use_parallel_cut: bool, duration=0.000001):
     return num_iters, h is not None
 
 
-def test_lowpass(benchmark) -> None:
+def test_lowpass(benchmark: Any) -> None:
     """Test the lowpass case with parallel cut"""
     result, feasible = benchmark(run_lowpass, True)
     assert feasible
@@ -42,7 +43,7 @@ def test_lowpass(benchmark) -> None:
     assert result <= 12600
 
 
-def test_no_parallel_cut(benchmark) -> None:
+def test_no_parallel_cut(benchmark: Any) -> None:
     """Test the lowpass case with no parallel cut"""
     result, feasible = benchmark(run_lowpass, False)
     assert feasible

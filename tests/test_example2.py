@@ -5,6 +5,7 @@ Test Example 2
 from __future__ import print_function
 
 import numpy as np
+from typing import Optional, Tuple
 
 from ellalgo.cutting_plane import cutting_plane_feas
 from ellalgo.ell import Ell
@@ -21,7 +22,7 @@ class MyOracle2(OracleFeas):
 
     idx = -1  # for round robin
 
-    def assess_feas(self, xc):
+    def assess_feas(self, xc: np.ndarray) -> Optional[Tuple[np.ndarray, float]]:
         """
         The `assess_feas` function iterates through a list of functions and returns the result of the first
         function that returns a positive value along with the corresponding gradient.
