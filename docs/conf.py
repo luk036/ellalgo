@@ -10,7 +10,6 @@
 import os
 import sys
 import shutil
-import sphinx_rtd_theme
 
 # -- Path setup --------------------------------------------------------------
 
@@ -74,8 +73,8 @@ extensions = [
     "sphinx.ext.ifconfig",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
-    'sphinx_rtd_theme',
-    'sphinxcontrib.svgbob',  # ASCII to SVG diagrams
+    "sphinx_rtd_theme",
+    "sphinxcontrib.svgbob",  # ASCII to SVG diagrams
 ]
 
 # Add any paths that contain templates here, relative to this directory.

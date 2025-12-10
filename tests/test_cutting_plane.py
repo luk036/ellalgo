@@ -30,7 +30,9 @@ def options() -> Options:
 class MyOracleFeas(OracleFeas):
     """Oracle for feasibility problem."""
 
-    def __init__(self, mat_f: List[np.ndarray], mat_b: Optional[np.ndarray] = None) -> None:
+    def __init__(
+        self, mat_f: List[np.ndarray], mat_b: Optional[np.ndarray] = None
+    ) -> None:
         pass
 
     def assess_feas(self, xc: np.ndarray) -> Optional[Tuple[np.ndarray, float]]:
@@ -44,7 +46,9 @@ class MyOracleFeas(OracleFeas):
 class MyOracleInfeas(OracleFeas):
     """Oracle for infeasibility problem."""
 
-    def __init__(self, mat_f: List[np.ndarray], mat_b: Optional[np.ndarray] = None) -> None:
+    def __init__(
+        self, mat_f: List[np.ndarray], mat_b: Optional[np.ndarray] = None
+    ) -> None:
         pass
 
     def assess_feas(self, xc: np.ndarray) -> Optional[Tuple[np.ndarray, float]]:

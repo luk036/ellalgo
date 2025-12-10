@@ -15,7 +15,8 @@ from ellalgo.oracles.lmi0_oracle import LMI0Oracle
 from ellalgo.oracles.lmi_old_oracle import LMIOldOracle
 from ellalgo.oracles.lmi_oracle import LMIOracle
 
-from ellalgo.ell_typing import OracleFeas, SearchSpace, CutChoice
+from ellalgo.ell_typing import CutChoice
+
 Cut = Tuple[np.ndarray, CutChoice]
 
 
@@ -54,7 +55,7 @@ class MyOracle(OracleOptim, Generic[OracleType]):
         )
         B2_mat = np.array([[14.0, 9.0, 40.0], [9.0, 91.0, 10.0], [40.0, 10.0, 15.0]])
         self.lmi1 = oracle([F1_mat[i] for i in range(F1_mat.shape[0])], B1_mat)
-        self.lmi2 = oracle([F2_mat[i] for i in range(F2_mat.shape[0])], B2_mat) 
+        self.lmi2 = oracle([F2_mat[i] for i in range(F2_mat.shape[0])], B2_mat)
 
     def assess_optim(self, xc: np.ndarray, gamma: float) -> Tuple[Cut, Optional[float]]:
         """
@@ -135,6 +136,7 @@ def test_lmi0_oracle() -> None:
     lmi1 = LMI0Oracle([F1[i] for i in range(F1.shape[0])])
     cut = lmi1.assess_feas(np.array([0.0, 0.0, 0.0]))
     assert cut is not None
+
 
 def test_lmi_lazy() -> None:
     """

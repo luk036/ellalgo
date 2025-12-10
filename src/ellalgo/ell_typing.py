@@ -14,10 +14,13 @@ Num = Union[float, int]
 
 class OracleFeas(Generic[ArrayType]):
     @abstractmethod
-    def __init__(self, mat_f: List[np.ndarray], mat_b: Optional[np.ndarray] = None) -> None:
+    def __init__(
+        self, mat_f: List[np.ndarray], mat_b: Optional[np.ndarray] = None
+    ) -> None:
         """
         Constructor for OracleFeas.
         """
+
     @abstractmethod
     def assess_feas(self, xc: ArrayType) -> Optional[Cut]:
         """
@@ -123,6 +126,7 @@ class SearchSpace(Generic[ArrayType]):
         """
         Constructor for SearchSpace.
         """
+
     @abstractmethod
     def update_bias_cut(self, cut: Cut) -> CutStatus:
         """

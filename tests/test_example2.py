@@ -22,7 +22,9 @@ class MyOracle2(OracleFeas):
 
     idx = -1  # for round robin
 
-    def __init__(self, mat_f: List[np.ndarray], mat_b: Optional[np.ndarray] = None) -> None:
+    def __init__(
+        self, mat_f: List[np.ndarray], mat_b: Optional[np.ndarray] = None
+    ) -> None:
         pass
 
     def assess_feas(self, xc: np.ndarray) -> Optional[Tuple[np.ndarray, float]]:

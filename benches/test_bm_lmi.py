@@ -2,7 +2,7 @@
 from __future__ import print_function
 
 # import time
-from typing import Any, Optional, Tuple, Type, List
+from typing import Any, Optional, Tuple, Type
 
 import numpy as np
 
@@ -64,6 +64,7 @@ class MyOracle(OracleOptim):
         if (fj := f0 - gamma) > 0.0:
             return (self.c, fj), None
         return (self.c, 0.0), f0
+
 
 def run_lmi(oracle: Type[OracleFeas]) -> int:
     """[summary]
