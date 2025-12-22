@@ -69,7 +69,7 @@ class Ell(SearchSpace[ArrayType]):
     _tsq: float  # Measure of distance between current center and optimal point
     helper: EllCalc  # Helper object for ellipsoid calculations
 
-    def __init__(self, val: Union[float, ArrayType], xc: ArrayType) -> None:
+    def __init__(self, val: Union[float, ArrayType], x_center: ArrayType) -> None:
         """
         Initialize the ellipsoid with given parameters.
 
@@ -79,10 +79,10 @@ class Ell(SearchSpace[ArrayType]):
 
         Args:
             val: Either a scalar (kappa) or a list of values for diagonal matrix
-            xc: The initial center point of the ellipsoid
+            x_center: The initial center point of the ellipsoid
 
         The method:
-        1. Determines the dimension from xc
+        1. Determines the dimension from x_center
         2. Creates a helper object for calculations
         3. Sets the center point
         4. Initializes tsq to 0
@@ -95,9 +95,9 @@ class Ell(SearchSpace[ArrayType]):
             >>> ell.xc()
             array([0., 0.])
         """
-        ndim = len(xc)
+        ndim = len(x_center)
         self.helper = EllCalc(ndim)
-        self._xc = xc
+        self._xc = x_center
         self._tsq = 0.0
         if isinstance(val, (int, float)):
             # Case 1: val is a scalar (kappa), create identity matrix
@@ -117,14 +117,14 @@ class Ell(SearchSpace[ArrayType]):
         """
         return self._xc
 
-    def set_xc(self, xc: ArrayType) -> None:
+    def set_xc(self, x_center: ArrayType) -> None:
         """
         Setter method for the ellipsoid's center point.
 
         Args:
-            xc: The new center point for the ellipsoid
+            x_center: The new center point for the ellipsoid
         """
-        self._xc = xc
+        self._xc = x_center
 
     def tsq(self) -> float:
         """

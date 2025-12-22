@@ -6,13 +6,13 @@ from ellalgo.conjugate_gradient import conjugate_gradient
 
 
 def test_conjugate_gradient_simple() -> None:
-    A = np.array([[4.0, 1.0], [1.0, 3.0]])
-    b = np.array([1.0, 2.0])
-    x_expected = np.array([0.0909091, 0.6363636])
+    matrix_A = np.array([[4.0, 1.0], [1.0, 3.0]])
+    vector_b = np.array([1.0, 2.0])
+    expected_solution = np.array([0.0909091, 0.6363636])
 
-    x = conjugate_gradient(A, b)
+    solution = conjugate_gradient(matrix_A, vector_b)
 
-    assert np.allclose(x, x_expected, rtol=1e-5)
+    assert np.allclose(solution, expected_solution, rtol=1e-5)
 
 
 # def test_conjugate_gradient_larger() -> None:
@@ -27,14 +27,14 @@ def test_conjugate_gradient_simple() -> None:
 
 
 def test_conjugate_gradient_with_initial_guess() -> None:
-    A = np.array([[4.0, 1.0], [1.0, 3.0]])
-    b = np.array([1.0, 2.0])
-    x0 = np.array([1.0, 1.0])
-    x_expected = np.array([0.0909091, 0.6363636])
+    matrix_A = np.array([[4.0, 1.0], [1.0, 3.0]])
+    vector_b = np.array([1.0, 2.0])
+    initial_guess = np.array([1.0, 1.0])
+    expected_solution = np.array([0.0909091, 0.6363636])
 
-    x = conjugate_gradient(A, b, x0=x0)
+    solution = conjugate_gradient(matrix_A, vector_b, x0=initial_guess)
 
-    assert np.allclose(x, x_expected, rtol=1e-5)
+    assert np.allclose(solution, expected_solution, rtol=1e-5)
 
 
 # def test_conjugate_gradient_non_convergence() -> None:
@@ -46,11 +46,11 @@ def test_conjugate_gradient_with_initial_guess() -> None:
 
 
 def test_conjugate_gradient_tolerance() -> None:
-    A = np.array([[4.0, 1.0], [1.0, 3.0]])
-    b = np.array([1.0, 2.0])
-    tol = 1e-10
+    matrix_A = np.array([[4.0, 1.0], [1.0, 3.0]])
+    vector_b = np.array([1.0, 2.0])
+    tolerance = 1e-10
 
-    x = conjugate_gradient(A, b, tol=tol)
+    solution = conjugate_gradient(matrix_A, vector_b, tol=tolerance)
 
-    residual = np.linalg.norm(b - np.dot(A, x))
-    assert residual < tol
+    residual = np.linalg.norm(vector_b - np.dot(matrix_A, solution))
+    assert residual < tolerance

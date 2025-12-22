@@ -22,13 +22,13 @@ class OracleFeas(Generic[ArrayType]):
         """
 
     @abstractmethod
-    def assess_feas(self, xc: ArrayType) -> Optional[Cut]:
+    def assess_feas(self, x_center: ArrayType) -> Optional[Cut]:
         """
         The `assess_feas` function assesses the feasibility of a given input and returns a cut if it is
         not feasible.
 
-        :param xc: An array of type ArrayType
-        :type xc: ArrayType
+        :param x_center: An array of type ArrayType
+        :type x_center: ArrayType
         """
 
 
@@ -45,15 +45,15 @@ class OracleFeas2(OracleFeas[ArrayType]):
 
 class OracleOptim(Generic[ArrayType]):
     @abstractmethod
-    def assess_optim(self, xc: ArrayType, gamma: Any) -> Tuple[Cut, Optional[float]]:
+    def assess_optim(self, x_center: ArrayType, gamma: Any) -> Tuple[Cut, Optional[float]]:
         """
-        The `assess_optim` function assesses the feasibility based on the given `xc` and `gamma`
+        The `assess_optim` function assesses the feasibility based on the given `x_center` and `gamma`
         parameters.
 
-        :param xc: An array of values that represents the current solution or point in the optimization
+        :param x_center: An array of values that represents the current solution or point in the optimization
             process
 
-        :type xc: ArrayType
+        :type x_center: ArrayType
 
         :param gamma: The `gamma` parameter is the value that we are trying to optimize or minimize. It
             could be a numerical value, a function, or any other type of object that represents the optimization
@@ -64,17 +64,17 @@ class OracleOptim(Generic[ArrayType]):
 # class OracleFeasQ(Generic[ArrayType]):
 #     @abstractmethod
 #     def assess_feas_q(
-#         self, xc: ArrayType, retry: bool
+#         self, x_center: ArrayType, retry: bool
 #     ) -> Tuple[Optional[Cut], Optional[ArrayType], bool]:
 #         """assessment of feasibility (discrete)
 #
 #         The function assess_feas_q assesses the feasibility of a given input and returns a tuple containing
 #         a cut, an array, and a boolean value.
 #
-#         :param xc: An array of some type. It represents a variable or a set of variables that need to be
+#         :param x_center: An array of some type. It represents a variable or a set of variables that need to be
 #             assessed for feasibility
 #
-#         :type xc: ArrayType
+#         :type x_center: ArrayType
 #
 #         :param retry: A boolean flag indicating whether to retry the assessment if it fails initially
 #
@@ -85,17 +85,17 @@ class OracleOptim(Generic[ArrayType]):
 class OracleOptimQ(Generic[ArrayType]):
     @abstractmethod
     def assess_optim_q(
-        self, xc: ArrayType, gamma: Any, retry: bool
+        self, x_center: ArrayType, gamma: Any, retry: bool
     ) -> Tuple[Cut, ArrayType, Optional[float], bool]:
         """assessment of optimization (discrete)
 
         The function `assess_optim_q` assesses the feasibility of a design variable and returns a tuple
         containing a cut, an array, an optional float, and a boolean value.
 
-        :param xc: An array or list representing the current solution or configuration being assessed for
+        :param x_center: An array or list representing the current solution or configuration being assessed for
             optimization
 
-        :type xc: ArrayType
+        :type x_center: ArrayType
 
         :param gamma: The `gamma` parameter is the desired value or condition that the optimization
             algorithm is trying to achieve. It could be a specific value, a range of values, or a certain
@@ -122,7 +122,7 @@ class OracleBS(ABC):
 # central cut, as well as accessing the xc and tsq attributes.
 class SearchSpace(Generic[ArrayType]):
     @abstractmethod
-    def __init__(self, val: Union[float, ArrayType], xc: ArrayType) -> None:
+    def __init__(self, val: Union[float, ArrayType], x_center: ArrayType) -> None:
         """
         Constructor for SearchSpace.
         """
@@ -194,10 +194,10 @@ class SearchSpaceQ(Generic[ArrayType]):
 
 class SearchSpace2(SearchSpace[ArrayType]):
     @abstractmethod
-    def set_xc(self, xc: ArrayType) -> None:
+    def set_xc(self, x_center: ArrayType) -> None:
         """
         The function sets the value of the variable `_xc` to the input `x`.
 
-        :param x: The parameter `x` is of type `ArrayType`
-        :type x: ArrayType
+        :param x_center: The parameter `x_center` is of type `ArrayType`
+        :type x_center: ArrayType
         """

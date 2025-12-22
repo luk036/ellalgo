@@ -44,30 +44,30 @@ def conjugate_gradient(
         ValueError: If the method does not converge within the specified maximum
             number of iterations.
     """
-    n = len(b)
+    dimension = len(b)
     if x0 is None:
-        x = np.zeros(n)  # Initialize solution vector with zeros if no initial guess
+        solution = np.zeros(dimension)  # Initialize solution vector with zeros if no initial guess
     else:
-        x = x0.copy()  # Use provided initial guess
+        solution = x0.copy()  # Use provided initial guess
 
-    # Initial residual calculation: r = b - A*x
-    r = b - np.dot(A, x)
-    p = r.copy()  # Initial search direction is set to residual
-    r_norm_sq = np.dot(r, r)  # Squared norm of residual
+    # Initial residual calculation: residual = b - A*solution
+    residual = b - np.dot(A, solution)
+    direction = residual.copy()  # Initial search direction is set to residual
+    residual_norm_sq = np.dot(residual, residual)  # Squared norm of residual
 
-    for i in range(max_iter):
-        Ap = np.dot(A, p)  # Matrix-vector product for line search
-        alpha = r_norm_sq / np.dot(p, Ap)  # Step size calculation
-        x += alpha * p  # Update solution vector
-        r -= alpha * Ap  # Update residual
-        r_norm_sq_new = np.dot(r, r)  # New residual norm squared
+    for iteration in range(max_iter):
+        A_direction = np.dot(A, direction)  # Matrix-vector product for line search
+        step_size = residual_norm_sq / np.dot(direction, A_direction)  # Step size calculation
+        solution += step_size * direction  # Update solution vector
+        residual -= step_size * A_direction  # Update residual
+        residual_norm_sq_new = np.dot(residual, residual)  # New residual norm squared
 
         # Check convergence condition using residual norm
-        if np.sqrt(r_norm_sq_new) < tol:
-            return x
+        if np.sqrt(residual_norm_sq_new) < tol:
+            return solution
 
-        beta = r_norm_sq_new / r_norm_sq  # Calculate improvement ratio
-        p = r + beta * p  # Update search direction using conjugate gradient
-        r_norm_sq = r_norm_sq_new  # Update residual norm for next iteration
+        improvement_ratio = residual_norm_sq_new / residual_norm_sq  # Calculate improvement ratio
+        direction = residual + improvement_ratio * direction  # Update search direction using conjugate gradient
+        residual_norm_sq = residual_norm_sq_new  # Update residual norm for next iteration
 
     raise ValueError(f"Conj Grad did not converge after {max_iter} iterations")

@@ -12,13 +12,13 @@ from ellalgo.ell_stable import EllStable
 from ellalgo.ell_typing import ArrayType, SearchSpace, SearchSpaceQ
 from ellalgo.oracles.profit_oracle import ProfitOracle, ProfitQOracle, ProfitRbOracle
 
-p, A, k = 20.0, 40.0, 30.5
-params = p, A, k
+price, amplitude, constant = 20.0, 40.0, 30.5
+params = price, amplitude, constant
 alpha, beta = 0.1, 0.4
-v1, v2 = 10.0, 35.0
-a = np.array([alpha, beta])
-v = np.array([v1, v2])
-r = np.array([100.0, 100.0])  # initial ellipsoid (sphere)
+value1, value2 = 10.0, 35.0
+alpha_beta_array = np.array([alpha, beta])
+value_array = np.array([value1, value2])
+radius_array = np.array([100.0, 100.0])  # initial ellipsoid (sphere)
 
 
 def run_profit(E: Type[SearchSpace]) -> int:
@@ -32,8 +32,8 @@ def run_profit(E: Type[SearchSpace]) -> int:
     :return: The function `run_profit` returns the number of iterations (`num_iters`) performed during
         the optimization process.
     """
-    ellip = E(r, np.array([0.0, 0.0]))
-    omega = ProfitOracle(params, a, v)
+    ellip = E(radius_array, np.array([0.0, 0.0]))
+    omega = ProfitOracle(params, alpha_beta_array, value_array)
     xbest, _, num_iters = cutting_plane_optim(omega, ellip, 0.0)
     assert xbest is not None
     return num_iters
@@ -50,11 +50,11 @@ def run_profit_rb(E: Type[SearchSpace]) -> int:
     :return: The function `run_profit_rb` returns the number of iterations `num_iters` after running the
         cutting plane optimization algorithm with the given parameters and constraints.
     """
-    e1 = 0.003
-    e2 = 0.007
-    e3 = e4 = e5 = 1.0
-    ellip = E(r, np.array([0.0, 0.0]))
-    omega = ProfitRbOracle(params, a, v, (e1, e2, e3, e4, e5))
+    epsilon1 = 0.003
+    epsilon2 = 0.007
+    epsilon3 = epsilon4 = epsilon5 = 1.0
+    ellip = E(radius_array, np.array([0.0, 0.0]))
+    omega = ProfitRbOracle(params, alpha_beta_array, value_array, (epsilon1, epsilon2, epsilon3, epsilon4, epsilon5))
     xbest, _, num_iters = cutting_plane_optim(omega, ellip, 0.0)
     assert xbest is not None
     return num_iters
@@ -70,20 +70,20 @@ def run_profit_q(E: Type[SearchSpaceQ[ArrayType]]) -> int:
     :return: The function `run_profit_q` returns the number of iterations (`num_iters`) performed during
         the optimization process.
     """
-    ellip = EllStable(r, np.array([0.0, 0.0]))
-    omega = ProfitQOracle(params, a, v)
+    ellip = EllStable(radius_array, np.array([0.0, 0.0]))
+    omega = ProfitQOracle(params, alpha_beta_array, value_array)
     xbest, _, num_iters = cutting_plane_optim_q(omega, ellip, 0.0)
     assert xbest is not None
     return num_iters
 
 
 def test_profit_oracle() -> None:
-    e1 = 0.003
-    e2 = 0.007
-    e3 = e4 = e5 = 1.0
-    omega = ProfitRbOracle(params, a, v, (e1, e2, e3, e4, e5))
-    x = np.array([0.0, 0.0])
-    cut = omega.assess_optim(x, 0.0)
+    epsilon1 = 0.003
+    epsilon2 = 0.007
+    epsilon3 = epsilon4 = epsilon5 = 1.0
+    omega = ProfitRbOracle(params, alpha_beta_array, value_array, (epsilon1, epsilon2, epsilon3, epsilon4, epsilon5))
+    test_point = np.array([0.0, 0.0])
+    cut = omega.assess_optim(test_point, 0.0)
     assert cut is not None
 
 

@@ -36,7 +36,7 @@ class EllStable(SearchSpaceQ[ArrayType], SearchSpace2[ArrayType]):
     _ndim: int
     helper: EllCalc
 
-    def __init__(self, val: Union[float, ArrayType], xc: ArrayType) -> None:
+    def __init__(self, val: Union[float, ArrayType], x_center: ArrayType) -> None:
         """
         The function initializes an object with given values and attributes.
 
@@ -44,15 +44,15 @@ class EllStable(SearchSpaceQ[ArrayType], SearchSpace2[ArrayType]):
         is an integer or a float, it represents the value of kappa. If it is a list of numbers, it
         represents the diagonal elements of a matrix, mq
 
-        :param xc: The parameter `xc` is of type `ArrayType`, which suggests that it is an array-like
-        object. It is used to store the values of `xc` in the `__init__` method. The length of `xc` is
-        calculated using `len(xc)` and stored in the variable
+        :param x_center: The parameter `x_center` is of type `ArrayType`, which suggests that it is an array-like
+        object. It is used to store the values of `x_center` in the `__init__` method. The length of `x_center` is
+        calculated using `len(x_center)` and stored in the variable
 
-        :type xc: ArrayType
+        :type x_center: ArrayType
         """
-        ndim = len(xc)
+        ndim = len(x_center)
         self.helper = EllCalc(ndim)
-        self._xc = xc
+        self._xc = x_center
         self._tsq = 0.0
         self._ndim = ndim
         if isinstance(val, (int, float)):
@@ -69,14 +69,14 @@ class EllStable(SearchSpaceQ[ArrayType], SearchSpace2[ArrayType]):
         """
         return self._xc
 
-    def set_xc(self, x: ArrayType) -> None:
+    def set_xc(self, x_center: ArrayType) -> None:
         """
         The function sets the value of the variable `_xc` to the input `x`.
 
         :param x: The parameter `x` is of type `ArrayType`
         :type x: ArrayType
         """
-        self._xc = x
+        self._xc = x_center
 
     def tsq(self) -> float:
         """
