@@ -54,7 +54,12 @@ def run_profit_rb(E: Type[SearchSpace]) -> int:
     epsilon2 = 0.007
     epsilon3 = epsilon4 = epsilon5 = 1.0
     ellip = E(radius_array, np.array([0.0, 0.0]))
-    omega = ProfitRbOracle(params, alpha_beta_array, value_array, (epsilon1, epsilon2, epsilon3, epsilon4, epsilon5))
+    omega = ProfitRbOracle(
+        params,
+        alpha_beta_array,
+        value_array,
+        (epsilon1, epsilon2, epsilon3, epsilon4, epsilon5),
+    )
     xbest, _, num_iters = cutting_plane_optim(omega, ellip, 0.0)
     assert xbest is not None
     return num_iters
@@ -81,7 +86,12 @@ def test_profit_oracle() -> None:
     epsilon1 = 0.003
     epsilon2 = 0.007
     epsilon3 = epsilon4 = epsilon5 = 1.0
-    omega = ProfitRbOracle(params, alpha_beta_array, value_array, (epsilon1, epsilon2, epsilon3, epsilon4, epsilon5))
+    omega = ProfitRbOracle(
+        params,
+        alpha_beta_array,
+        value_array,
+        (epsilon1, epsilon2, epsilon3, epsilon4, epsilon5),
+    )
     test_point = np.array([0.0, 0.0])
     cut = omega.assess_optim(test_point, 0.0)
     assert cut is not None

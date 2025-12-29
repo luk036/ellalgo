@@ -45,7 +45,9 @@ class OracleFeas2(OracleFeas[ArrayType]):
 
 class OracleOptim(Generic[ArrayType]):
     @abstractmethod
-    def assess_optim(self, x_center: ArrayType, gamma: Any) -> Tuple[Cut, Optional[float]]:
+    def assess_optim(
+        self, x_center: ArrayType, gamma: Any
+    ) -> Tuple[Cut, Optional[float]]:
         """
         The `assess_optim` function assesses the feasibility based on the given `x_center` and `gamma`
         parameters.
