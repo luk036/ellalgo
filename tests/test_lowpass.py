@@ -57,3 +57,43 @@ def test_lowpass() -> None:
     assert feasible
     assert num_iters >= 12300
     assert num_iters <= 12600
+
+
+def test_lowpass_oracle_negative_transition() -> None:
+    """
+    Test the lowpass oracle with negative response in transition band.
+    """
+    ndim = 32
+    omega = create_lowpass_case(ndim)
+
+    # Create coefficients that will produce negative response in transition band
+    h = np.zeros(ndim)
+    h[0] = -0.1  # Negative first coefficient
+
+    # This should trigger the non-negativity check in transition band
+    cut = omega.assess_feas(h)
+    assert cut is not None
+    assert cut[0] is not None  # Gradient should be returned
+
+
+def test_lowpass_oracle_negative_first_coeff() -> None:
+    """
+    Test the lowpass oracle with negative first coefficient.
+    """
+    ndim = 32
+    omega = create_lowpass_case(ndim)
+
+    # Create coefficients with negative first value
+    h = np.zeros(ndim)
+    h[0] = -0.5  # Negative first coefficient
+    # Set other coefficients to avoid other violations
+    for i in range(1, ndim):
+        h[i] = 0.01
+
+    # This should trigger the first coefficient non-negativity check
+    cut = omega.assess_feas(h)
+    assert cut is not None
+    assert cut[0] is not None  # Gradient should be returned
+    # Check that gradient has -1.0 at position 0
+    assert cut[0][0] == -1.0
+    # The gradient has non-zero values at other positions due to the spectrum matrix

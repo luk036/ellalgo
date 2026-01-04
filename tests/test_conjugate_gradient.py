@@ -37,12 +37,15 @@ def test_conjugate_gradient_with_initial_guess() -> None:
     assert np.allclose(solution, expected_solution, rtol=1e-5)
 
 
-# def test_conjugate_gradient_non_convergence() -> None:
-#     A = np.array([[1.0, 2.0], [2.0, 1.0]])  # Not positive definite
-#     b = np.array([1.0, 1.0])
-#
-#     with pytest.raises(ValueError):
-#         conjugate_gradient(A, b, max_iter=10)
+def test_conjugate_gradient_non_convergence() -> None:
+    import pytest
+
+    # Use a matrix that will cause division by zero in the algorithm
+    A = np.array([[0.0, 0.0], [0.0, 0.0]])  # Zero matrix - will cause issues
+    b = np.array([1.0, 1.0])
+
+    with pytest.raises(ValueError, match="Conj Grad did not converge after"):
+        conjugate_gradient(A, b, max_iter=10)
 
 
 def test_conjugate_gradient_tolerance() -> None:

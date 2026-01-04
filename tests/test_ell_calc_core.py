@@ -110,3 +110,21 @@ def test_calc_parallel_bias_cut_fast() -> None:
     assert rho == approx(0.0)
     assert sigma == approx(0.8)
     assert delta == approx(1.25)
+
+
+def test_calc_parallel_bias_cut_fast_k_le_eta() -> None:
+    """Test calc_parallel_bias_cut_fast with k <= eta to cover line 573."""
+    ell_calc_core = EllCalcCore(4)
+    # Use values that will make k <= eta to trigger the central cut path
+    # This is a specific case where the algorithm falls back to central cut
+    rho, sigma, delta = ell_calc_core.calc_parallel_bias_cut_fast(
+        0.0,
+        0.01,
+        0.01,
+        0.0,
+        0.01,  # Small values to trigger k <= eta
+    )
+    # Should fall back to central cut calculation
+    assert rho is not None
+    assert sigma is not None
+    assert delta is not None

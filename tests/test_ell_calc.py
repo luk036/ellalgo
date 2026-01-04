@@ -133,3 +133,28 @@ def test_calc_parallel_q() -> None:
     assert rho == approx(0.0232)
     assert sigma == approx(0.928)
     assert delta == approx(1.232)
+
+
+def test_calc_single_or_parallel_central_cut_tsq_le_b1sq() -> None:
+    """Test case where tsq <= b1sq to cover line 157."""
+    ell_calc = EllCalc(4)
+    # Use small tsq and larger beta[1] to trigger tsq <= b1sq condition
+    status, result = ell_calc.calc_single_or_parallel_central_cut(
+        [0.0, 0.1], 0.005
+    )  # tsq=0.005, b1sq=0.01
+    assert status == CutStatus.Success
+    assert result is not None
+    rho, sigma, delta = result
+    # This should go through the central cut path
+
+
+def test_calc_single_or_parallel_q_no_parallel_cut() -> None:
+    """Test case where use_parallel_cut is False to cover line 255."""
+    ell_calc = EllCalc(4)
+    ell_calc.use_parallel_cut = False  # Disable parallel cuts
+    # This should trigger the len(beta) < 2 or not self.use_parallel_cut condition
+    status, result = ell_calc.calc_single_or_parallel_q([0.05, 0.1], 0.01)
+    assert status == CutStatus.Success
+    assert result is not None
+    rho, sigma, delta = result
+    # This should go through the bias_cut_q path

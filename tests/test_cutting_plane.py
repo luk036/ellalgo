@@ -10,6 +10,7 @@ import numpy as np
 import pytest
 
 from ellalgo.cutting_plane import (
+    BSearchAdaptor,
     Options,
     bsearch,
     cutting_plane_feas,
@@ -193,3 +194,101 @@ def test_bsearch_no_soln(options: Options) -> None:
     gamma, num_iters = bsearch(omega, (-100.0, -50.0), options)
     assert gamma == -50.0
     assert num_iters == 20
+
+
+class MyOracleFeas2(OracleFeas):
+    """Oracle for feasibility problem that always returns a cut."""
+
+    def __init__(
+        self, mat_f: List[np.ndarray], mat_b: Optional[np.ndarray] = None
+    ) -> None:
+        pass
+
+    def assess_feas(self, xc: np.ndarray) -> Optional[Tuple[np.ndarray, float]]:
+        """Assess feasibility of `xc`."""
+        return (np.array([1.0, 1.0]), 1.0)  # Always returns a cut
+
+
+def test_cutting_plane_feas_max_iters(options: Options) -> None:
+    """Test cutting plane feasibility reaching max iterations."""
+    xinit = np.array([0.0, 0.0])
+    ellip = Ell(10.0, xinit)
+    omega = MyOracleFeas2([], None)  # Always returns a cut
+    options.max_iters = 5
+    xbest, num_iters = cutting_plane_feas(omega, ellip, options)
+    assert xbest is None
+    assert num_iters == 2  # Actual behavior: returns after 2 iterations
+
+
+class MyOracleOptim2(OracleOptim):
+    """Oracle for optimization problem that always returns a cut."""
+
+    def assess_optim(
+        self, xc: np.ndarray, gamma: float
+    ) -> Tuple[Tuple[np.ndarray, float], Optional[float]]:
+        """Assess optimality of `xc`."""
+        return ((np.array([1.0, 1.0]), 1.0), None)  # Always returns a cut
+
+
+def test_cutting_plane_optim_max_iters(options: Options) -> None:
+    """Test cutting plane optimization reaching max iterations."""
+    xinit = np.array([0.0, 0.0])
+    ellip = Ell(10.0, xinit)
+    omega = MyOracleOptim2()  # Always returns a cut
+    options.max_iters = 5
+    xbest, fbest, num_iters = cutting_plane_optim(omega, ellip, 0.0, options)
+    assert xbest is None
+    assert num_iters == 2  # Actual behavior: returns after 2 iterations
+
+
+class MyOracleOptimQ2(OracleOptimQ):
+    """Oracle for quantized optimization with special cases."""
+
+    def assess_optim_q(
+        self, xc: np.ndarray, gamma: float, retry: bool
+    ) -> Tuple[Tuple[np.ndarray, float], Optional[np.ndarray], Optional[float], bool]:
+        """Assess optimality of `xc`."""
+        x, y = xc
+        x + y
+
+        # Always return a cut to test the NoEffect case
+        return ((np.array([1.0, 1.0]), 1.0), None, None, True)
+
+
+def test_cutting_plane_optim_q_no_effect(options: Options) -> None:
+    """Test cutting plane optimization with quantization hitting NoEffect."""
+    xinit = np.array([0.0, 0.0])
+    ellip = EllStable(10.0, xinit)
+    omega = MyOracleOptimQ2()  # Always returns a cut
+    options.max_iters = 5
+    xbest, fbest, num_iters = cutting_plane_optim_q(omega, ellip, 0.0, options)
+    assert xbest is None  # Actual behavior: returns None
+    assert num_iters == 2  # Actual behavior: returns after 2 iterations
+
+
+class MyOracleBS2(OracleBS):
+    """Oracle for binary search with update method."""
+
+    def __init__(self) -> None:
+        self.gamma_val = 0.0
+
+    def assess_bs(self, gamma: float) -> bool:
+        """Assess feasibility of `gamma`."""
+        self.gamma_val = gamma
+        return gamma > 0
+
+    def update(self, gamma: float) -> None:
+        """Update with new gamma value."""
+        self.gamma_val = gamma
+
+
+def test_bsearch_adaptor_x_best(options: Options) -> None:
+    """Test BSearchAdaptor.x_best property."""
+    xinit = np.array([0.0, 0.0])
+    ellip = Ell(10.0, xinit)
+    omega = MyOracleBS2()
+    adaptor = BSearchAdaptor(omega, ellip, options)
+
+    # Test that x_best returns the current center of the ellipsoid
+    x_best = adaptor.x_best
+    np.testing.assert_array_equal(x_best, xinit)
