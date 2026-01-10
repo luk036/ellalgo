@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-import numpy as np
 from typing import Any, Optional, Tuple, Type
+
+import numpy as np
 
 from ellalgo.cutting_plane import Options, cutting_plane_optim
 from ellalgo.ell import Ell

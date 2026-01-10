@@ -4,8 +4,9 @@ Test Example 1 (with round robin)
 
 from __future__ import print_function
 
-import numpy as np
 from typing import Optional, Tuple
+
+import numpy as np
 
 from ellalgo.cutting_plane import Options, cutting_plane_optim
 from ellalgo.ell import Ell

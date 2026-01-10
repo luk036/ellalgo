@@ -4,8 +4,9 @@ Test Example 3
 
 from __future__ import print_function
 
-import numpy as np
 from typing import List, Optional, Tuple
+
+import numpy as np
 
 from ellalgo.cutting_plane import BSearchAdaptor, Options, bsearch
 from ellalgo.ell_stable import EllStable

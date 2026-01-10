@@ -6,12 +6,13 @@ that should hold regardless of the specific input values.
 """
 
 import math
+
+import numpy as np
 from hypothesis import assume, given, settings
 from hypothesis import strategies as st
 from pytest import approx
 
-from ellalgo.oracles.profit_oracle import ProfitOracle, ProfitRbOracle, ProfitQOracle
-import numpy as np
+from ellalgo.oracles.profit_oracle import ProfitOracle, ProfitQOracle, ProfitRbOracle
 
 
 class TestProfitOracleProperties:

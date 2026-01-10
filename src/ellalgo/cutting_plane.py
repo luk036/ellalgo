@@ -25,12 +25,13 @@ In summary, this code provides a toolkit for solving different types of optimiza
 """
 
 import copy
-import numpy as np
 from typing import Any, MutableSequence, Optional, Tuple, Union
 
+import numpy as np
+
 from .ell_config import CutStatus, Options
+from .ell_typing import ArrayType  # OracleFeasQ,
 from .ell_typing import (
-    ArrayType,  # OracleFeasQ,
     OracleBS,
     OracleFeas,
     OracleFeas2,

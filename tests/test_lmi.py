@@ -3,6 +3,7 @@ Test LMI
 """
 
 from __future__ import annotations
+
 from typing import Generic, Optional, Tuple, Type, TypeVar
 
 import numpy as np
@@ -10,12 +11,10 @@ import numpy as np
 from ellalgo.cutting_plane import OracleOptim, cutting_plane_optim
 from ellalgo.ell import Ell
 from ellalgo.ell_stable import EllStable
-from ellalgo.ell_typing import OracleFeas, SearchSpace
+from ellalgo.ell_typing import CutChoice, OracleFeas, SearchSpace
 from ellalgo.oracles.lmi0_oracle import LMI0Oracle
 from ellalgo.oracles.lmi_old_oracle import LMIOldOracle
 from ellalgo.oracles.lmi_oracle import LMIOracle
-
-from ellalgo.ell_typing import CutChoice
 
 Cut = Tuple[np.ndarray, CutChoice]
 

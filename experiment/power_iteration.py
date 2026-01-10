@@ -1,5 +1,6 @@
-import numpy as np
 from typing import Tuple
+
+import numpy as np
 
 """
 Power method for finding the largest eigenvalue of a square matrix

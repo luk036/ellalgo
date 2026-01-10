@@ -2,8 +2,9 @@
 Test Lowpass
 """
 
-import numpy as np
 from typing import Tuple
+
+import numpy as np
 
 from ellalgo.cutting_plane import Options, cutting_plane_optim
 from ellalgo.ell import Ell
