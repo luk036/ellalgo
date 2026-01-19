@@ -59,8 +59,14 @@ def conjugate_gradient(
 
     for iteration in range(max_iter):
         A_direction = np.dot(A, direction)  # Matrix-vector product for line search
-        step_size = residual_norm_sq / np.dot(
-            direction, A_direction
+        direction_dot_A_direction = np.dot(direction, A_direction)
+
+        # Check for zero or near-zero denominator to avoid division by zero
+        if direction_dot_A_direction == 0:
+            raise ValueError(f"Conj Grad did not converge after {max_iter} iterations")
+
+        step_size = (
+            residual_norm_sq / direction_dot_A_direction
         )  # Step size calculation
         solution += step_size * direction  # Update solution vector
         residual -= step_size * A_direction  # Update residual
