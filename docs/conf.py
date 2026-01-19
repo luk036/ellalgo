@@ -73,7 +73,6 @@ extensions = [
     "sphinx.ext.ifconfig",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
-    "sphinx_rtd_theme",
     "sphinxcontrib.svgbob",  # ASCII to SVG diagrams
 ]
 

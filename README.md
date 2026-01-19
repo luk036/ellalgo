@@ -1,13 +1,8 @@
-<!-- These are examples of badges you might want to add to your README:
-     please update the URLs accordingly
-
-[![Built Status](https://api.cirrus-ci.com/github/<USER>/ellalgo.svg?branch=main)](https://cirrus-ci.com/github/<USER>/ellalgo)
+[![Built Status](https://api.cirrus-ci.com/github/luk036/ellalgo.svg?branch=main)](https://cirrus-ci.com/github/luk036/ellalgo)
 [![ReadTheDocs](https://readthedocs.org/projects/ellalgo/badge/?version=latest)](https://ellalgo.readthedocs.io/en/stable/)
-[![Coveralls](https://img.shields.io/coveralls/github/<USER>/ellalgo/main.svg)](https://coveralls.io/r/<USER>/ellalgo)
+[![Coveralls](https://img.shields.io/coveralls/github/luk036/ellalgo/main.svg)](https://coveralls.io/r/luk036/ellalgo)
 [![PyPI-Server](https://img.shields.io/pypi/v/ellalgo.svg)](https://pypi.org/project/ellalgo/)
-[![Conda-Forge](https://img.shields.io/conda/vn/conda-forge/ellalgo.svg)](https://anaconda.org/conda-forge/ellalgo)
-[![Monthly Downloads](https://pepy.tech/badge/ellalgo/month)](https://pepy.tech/project/ellalgo)
-[![Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Twitter)](https://twitter.com/ellalgo)
+
 [![Coverage Status](https://coveralls.io/repos/github/luk036/ellalgo/badge.svg?branch=main)](https://coveralls.io/github/luk036/ellalgo?branch=main)
 -->
 
@@ -36,8 +31,6 @@ In the context of the Ellipsoid Method, a parallel cut refers to a pair of linea
 - [netoptim](https://github.com/luk036/netoptim)
 - [corr-solver](https://github.com/luk036/corr-solver)
 - [multiplierless](https://github.com/luk036/multiplierless)
-
-<!-- pyscaffold-notes -->
 
 ## See also
 

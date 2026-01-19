@@ -1,0 +1,45 @@
+version: 2
+updates:
+  # Enable version updates for production dependencies
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    # Group dependencies to reduce PR noise
+    groups:
+      test-dependencies:
+        patterns:
+          - "pytest"
+          - "pytest-*"
+          - "hypothesis"
+          - "codecov"
+      dev-dependencies:
+        patterns:
+          - "black"
+          - "isort"
+          - "flake8"
+          - "mypy"
+          - "pre-commit"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "09:00"
+
+  # Security updates (daily check)
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    labels:
+      - "security"
+    commit-message:
+      prefix: "security"
+      include: "scope"

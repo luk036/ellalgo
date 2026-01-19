@@ -1,7 +1,7 @@
 """
-This is a skeleton file that can serve as a starting point for a Python
-console script. To run this script uncomment the following lines in the
-``[options.entry_points]`` section in ``setup.cfg``::
+This is a PyScaffold-generated skeleton file. It serves as a starting point
+for a Python console script. To run this script, uncomment the following lines
+in the ``[options.entry_points]`` section in ``setup.cfg``::
 
     console_scripts =
          fibonacci = ellalgo.skeleton:run

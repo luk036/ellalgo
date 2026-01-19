@@ -15,16 +15,10 @@ matrix is positive definite (a special property of matrices). Additionally, the
 class can produce other outputs like a witness vector (if the matrix is not
 positive definite) and a square root of the matrix (if it is positive definite).
 
-The LDLTMgr class achieves its purpose through several methods. The main method
-is 'factor', which performs the actual LDLT factorization. It does this by
-going through the matrix elements row by row, calculating and storing values in
-a special way. This process helps determine if the matrix is positive definite
-and allows for efficient calculations later.
+An important aspect of this code is its use of "lazy evaluation". This means it doesn't need the entire matrix upfront but can work with just a function that provides matrix elements as needed.
 
-An important aspect of this code is its use of "lazy evaluation". This means it
-doesn't need the entire matrix upfront but can work with just a function that
-provides matrix elements as needed. This can be more efficient for large
-matrices or when the matrix is defined by a formula rather than stored values.
+This can be more efficient for large matrices or when the matrix is defined by a
+formula rather than stored values.
 
 The class also includes methods to check if the matrix is positive definite
 ('is_spd'), calculate a witness vector if it's not ('witness'), and compute a

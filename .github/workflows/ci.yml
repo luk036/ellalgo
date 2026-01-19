@@ -37,8 +37,8 @@ jobs:
       - uses: actions/setup-python@v4
         id: setup-python
         with: { python-version: "3.11" }
-      # - name: Run static analysis and format checkers
-      #   run: pipx run pre-commit run --all-files --show-diff-on-failure
+      - name: Run static analysis and format checkers
+        run: pipx run pre-commit run --all-files --show-diff-on-failure
       - name: Build package distribution files
         run: >-
           pipx run --python '${{ steps.setup-python.outputs.python-path }}'
@@ -80,27 +80,42 @@ jobs:
         run: >-
           pipx run --python '${{ steps.setup-python.outputs.python-path }}'
           tox --installpkg '${{ needs.prepare.outputs.wheel-distribution }}'
-          -- -rFEx --durations 10 --color yes  # pytest args
-  #     - name: Generate coverage report
-  #       run: pipx run coverage lcov -o coverage.lcov
-  #     - name: Upload partial coverage report
-  #       uses: coverallsapp/github-action@master
-  #       with:
-  #         path-to-lcov: coverage.lcov
-  #         github-token: ${{ secrets.GITHUB_TOKEN }}
-  #         flag-name: ${{ matrix.platform }} - py${{ matrix.python }}
-  #         parallel: true
-  #
-  # finalize:
-  #   needs: test
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Finalize coverage report
-  #       uses: coverallsapp/github-action@master
-  #       with:
-  #         github-token: ${{ secrets.GITHUB_TOKEN }}
-  #         parallel-finished: true
-  #
+           -- -rFEx --durations 10 --color yes  # pytest args
+      - name: Generate coverage report
+        run: pipx run coverage lcov -o coverage.lcov
+      - name: Upload partial coverage report
+        uses: coverallsapp/github-action@master
+        with:
+          path-to-lcov: coverage.lcov
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          flag-name: ${{ matrix.platform }} - py${{ matrix.python }}
+          parallel: true
+
+  finalize:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Finalize coverage report
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true
+
+  benchmark:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - name: Install package with benchmark dependencies
+        run: |
+          pip install -e .
+          pip install pytest pytest-benchmark
+      - name: Run benchmarks
+        run: pytest benches/ --benchmark-only --benchmark-autosave
+
   # publish:
   #   needs: finalize
   #   if: ${{ github.event_name == 'push' && contains(github.ref, 'refs/tags/') }}

@@ -1,24 +1,6 @@
-```{todo} THIS IS SUPPOSED TO BE AN EXAMPLE. MODIFY IT ACCORDING TO YOUR NEEDS!
 
-   The document assumes you are using a source repository service that promotes a
-   contribution model similar to [GitHub's fork and pull request workflow].
-   While this is true for the majority of services (like GitHub, GitLab,
-   BitBucket), it might not be the case for private repositories (e.g., when
-   using Gerrit).
-
-   Also notice that the code examples might refer to GitHub URLs or the text
-   might use GitHub specific terminology (e.g., *Pull Request* instead of *Merge
-   Request*).
-
-   Please make sure to check the document having these assumptions in mind
-   and update things accordingly.
-```
-
-```{todo} Provide the correct links/replacements at the bottom of the document.
 
 ```
-
-```{todo} You might want to have a look on [PyScaffold's contributor's guide],
 
    especially if your project is open source. The text should be very similar to
    this template, but there are a few extra contents that you might decide to
@@ -48,11 +30,9 @@ If you experience bugs or general issues with `ellalgo`, please have a look
 on the [issue tracker].
 If you don't see anything useful there, please feel free to fire an issue report.
 
-:::{tip}
 Please don't forget to include the closed issues in your search.
 Sometimes a solution was already reported, and the problem is considered
 **solved**.
-:::
 
 New issue reports should include information about your programming environment
 (e.g., operating system, Python version) and steps to reproduce the problem.
@@ -69,12 +49,7 @@ by adding missing information and correcting mistakes.
 This means that the docs are kept in the same repository as the project code, and
 that any documentation update is done in the same way was a code contribution.
 
-```{todo} Don't forget to mention which markup language you are using.
-
-    e.g.,  [reStructuredText] or [CommonMark] with [MyST] extensions.
-```
-
-```{todo} If your project is hosted on GitHub, you can also mention the following tip:
+The documentation uses MyST (Markdown with Sphinx extensions).
 
    :::{tip}
       Please notice that the [GitHub web interface] provides a quick way of
@@ -108,12 +83,11 @@ python3 -m http.server --directory 'docs/_build/html'
 
 ## Code Contributions
 
-```{todo} Please include a reference or explanation about the internals of the project.
-
-   An architecture description, design principles or at least a summary of the
-   main concepts will make it easy for potential contributors to get started
-   quickly.
-```
+For information about `ellalgo`'s internals, see the [AGENTS.md](AGENTS.md) file which contains:
+- Package structure and organization
+- Type system and naming conventions
+- Testing patterns
+- Code style guidelines
 
 ### Submit an issue
 
@@ -161,7 +135,6 @@ conda activate ellalgo
 
    to be able to import the package under development in the Python REPL.
 
-   ```{todo} if you are not using pre-commit, please remove the following item:
 
    ```
 
@@ -199,7 +172,6 @@ conda activate ellalgo
 
    to record your changes in [git].
 
-   ```{todo} if you are not using pre-commit, please remove the following item:
 
    ```
 
@@ -244,7 +216,6 @@ conda activate ellalgo
 2. Go to the web page of your fork and click "Create pull request"
    to send your changes for review.
 
-   ```{todo} if you are using GitHub, you can uncomment the following paragraph
 
       Find more detailed information in [creating a PR]. You might also want to open
       the PR as a draft first and mark it as ready for review after the feedbacks
@@ -309,8 +280,6 @@ package:
 
 ### Releases
 
-```{todo} This section assumes you are using PyPI to publicly release your package.
-
    If instead you are using a different/private package index, please update
    the instructions accordingly.
 ```
@@ -366,9 +335,7 @@ on [PyPI], the following steps can be used to release a new version for
 [virtual environment]: https://realpython.com/python-virtual-environments-a-primer/
 [virtualenv]: https://virtualenv.pypa.io/en/stable/
 
-```{todo} Please review and change the following definitions:
-
 ```
 
-[repository]: https://github.com/<USERNAME>/ellalgo
-[issue tracker]: https://github.com/<USERNAME>/ellalgo/issues
+[repository]: https://github.com/luk036/ellalgo
+[issue tracker]: https://github.com/luk036/ellalgo/issues
