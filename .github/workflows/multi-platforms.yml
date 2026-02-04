@@ -33,5 +33,5 @@ jobs:
           conda install pytest
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          python setup.py develop
+          pip install -e .
           pytest
