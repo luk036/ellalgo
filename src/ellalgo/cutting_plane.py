@@ -114,9 +114,9 @@ def cutting_plane_feas(
      └────────────┘    └───────────┘└──────────┘
 
     Args:
-        omega (OracleFeas): The feasibility oracle.
-        space (SearchSpace): The search space.
-        options (Options, optional): The options for the algorithm. Defaults to
+        omega (ellalgo.ell_typing.OracleFeas): The feasibility oracle.
+        space (ellalgo.ell_typing.SearchSpace): The search space.
+        options (ellalgo.ell_config.Options, optional): The options for the algorithm. Defaults to
             `Options()`.
 
     Returns:
@@ -176,10 +176,10 @@ def cutting_plane_optim(
     - Bias cut: This maintains the feasibility of the current `gamma` level.
 
     Args:
-        omega (OracleOptim): The optimization oracle.
-        space (SearchSpace): The search space.
+        omega (ellalgo.ell_typing.OracleOptim): The optimization oracle.
+        space (ellalgo.ell_typing.SearchSpace): The search space.
         gamma (float): The initial best objective value.
-        options (Options, optional): The options for the algorithm. Defaults to
+        options (ellalgo.ell_config.Options, optional): The options for the algorithm. Defaults to
             `Options()`.
 
     Returns:

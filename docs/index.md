@@ -75,6 +75,5 @@ Module Reference <api/modules>
 ## Learn More
 
 - [Presentation Slides](https://luk036.github.io/cvx)
-- [Used by Projects](../README.md#used-by)
 
 [MyST]: https://myst-parser.readthedocs.io/en/latest/

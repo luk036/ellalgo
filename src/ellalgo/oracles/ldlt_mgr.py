@@ -15,10 +15,10 @@ matrix is positive definite (a special property of matrices). Additionally, the
 class can produce other outputs like a witness vector (if the matrix is not
 positive definite) and a square root of the matrix (if it is positive definite).
 
-An important aspect of this code is its use of "lazy evaluation". This means it doesn't need the entire matrix upfront but can work with just a function that provides matrix elements as needed.
-
-This can be more efficient for large matrices or when the matrix is defined by a
-formula rather than stored values.
+An important aspect of this code is its use of "lazy evaluation". This means it
+doesn't need the entire matrix upfront but can work with just a function that
+provides matrix elements as needed. This can be more efficient for large matrices
+or when the matrix is defined by a formula rather than stored values.
 
 The class also includes methods to check if the matrix is positive definite
 ('is_spd'), calculate a witness vector if it's not ('witness'), and compute a
@@ -63,7 +63,8 @@ class LDLTMgr:
     - **Lazy Evaluation**: The implementation supports lazy evaluation, allowing
       it to work with matrices that are not explicitly stored in memory.
 
-    The class provides methods to:
+    The class provides the following capabilities:
+
     - Check if a matrix is symmetric positive-definite (SPD).
     - Find a "witness" vector that certifies that a matrix is not SPD.
     - Compute the Cholesky factorization (R matrix such that A = R^T R) if the
@@ -79,13 +80,9 @@ class LDLTMgr:
         Args:
             ndim: The dimension of the square matrix to be factorized.
 
-        Attributes initialized:
-            pos: Tuple tracking the position where positive definiteness fails (0,0) initially
-            wit: Witness vector storage initialized to zeros
-            _ndim: Stores the matrix dimension
-            _storage: Pre-allocated storage for factorization results (ndim x ndim matrix)
-
-        The initialization prepares all necessary storage to avoid repeated allocations during factorization.
+        The initialization prepares all necessary storage to avoid repeated allocations
+        during factorization, including position tracking, witness vector storage,
+        and the factorization storage matrix.
         """
         self.pos: Tuple[int, int] = (0, 0)
         self.wit: np.ndarray = np.zeros(ndim)

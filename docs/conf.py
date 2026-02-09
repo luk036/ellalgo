@@ -52,6 +52,33 @@ try:
         args = args[1:]
 
     apidoc.main(args)
+
+    # Remove package-level documentation to avoid duplicate warnings
+    package_rst = os.path.join(output_dir, "ellalgo.rst")
+    if os.path.exists(package_rst):
+        with open(package_rst, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        # Remove the package-level automodule directive
+        lines = content.split("\n")
+        new_lines = []
+        skip_next = False
+        for i, line in enumerate(lines):
+            if skip_next:
+                skip_next = False
+                continue
+            if ".. automodule:: ellalgo" in line:
+                # Skip this line and the next 4 lines (options)
+                skip_next = True
+                continue
+            if i > 0 and lines[i - 1] == "" and line == "Subpackages":
+                # Add a blank line before Subpackages
+                new_lines.append("")
+            new_lines.append(line)
+
+        with open(package_rst, "w", encoding="utf-8") as f:
+            f.write("\n".join(new_lines))
+
 except Exception as e:
     print("Running `sphinx-apidoc` failed!\n{}".format(e))
 

@@ -69,12 +69,14 @@ by adding missing information and correcting mistakes.
 This means that the docs are kept in the same repository as the project code, and
 that any documentation update is done in the same way was a code contribution.
 
-```{todo} Don't forget to mention which markup language you are using.
+```{todo}
+Don't forget to mention which markup language you are using.
 
-    e.g.,  [reStructuredText] or [CommonMark] with [MyST] extensions.
+e.g.,  [reStructuredText] or [CommonMark] with [MyST] extensions.
 ```
 
-```{todo} If your project is hosted on GitHub, you can also mention the following tip:
+```{todo}
+If your project is hosted on GitHub, you can also mention the following tip:
 
    :::{tip}
       Please notice that the [GitHub web interface] provides a quick way of
