@@ -19,7 +19,13 @@ from ellalgo.cutting_plane import (
 )
 from ellalgo.ell import Ell
 from ellalgo.ell_stable import EllStable
-from ellalgo.ell_typing import OracleBS, OracleFeas, OracleOptim, OracleOptimQ
+from ellalgo.ell_typing import (
+    OracleBS,
+    OracleFeas,
+    OracleFeas2,
+    OracleOptim,
+    OracleOptimQ,
+)
 
 
 @pytest.fixture
@@ -266,11 +272,15 @@ def test_cutting_plane_optim_q_no_effect(options: Options) -> None:
     assert num_iters == 2  # Actual behavior: returns after 2 iterations
 
 
-class MyOracleBS2(OracleBS):
+class MyOracleBS2(OracleFeas2):
     """Oracle for binary search with update method."""
 
     def __init__(self) -> None:
         self.gamma_val = 0.0
+
+    def assess_feas(self, xc: np.ndarray) -> Optional[Tuple[np.ndarray, float]]:
+        """Assess feasibility of `xc`."""
+        return (np.array([1.0, 1.0]), 1.0)  # Always returns a cut
 
     def assess_bs(self, gamma: float) -> bool:
         """Assess feasibility of `gamma`."""
@@ -285,7 +295,7 @@ class MyOracleBS2(OracleBS):
 def test_bsearch_adaptor_x_best(options: Options) -> None:
     """Test BSearchAdaptor.x_best property."""
     xinit = np.array([0.0, 0.0])
-    ellip = Ell(10.0, xinit)
+    ellip = EllStable(10.0, xinit)
     omega = MyOracleBS2()
     adaptor = BSearchAdaptor(omega, ellip, options)
 

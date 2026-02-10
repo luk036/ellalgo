@@ -19,6 +19,7 @@ class TestProfitOracleProperties:
     """Property-based tests for ProfitOracle mathematical properties."""
 
     @st.composite
+    @staticmethod
     def valid_profit_params(draw):
         """Generate valid profit oracle parameters."""
         # Unit price (positive)
@@ -31,6 +32,7 @@ class TestProfitOracleProperties:
         return (unit_price, scale, limit)
 
     @st.composite
+    @staticmethod
     def valid_elasticities(draw):
         """Generate valid elasticity parameters."""
         # Elasticities should be positive and sum to less than 1 for diminishing returns
@@ -43,6 +45,7 @@ class TestProfitOracleProperties:
         return np.array([alpha, beta])
 
     @st.composite
+    @staticmethod
     def valid_price_out(draw):
         """Generate valid output price parameters."""
         v1 = draw(st.floats(min_value=0.1, max_value=10.0))
@@ -51,6 +54,7 @@ class TestProfitOracleProperties:
         return np.array([v1, v2])
 
     @st.composite
+    @staticmethod
     def valid_solution_point(draw):
         """Generate valid solution points in log-space."""
         # Log-space values (can be negative)
@@ -244,6 +248,7 @@ class TestProfitRbOracleProperties:
     """Property-based tests for ProfitRbOracle mathematical properties."""
 
     @st.composite
+    @staticmethod
     def valid_robust_params(draw):
         """Generate valid robust oracle parameters."""
         # Base parameters
