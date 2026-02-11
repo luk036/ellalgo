@@ -40,6 +40,7 @@ class TestEllCalcProperties:
         status, result = calc.calc_bias_cut(beta, tsq)
 
         if status == CutStatus.Success:
+            assert result is not None
             rho, sigma, delta = result
 
             # Result parameters should be positive
@@ -64,6 +65,7 @@ class TestEllCalcProperties:
         status, result = calc.calc_parallel(beta0, beta1, tsq)
 
         if status == CutStatus.Success:
+            assert result is not None
             rho, sigma, delta = result
 
             # Result parameters should be positive
@@ -110,6 +112,7 @@ class TestEllCalcProperties:
         )
 
         if status_single == CutStatus.Success:
+            assert result_single is not None
             rho, sigma, delta = result_single
 
             # Result parameters should be positive
@@ -138,6 +141,7 @@ class TestEllCalcProperties:
         )
 
         if status_parallel == CutStatus.Success:
+            assert result_parallel is not None
             rho, sigma, delta = result_parallel
 
             # Result parameters should be positive
@@ -161,6 +165,7 @@ class TestEllCalcProperties:
         status, result = calc.calc_bias_cut_q(beta, tsq)
 
         if status == CutStatus.Success:
+            assert result is not None
             rho, sigma, delta = result
 
             # Result parameters should be positive
@@ -187,6 +192,7 @@ class TestEllCalcProperties:
         status, result = calc.calc_parallel_q(beta0, beta1, tsq)
 
         if status == CutStatus.Success:
+            assert result is not None
             rho, sigma, delta = result
 
             # Result parameters should be positive
@@ -228,12 +234,14 @@ class TestEllCalcProperties:
         # Results may differ between single and parallel cuts
         # but both should be valid if successful
         if status_single == CutStatus.Success:
+            assert result_single is not None
             rho, sigma, delta = result_single
             assert rho >= 0
             assert sigma >= 0
             assert delta >= 0
 
         if status_parallel == CutStatus.Success:
+            assert result_parallel is not None
             rho, sigma, delta = result_parallel
             assert rho >= 0
             assert sigma >= 0
@@ -278,6 +286,8 @@ class TestEllCalcProperties:
 
         if status_central == CutStatus.Success and status_bias == CutStatus.Success:
             # Both should produce valid results
+            assert result_central is not None
+            assert result_bias is not None
             assert result_central[0] >= 0  # rho >= 0
             assert result_bias[0] >= 0  # rho >= 0
             assert result_central[2] >= 0  # delta >= 0
@@ -317,6 +327,8 @@ class TestEllCalcProperties:
 
         if status1 == CutStatus.Success and status2 == CutStatus.Success:
             # Both should be valid regardless of dimension
+            assert result1 is not None
+            assert result2 is not None
             assert result1[2] >= 0  # delta >= 0
             assert result2[2] >= 0  # delta >= 0
             # The relationship between deltas depends on the specific algorithm
