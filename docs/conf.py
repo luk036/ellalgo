@@ -30,7 +30,6 @@ sys.path.insert(0, os.path.join(__location__, "../src"))
 
 from sphinx.ext import apidoc
 
-
 # del apidoc
 
 
