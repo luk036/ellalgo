@@ -18,6 +18,7 @@ from ellalgo.oracles.profit_oracle import ProfitOracle, ProfitQOracle, ProfitRbO
 class TestProfitOracleProperties:
     """Property-based tests for ProfitOracle mathematical properties."""
 
+    @staticmethod
     @st.composite
     def valid_profit_params(draw):
         """Generate valid profit oracle parameters."""
@@ -30,6 +31,7 @@ class TestProfitOracleProperties:
 
         return (unit_price, scale, limit)
 
+    @staticmethod
     @st.composite
     def valid_elasticities(draw):
         """Generate valid elasticity parameters."""
@@ -42,6 +44,7 @@ class TestProfitOracleProperties:
 
         return np.array([alpha, beta])
 
+    @staticmethod
     @st.composite
     def valid_price_out(draw):
         """Generate valid output price parameters."""
@@ -50,6 +53,7 @@ class TestProfitOracleProperties:
 
         return np.array([v1, v2])
 
+    @staticmethod
     @st.composite
     def valid_solution_point(draw):
         """Generate valid solution points in log-space."""
@@ -243,6 +247,7 @@ class TestProfitOracleProperties:
 class TestProfitRbOracleProperties:
     """Property-based tests for ProfitRbOracle mathematical properties."""
 
+    @staticmethod
     @st.composite
     def valid_robust_params(draw):
         """Generate valid robust oracle parameters."""
