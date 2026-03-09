@@ -15,53 +15,73 @@ from pytest import approx
 from ellalgo.oracles.profit_oracle import ProfitOracle, ProfitQOracle, ProfitRbOracle
 
 
+@st.composite
+def valid_profit_params(draw):
+    """Generate valid profit oracle parameters."""
+    # Unit price (positive)
+    unit_price = draw(st.floats(min_value=0.1, max_value=100.0))
+    # Scale factor (positive)
+    scale = draw(st.floats(min_value=0.1, max_value=10.0))
+    # Limit (positive)
+    limit = draw(st.floats(min_value=1.0, max_value=100.0))
+
+    return (unit_price, scale, limit)
+
+
+@st.composite
+def valid_elasticities(draw):
+    """Generate valid elasticity parameters."""
+    # Elasticities should be positive and sum to less than 1 for diminishing returns
+    alpha = draw(st.floats(min_value=0.01, max_value=0.8))
+    beta = draw(st.floats(min_value=0.01, max_value=0.8))
+
+    # Ensure sum < 1 for economic feasibility
+    assume(alpha + beta < 0.99)
+
+    return np.array([alpha, beta])
+
+
+@st.composite
+def valid_price_out(draw):
+    """Generate valid output price parameters."""
+    v1 = draw(st.floats(min_value=0.1, max_value=10.0))
+    v2 = draw(st.floats(min_value=0.1, max_value=10.0))
+
+    return np.array([v1, v2])
+
+
+@st.composite
+def valid_solution_point(draw):
+    """Generate valid solution points in log-space."""
+    # Log-space values (can be negative)
+    x1 = draw(st.floats(min_value=-3.0, max_value=3.0))
+    x2 = draw(st.floats(min_value=-3.0, max_value=3.0))
+
+    return np.array([x1, x2])
+
+
+@st.composite
+def valid_robust_params(draw):
+    """Generate valid robust oracle parameters."""
+    # Base parameters
+    unit_price = draw(st.floats(min_value=1.0, max_value=100.0))
+    scale = draw(st.floats(min_value=0.1, max_value=10.0))
+    limit = draw(st.floats(min_value=1.0, max_value=100.0))
+
+    # Uncertainty parameters (should be small relative to base values)
+    e1 = draw(st.floats(min_value=0.01, max_value=0.1))  # Elasticity uncertainty
+    e2 = draw(st.floats(min_value=0.01, max_value=0.1))
+    e3 = draw(
+        st.floats(min_value=0.01, max_value=unit_price * 0.1)
+    )  # Price uncertainty
+    e4 = draw(st.floats(min_value=0.01, max_value=limit * 0.1))  # Limit uncertainty
+    e5 = draw(st.floats(min_value=0.01, max_value=0.1))  # Input price uncertainty
+
+    return (unit_price, scale, limit), (e1, e2, e3, e4, e5)
+
+
 class TestProfitOracleProperties:
     """Property-based tests for ProfitOracle mathematical properties."""
-
-    @staticmethod
-    @st.composite
-    def valid_profit_params(draw):
-        """Generate valid profit oracle parameters."""
-        # Unit price (positive)
-        unit_price = draw(st.floats(min_value=0.1, max_value=100.0))
-        # Scale factor (positive)
-        scale = draw(st.floats(min_value=0.1, max_value=10.0))
-        # Limit (positive)
-        limit = draw(st.floats(min_value=1.0, max_value=100.0))
-
-        return (unit_price, scale, limit)
-
-    @staticmethod
-    @st.composite
-    def valid_elasticities(draw):
-        """Generate valid elasticity parameters."""
-        # Elasticities should be positive and sum to less than 1 for diminishing returns
-        alpha = draw(st.floats(min_value=0.01, max_value=0.8))
-        beta = draw(st.floats(min_value=0.01, max_value=0.8))
-
-        # Ensure sum < 1 for economic feasibility
-        assume(alpha + beta < 0.99)
-
-        return np.array([alpha, beta])
-
-    @staticmethod
-    @st.composite
-    def valid_price_out(draw):
-        """Generate valid output price parameters."""
-        v1 = draw(st.floats(min_value=0.1, max_value=10.0))
-        v2 = draw(st.floats(min_value=0.1, max_value=10.0))
-
-        return np.array([v1, v2])
-
-    @staticmethod
-    @st.composite
-    def valid_solution_point(draw):
-        """Generate valid solution points in log-space."""
-        # Log-space values (can be negative)
-        x1 = draw(st.floats(min_value=-3.0, max_value=3.0))
-        x2 = draw(st.floats(min_value=-3.0, max_value=3.0))
-
-        return np.array([x1, x2])
 
     @given(valid_profit_params(), valid_elasticities(), valid_price_out())
     def test_initialization_properties(self, params, elasticities, price_out):
@@ -247,30 +267,10 @@ class TestProfitOracleProperties:
 class TestProfitRbOracleProperties:
     """Property-based tests for ProfitRbOracle mathematical properties."""
 
-    @staticmethod
-    @st.composite
-    def valid_robust_params(draw):
-        """Generate valid robust oracle parameters."""
-        # Base parameters
-        unit_price = draw(st.floats(min_value=1.0, max_value=100.0))
-        scale = draw(st.floats(min_value=0.1, max_value=10.0))
-        limit = draw(st.floats(min_value=1.0, max_value=100.0))
-
-        # Uncertainty parameters (should be small relative to base values)
-        e1 = draw(st.floats(min_value=0.01, max_value=0.1))  # Elasticity uncertainty
-        e2 = draw(st.floats(min_value=0.01, max_value=0.1))
-        e3 = draw(
-            st.floats(min_value=0.01, max_value=unit_price * 0.1)
-        )  # Price uncertainty
-        e4 = draw(st.floats(min_value=0.01, max_value=limit * 0.1))  # Limit uncertainty
-        e5 = draw(st.floats(min_value=0.01, max_value=0.1))  # Input price uncertainty
-
-        return (unit_price, scale, limit), (e1, e2, e3, e4, e5)
-
     @given(
         valid_robust_params(),
-        TestProfitOracleProperties.valid_elasticities(),
-        TestProfitOracleProperties.valid_price_out(),
+        valid_elasticities(),
+        valid_price_out(),
     )
     def test_robust_initialization_properties(
         self, robust_params, elasticities, price_out
@@ -291,9 +291,9 @@ class TestProfitRbOracleProperties:
 
     @given(
         valid_robust_params(),
-        TestProfitOracleProperties.valid_elasticities(),
-        TestProfitOracleProperties.valid_price_out(),
-        TestProfitOracleProperties.valid_solution_point(),
+        valid_elasticities(),
+        valid_price_out(),
+        valid_solution_point(),
         st.floats(min_value=0.0, max_value=100.0),
     )
     @settings(max_examples=50)
@@ -330,9 +330,9 @@ class TestProfitQOracleProperties:
     """Property-based tests for ProfitQOracle mathematical properties."""
 
     @given(
-        TestProfitOracleProperties.valid_profit_params(),
-        TestProfitOracleProperties.valid_elasticities(),
-        TestProfitOracleProperties.valid_price_out(),
+        valid_profit_params(),
+        valid_elasticities(),
+        valid_price_out(),
     )
     def test_discrete_initialization_properties(self, params, elasticities, price_out):
         """Test that ProfitQOracle initialization preserves discrete properties."""
@@ -346,10 +346,10 @@ class TestProfitQOracleProperties:
         assert np.allclose(oracle.xd, np.array([0.0, 0.0]))
 
     @given(
-        TestProfitOracleProperties.valid_profit_params(),
-        TestProfitOracleProperties.valid_elasticities(),
-        TestProfitOracleProperties.valid_price_out(),
-        TestProfitOracleProperties.valid_solution_point(),
+        valid_profit_params(),
+        valid_elasticities(),
+        valid_price_out(),
+        valid_solution_point(),
         st.floats(min_value=0.0, max_value=100.0),
     )
     @settings(max_examples=50)
@@ -390,9 +390,9 @@ class TestProfitQOracleProperties:
             assert not retry_flag2
 
     @given(
-        TestProfitOracleProperties.valid_profit_params(),
-        TestProfitOracleProperties.valid_elasticities(),
-        TestProfitOracleProperties.valid_price_out(),
+        valid_profit_params(),
+        valid_elasticities(),
+        valid_price_out(),
     )
     def test_integer_solution_properties(self, params, elasticities, price_out):
         """Test properties of integer solutions."""
