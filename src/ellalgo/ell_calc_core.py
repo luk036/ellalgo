@@ -491,7 +491,7 @@ class EllCalcCore:
             beta0, beta1, tsq, b0b1, tsq + self._n_f * b0b1
         )
 
-    def calc_parallel_bias_cut_fast(
+    def calc_parallel_bias_cut_fast_old(
         self, beta0: float, beta1: float, tsq: float, b0b1: float, eta: float
     ) -> Tuple[float, float, float]:
         r"""Calculation Parallel Deep Cut (13 mul/div + 1 sqrt)
@@ -560,9 +560,9 @@ class EllCalcCore:
 
         Examples:
             >>> calc = EllCalcCore(4)
-            >>> calc.calc_parallel_bias_cut_fast(0.11, 0.01, 0.01, 0.0011, 0.0144)
+            >>> calc.calc_parallel_bias_cut_fast_old(0.11, 0.01, 0.01, 0.0011, 0.0144)
             (0.027228509068282114, 0.45380848447136857, 1.0443438549074862)
-            >>> calc.calc_parallel_bias_cut_fast(-0.25, 0.25, 1.0, -0.0625, 0.75)
+            >>> calc.calc_parallel_bias_cut_fast_old(-0.25, 0.25, 1.0, -0.0625, 0.75)
             (0.0, 0.8, 1.25)
         """
         bavg = 0.5 * (beta0 + beta1)
@@ -580,6 +580,92 @@ class EllCalcCore:
         inv_mu = eta / (k - eta)
         rho = bavg * sigma
         delta = (tsq + inv_mu * (bavgsq * sigma - b0b1)) / tsq
+        return (rho, sigma, delta)
+
+    def calc_parallel_bias_cut_fast(
+        self, beta0: float, beta1: float, tsq: float, b0b1: float, eta: float
+    ) -> Tuple[float, float, float]:
+        r"""Calculation Parallel Deep Cut (13 mul/div + 1 sqrt)
+
+        Optimized version of parallel biased cut calculation that takes precomputed
+        b0b1 (β₀β₁) and eta (η) values as input to reduce computation.
+
+        This version is more efficient when the calling code can precompute these
+        values, saving redundant calculations.
+
+        :param beta0: First bias parameter (for the reference cut)
+        :type beta0: float
+        :param beta1: Second bias parameter (for the parallel cut)
+        :type beta1: float
+        :param tsq: Square of the distance parameter (τ²)
+        :type tsq: float
+        :param b0b1: Precomputed product of beta0 and beta1 (β₀β₁)
+        :type b0b1: float
+        :param eta: Precomputed value of τ² + n⋅β₀β₁
+        :type eta: float
+        :return: Tuple of (ρ, σ, δ) values for the parallel biased cut
+        :rtype: Tuple[float, float, float]
+
+        Examples:
+            >>> calc = EllCalcCore(4)
+            >>> calc.calc_parallel_bias_cut_fast(0.11, 0.01, 0.01, 0.0011, 0.0144)
+            (0.027228509068282114, 0.45380848447136857, 1.0443438549074862)
+            >>> calc.calc_parallel_bias_cut_fast(-0.25, 0.25, 1.0, -0.0625, 0.75)
+            (0.0, 0.8, 1.25)
+        """
+        b0sq = beta0 * beta0
+        b1sq = beta1 * beta1
+        zeta0 = tsq - b0sq
+        zeta1 = tsq - b1sq
+        xi = sqrt(zeta0 * zeta1 + (self._half_n * (b1sq - b0sq)) ** 2)
+        bsumsq = (beta0 + beta1) ** 2
+        # sigma = self._cst3 + self._cst2 * (tsq + b0b1 - xi) / bsumsq
+        sigma = 2.0 * eta / (tsq + b0b1 + self._half_n * bsumsq + xi)
+        rho = sigma * (beta0 + beta1) / 2.0
+        delta = self._cst1 * ((zeta0 + zeta1) / 2.0 + xi / self._n_f) / tsq
+        return (rho, sigma, delta)
+
+    def calc_parallel_bias_cut_fast2(
+        self, beta0: float, beta1: float, tsq: float, b0b1: float, eta: float
+    ) -> Tuple[float, float, float]:
+        r"""Calculation Parallel Deep Cut (13 mul/div + 1 sqrt)
+
+        Optimized version of parallel biased cut calculation that takes precomputed
+        b0b1 (β₀β₁) and eta (η) values as input to reduce computation.
+
+        This version is more efficient when the calling code can precompute these
+        values, saving redundant calculations.
+
+        :param beta0: First bias parameter (for the reference cut)
+        :type beta0: float
+        :param beta1: Second bias parameter (for the parallel cut)
+        :type beta1: float
+        :param tsq: Square of the distance parameter (τ²)
+        :type tsq: float
+        :param b0b1: Precomputed product of beta0 and beta1 (β₀β₁)
+        :type b0b1: float
+        :param eta: Precomputed value of τ² + n⋅β₀β₁
+        :type eta: float
+        :return: Tuple of (ρ, σ, δ) values for the parallel biased cut
+        :rtype: Tuple[float, float, float]
+
+        Examples:
+            >>> calc = EllCalcCore(4)
+            >>> calc.calc_parallel_bias_cut_fast2(0.11, 0.01, 0.01, 0.0011, 0.0144)
+            (0.027228509068282114, 0.45380848447136857, 1.0443438549074862)
+            >>> calc.calc_parallel_bias_cut_fast2(-0.25, 0.25, 1.0, -0.0625, 0.75)
+            (0.0, 0.8, 1.25)
+        """
+        b0sq = beta0 * beta0
+        b1sq = beta1 * beta1
+        zeta0 = tsq - b0sq
+        zeta1 = tsq - b1sq
+        xi = sqrt(zeta0 * zeta1 + (self._half_n * (b1sq - b0sq)) ** 2)
+        bsumsq = (beta0 + beta1) ** 2
+        sigma = self._cst3 + self._cst2 * (tsq + b0b1 - xi) / bsumsq
+        # sigma = 2.0 * eta / (tsq + b0b1 + self._n_f * bsumsq + xi)
+        rho = sigma * (beta0 + beta1) / 2.0
+        delta = self._cst1 * ((zeta0 + zeta1) / 2.0 + xi / self._n_f) / tsq
         return (rho, sigma, delta)
 
     def calc_parallel_bias_cut_old(
