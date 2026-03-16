@@ -71,10 +71,10 @@ class EllStable(SearchSpaceQ[ArrayType], SearchSpace2[ArrayType]):
 
     def set_xc(self, x_center: ArrayType) -> None:
         """
-        The function sets the value of the variable `_xc` to the input `x`.
+        The function sets the value of the variable `_xc` to the input `x_center`.
 
-        :param x: The parameter `x` is of type `ArrayType`
-        :type x: ArrayType
+        :param x_center: The parameter `x_center` is of type `ArrayType`
+        :type x_center: ArrayType
         """
         self._xc = x_center
 

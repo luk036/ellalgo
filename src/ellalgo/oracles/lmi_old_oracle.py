@@ -31,11 +31,11 @@ class LMIOldOracle(OracleFeas):
 
     def assess_feas(self, xc: np.ndarray) -> Optional[Cut]:
         """
-        The `assess_feas` function assesses the feasibility of a given input array `x` and returns a `Cut`
+        The `assess_feas` function assesses the feasibility of a given input array `xc` and returns a `Cut`
         object if the feasibility is violated, otherwise it returns `None`.
 
-        :param x: An array of values that will be used in the calculation
-        :type x: np.ndarray
+        :param xc: An array of values that will be used in the calculation
+        :type xc: np.ndarray
         :return: The function `assess_feas` returns an `Optional[Cut]`.
         """
         n = len(xc)
