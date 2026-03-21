@@ -1,6 +1,7 @@
 import numpy as np
 from pytest import approx
-from ellalgo.oracles.spectral_fact import spectral_fact, inverse_spectral_fact
+
+from ellalgo.oracles.spectral_fact import inverse_spectral_fact, spectral_fact
 
 
 def test_spectral_fact() -> None:

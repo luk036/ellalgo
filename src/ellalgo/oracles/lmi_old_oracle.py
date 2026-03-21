@@ -16,27 +16,53 @@ class LMIOldOracle(OracleFeas):
         find  x
         s.t.  (B − F * x) ⪰ 0
 
+    This is a legacy implementation that constructs the full LMI matrix explicitly.
+    For better performance with large matrices, use `LMIOracle` which uses lazy
+    evaluation.
+
+    Examples:
+        >>> import numpy as np
+        >>> from ellalgo.oracles.lmi_old_oracle import LMIOldOracle
+        >>> F1 = np.array([[1.0, 0.0], [0.0, 1.0]])
+        >>> F2 = np.array([[0.0, 1.0], [1.0, 0.0]])
+        >>> B = np.array([[2.0, 0.0], [0.0, 2.0]])
+        >>> oracle = LMIOldOracle([F1, F2], B)
+        >>> result = oracle.assess_feas(np.array([0.0, 0.0]))
+        >>> result is None or isinstance(result, tuple)
+        True
     """
 
     def __init__(self, mat_f: List[np.ndarray], mat_b: np.ndarray):
-        """
-        The function initializes the class with two matrices and creates an instance of the LDLTMgr class.
+        """Initialize the LMI oracle with coefficient matrices.
 
-        :param mat_f: A list of numpy arrays representing the matrix F
-        :param mat_b: A numpy array representing the matrix B
+        :param mat_f: List of coefficient matrices [F₁, F₂, ..., Fₙ] where each F_i ∈ ℝ^{m×m}
+        :param mat_b: Constant matrix B ∈ ℝ^{m×m} defining the LMI constraint
         """
         self.mat_f = mat_f
         self.mat_f0 = mat_b
         self.ldlt_mgr = LDLTMgr(len(mat_b))
 
     def assess_feas(self, xc: np.ndarray) -> Optional[Cut]:
-        """
-        The `assess_feas` function assesses the feasibility of a given input array `xc` and returns a `Cut`
-        object if the feasibility is violated, otherwise it returns `None`.
+        """Assess the feasibility of a candidate solution.
 
-        :param xc: An array of values that will be used in the calculation
-        :type xc: np.ndarray
-        :return: The function `assess_feas` returns an `Optional[Cut]`.
+        This method checks if the given solution satisfies the LMI constraint
+        (B − F₁x₁ − F₂x₂ − ... − Fₙxₙ) ⪰ 0 by constructing the full matrix
+        and performing LDLT factorization.
+
+        :param xc: The candidate solution vector x
+        :returns: `None` if feasible, otherwise a tuple `(g, ep)` containing the
+            subgradient `g` and the negative eigenvalue measure `ep`
+        :raises: None
+
+        Examples:
+            >>> import numpy as np
+            >>> from ellalgo.oracles.lmi_old_oracle import LMIOldOracle
+            >>> F1 = np.array([[1.0, 0.0], [0.0, 1.0]])
+            >>> F2 = np.array([[0.0, 1.0], [1.0, 0.0]])
+            >>> B = np.array([[2.0, 0.0], [0.0, 2.0]])
+            >>> oracle = LMIOldOracle([F1, F2], B)
+            >>> oracle.assess_feas(np.array([0.0, 0.0])) is None
+            True
         """
         n = len(xc)
         A = self.mat_f0.copy()
