@@ -1,11 +1,19 @@
-"""
-Spectral Factorization Code
+"""Spectral Factorization Code
 
-This code implements spectral factorization, which is a mathematical technique used in signal processing. The main purpose of this code is to compute a minimum-phase impulse response that satisfies a given auto-correlation. In simpler terms, it's trying to find a special sequence of numbers (the impulse response) that, when processed in a certain way, matches a given pattern of relationships between data points (the auto-correlation).
+This code implements spectral factorization, which is a mathematical
+technique used in signal processing. The main purpose of this code is to
+compute a minimum-phase impulse response that satisfies a given
+auto-correlation. In simpler terms, it's trying to find a special sequence
+of numbers (the impulse response) that, when processed in a certain way,
+matches a given pattern of relationships between data points (the
+auto-correlation).
 
 The code contains two main functions: spectral_fact and inverse_spectral_fact.
 
-The spectral_fact function takes one input: r, which is the top-half of the auto-correlation coefficients. This input should be a list or array of numbers. The function outputs h, which is the impulse response that gives the desired auto-correlation.
+The spectral_fact function takes one input: r, which is the top-half of the
+auto-correlation coefficients. This input should be a list or array of
+numbers. The function outputs h, which is the impulse response that gives the
+desired auto-correlation.
 
 To achieve its purpose, the spectral_fact function follows these steps:
 
@@ -15,11 +23,22 @@ To achieve its purpose, the spectral_fact function follows these steps:
 4. It combines the results of steps 2 and 3 to create a complex representation.
 5. Finally, it converts this representation back to the time domain to get the impulse response.
 
-The function uses several mathematical operations like Fourier transforms, logarithms, and complex number manipulations to achieve this. These operations help transform the data between different representations (time domain and frequency domain) and extract the necessary information to compute the impulse response.
+The function uses several mathematical operations like Fourier transforms,
+logarithms, and complex number manipulations to achieve this. These
+operations help transform the data between different representations (time
+domain and frequency domain) and extract the necessary information to compute
+the impulse response.
 
-The inverse_spectral_fact function does the opposite of spectral_fact. It takes the impulse response h as input and attempts to reconstruct the original auto-correlation coefficients. This function is simpler and uses a mathematical operation called convolution to compute its result.
+The inverse_spectral_fact function does the opposite of spectral_fact. It
+takes the impulse response h as input and attempts to reconstruct the original
+auto-correlation coefficients. This function is simpler and uses a mathematical
+operation called convolution to compute its result.
 
-Overall, this code provides tools for working with signal processing problems, particularly those involving auto-correlations and impulse responses. It's useful in fields like audio processing, communications, and data analysis where understanding the relationships between data points over time is important.
+Overall, this code provides tools for working with signal processing problems,
+particularly those involving auto-correlations and impulse responses. It's
+useful in fields like audio processing, communications, and data analysis
+where understanding the relationships between data points over time is
+important.
 
 Spectral Factorization Process Diagram::
 
@@ -69,12 +88,16 @@ __all__ = ["spectral_fact", "inverse_spectral_fact"]
 
 
 def spectral_fact(r: np.ndarray) -> np.ndarray:
-    """Computes the minimum-phase impulse response which satisfies a given auto-correlation.
+    """Computes the minimum-phase impulse response satisfying a given auto-correlation.
 
-    This function implements the Kolmogorov 1939 approach to spectral factorization, as described in pp. 232-233 of "Signal Analysis" by A. Papoulis.
+    This function implements the Kolmogorov 1939 approach to spectral
+    factorization, as described in pp. 232-233 of "Signal Analysis" by
+    A. Papoulis.
 
     Args:
-        r (numpy.ndarray): The top-half of the auto-correlation coefficients, starting from the 0th element to the end of the auto-correlation. This should be passed in as a column vector.
+        r (numpy.ndarray): The top-half of the auto-correlation coefficients,
+            starting from the 0th element to the end of the auto-correlation.
+            This should be passed in as a column vector.
 
     Returns:
         numpy.ndarray: The impulse response that gives the desired auto-correlation.
