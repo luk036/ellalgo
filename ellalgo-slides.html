@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>ellalgo-slides</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<h1 id="ellipsoid-method-and-the-amazing-oracles">Ellipsoid Method and
+the Amazing Oracles 🎯</h1>
+<h2 id="a-60-minute-technical-presentation">A 60-Minute Technical
+Presentation</h2>
+<hr />
+<h1 id="agenda">📑 Agenda</h1>
+<ol type="1">
+<li><strong>Introduction</strong> - What is the Ellipsoid Method?
+🧭</li>
+<li><strong>Core Components</strong> - The Search Space (Ellipsoid)
+📦</li>
+<li><strong>Cutting Plane Algorithms</strong> - The Engine 🔧</li>
+<li><strong>The Amazing Oracles</strong> - Problem-Specific Oracles
+🔮</li>
+<li><strong>Deep Dive: Ellipsoid Updates</strong> - The Math Behind the
+Magic 🧮</li>
+<li><strong>Real-World Applications</strong> - From Finance to Signal
+Processing 🌐</li>
+<li><strong>Summary &amp; Q&amp;A</strong> ❓</li>
+</ol>
+<hr />
+<h1 id="introduction-the-ellipsoid-method">1. Introduction: The
+Ellipsoid Method 🧭</h1>
+<h2 id="what-is-the-ellipsoid-method">What is the Ellipsoid Method?</h2>
+<p>The <strong>Ellipsoid Method</strong> is a <em>polynomial-time</em>
+algorithm for convex optimization, introduced by <strong>L.G. Khachiyan
+in 1979</strong>.</p>
+<blockquote>
+<p>🎯 It uses ellipsoids to iteratively reduce the feasible region until
+an optimal solution is found.</p>
+</blockquote>
+<pre class="mermaid"><code>flowchart LR
+    A[Initial Ellipsoid] --&gt; B[Query Oracle]
+    B --&gt; C{Cut Available?}
+    C --&gt;|Yes| D[Update Ellipsoid]
+    C --&gt;|No| E[Solution Found!]
+    D --&gt; B
+    E --&gt; F[Optimal Point]
+
+    style A fill:#e1f5fe
+    style E fill:#c8e6c9
+    style F fill:#fff9c4</code></pre>
+<h2 id="key-properties">Key Properties</h2>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>⏱️ <strong>Time Complexity</strong></td>
+<td><span
+class="math inline"><em>O</em>(<em>n</em><sup>4</sup><em>L</em>)</span>
+where <span class="math inline"><em>L</em></span> is input bits</td>
+</tr>
+<tr>
+<td>📊 <strong>Iterations</strong></td>
+<td>Polynomial in problem dimension</td>
+</tr>
+<tr>
+<td>🎯 <strong>Optimality</strong></td>
+<td>Guarantees <span class="math inline"><em>ϵ</em></span>-optimal
+solution</td>
+</tr>
+<tr>
+<td>🔄 <strong>Robustness</strong></td>
+<td>Works with only subgradient access</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="core-components-the-search-space">2. Core Components: The Search
+Space 📦</h1>
+<h2 id="the-ell-class">The <code>Ell</code> Class</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ellalgo.ell <span class="im">import</span> Ell</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create ellipsoid with radius 1.0 centered at origin</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>ell <span class="op">=</span> Ell(<span class="fl">1.0</span>, np.array([<span class="fl">0.0</span>, <span class="fl">0.0</span>]))</span></code></pre></div>
+<h3 id="visual-representation">Visual Representation</h3>
+<pre class="mermaid"><code>graph TD
+    subgraph Ellipsoid Structure
+        A[_xc: Center] --&gt; B[&quot;xc\(\\) method&quot;]
+        C[_mq: Shape Matrix] --&gt; B
+        D[_kappa: Scaling] --&gt; B
+        E[_tsq: Distance] --&gt; B[&quot;tsq\(\\) method&quot;]
+    end
+
+    B --&gt; F[Get Current Point]
+    E --&gt; G[Check Convergence]
+
+    style A fill:#ffecb3
+    style C fill:#ffecb3
+    style D fill:#ffecb3
+    style E fill:#ffecb3</code></pre>
+<h3 id="ellipsoid-parameters">Ellipsoid Parameters</h3>
+<ul>
+<li><strong><span
+class="math inline"><em>x</em><sub><em>c</em></sub></span></strong>:
+Center point (current best solution candidate) 📍</li>
+<li><strong><span class="math inline"><em>M</em></span></strong>: Shape
+matrix (defines ellipsoid geometry) 🧭</li>
+<li><strong><span class="math inline"><em>κ</em></span></strong>:
+Scaling factor 🔢</li>
+<li><strong><span
+class="math inline"><em>τ</em><sup>2</sup></span></strong>: Distance
+measure to optimal point 📏</li>
+</ul>
+<hr />
+<h1 id="cutting-plane-algorithms">3. Cutting Plane Algorithms 🔧</h1>
+<h2 id="the-main-algorithm">The Main Algorithm</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ellalgo.cutting_plane <span class="im">import</span> cutting_plane_feas, cutting_plane_optim</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ellalgo.ell_config <span class="im">import</span> Options</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Feasibility problem</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>x, niter <span class="op">=</span> cutting_plane_feas(oracle, space, Options())</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Optimization problem  </span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>x, gamma, niter <span class="op">=</span> cutting_plane_optim(oracle, space, gamma_init, Options())</span></code></pre></div>
+<h2 id="algorithm-flow">Algorithm Flow</h2>
+<pre class="mermaid"><code>sequenceDiagram
+    participant C as Cutting Plane
+    participant S as Search Space
+    participant O as Oracle
+
+    Note over C: Start with initial ellipsoid
+    loop for each iteration
+        C-&gt;&gt;S: Get center point xc
+        S--&gt;&gt;C: Return xc
+
+        C-&gt;&gt;O: assess_feas(xc) / assess_optim(xc, gamma)
+        O--&gt;&gt;C: Return cut (or None)
+
+        alt cut is not None
+            C-&gt;&gt;S: update_bias_cut(cut) / update_central_cut(cut)
+            S--&gt;&gt;C: Return status
+        else
+            Note over C: Solution found!
+        end
+    end</code></pre>
+<hr />
+<h1 id="types-of-cuts">4. Types of Cuts 🗡️</h1>
+<h2 id="deep-cut-bias-cut">Deep Cut (Bias Cut)</h2>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Deep cut - cuts through ellipsoid</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>ell.update_bias_cut((gradient, beta))</span></code></pre></div>
+<p>The deep cut equation:</p>
+<p><span
+class="math display"><em>g</em><sup><em>T</em></sup>(<em>x</em> − <em>x</em><sub><em>c</em></sub>) + <em>β</em> ≤ 0</span></p>
+<p>Where <span class="math inline"><em>β</em></span> controls cut
+position (not through center).</p>
+<h2 id="central-cut">Central Cut</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Central cut - passes through center</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>ell.update_central_cut((gradient, <span class="fl">0.0</span>))</span></code></pre></div>
+<pre class="mermaid"><code>graph LR
+    subgraph Cut Types
+        A[Ellipsoid] --&gt; B[Deep Cut]
+        A --&gt; C[Central Cut]
+        A --&gt; D[Parallel Cut]
+    end
+
+    B --&gt; B1[β ≠ 0, asymmetric]
+    C --&gt; C1[β = 0, through center]
+    D --&gt; D1[Two parallel hyperplanes]
+
+    style B1 fill:#e8eaf6
+    style C1 fill:#e8eaf6
+    style D1 fill:#e8eaf6</code></pre>
+<h2 id="parallel-cut">Parallel Cut</h2>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Parallel cut - two constraints</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Format: (gradient, (beta_lower, beta_upper))</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>ell.update_bias_cut((gradient, (beta0, beta1)))</span></code></pre></div>
+<p>Useful when you have constraints like: <span
+class="math display"><em>a</em><sup><em>T</em></sup><em>x</em> ≤ <em>b</em><sub>1</sub>  and   − <em>a</em><sup><em>T</em></sup><em>x</em> ≤ −<em>b</em><sub>2</sub></span></p>
+<hr />
+<h1 id="the-amazing-oracles">5. The Amazing Oracles 🔮</h1>
+<h2 id="oracle-interfaces">Oracle Interfaces</h2>
+<pre class="mermaid"><code>classDiagram
+    class OracleFeas {
+        &lt;&lt;abstract&gt;&gt;
+        +assess_feas(x_center) Optional[Cut]
+    }
+
+    class OracleOptim {
+        &lt;&lt;abstract&gt;&gt;
+        +assess_optim(x_center, gamma) Tuple[Cut, Optional[float]]
+    }
+
+    class OracleOptimQ {
+        &lt;&lt;abstract&gt;&gt;
+        +assess_optim_q(x_center, gamma, retry) Tuple[Cut, Array, Optional[float], bool]
+    }
+
+    OracleFeas &lt;|-- LMIOracle
+    OracleFeas &lt;|-- ProfitOracle
+    OracleOptim &lt;|-- LowpassOracle
+    OracleOptim &lt;|-- ProfitOracle
+    OracleOptimQ &lt;|-- ProfitQOracle</code></pre>
+<h2 id="lmi-oracle---linear-matrix-inequalities">5.1 LMI Oracle - Linear
+Matrix Inequalities 📐</h2>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ellalgo.oracles.lmi_oracle <span class="im">import</span> LMIOracle</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># LMI: B - (F1*x1 + F2*x2 + ...) ⪰ 0</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>oracle <span class="op">=</span> LMIOracle([F1, F2, ..., Fn], B)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>cut <span class="op">=</span> oracle.assess_feas(xc)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns (gradient, violation) if infeasible</span></span></code></pre></div>
+<h3 id="mathematical-background">Mathematical Background</h3>
+<p>The LMI constraint:</p>
+<p><span class="math display">$$
+B - \sum_{i=1}^n F_i x_i \succeq 0
+$$</span></p>
+<p>Using <strong>LDLT factorization</strong> to check positive
+semidefiniteness:</p>
+<pre class="mermaid"><code>graph TD
+    A[Input xc] --&gt; B[&quot;Construct Matrix M(xc)&quot;]
+    B --&gt; C[LDLT Factorization]
+    C --&gt; D{Success?}
+    D --&gt;|Yes| E[&quot;Feasible: M ⪰ 0&quot;]
+    D --&gt;|No| F[Compute Cut]
+    F --&gt; G[Subgradient g]
+    F --&gt; H[witness vector]
+
+    style E fill:#c8e6c9
+    style F fill:#ffcdd2</code></pre>
+<h3 id="ldlt-manager">LDLT Manager</h3>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ellalgo.oracles.ldlt_mgr <span class="im">import</span> LDLTMgr</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>ldlt_mgr <span class="op">=</span> LDLTMgr(matrix_size)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> ldlt_mgr.factor(get_elem):</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Matrix is PSD</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    witness <span class="op">=</span> ldlt_mgr.witness()</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    g <span class="op">=</span> ldlt_mgr.sym_quad(Fk)  <span class="co"># subgradient</span></span></code></pre></div>
+<hr />
+<h2 id="profit-oracle---economic-optimization">5.2 Profit Oracle -
+Economic Optimization 💰</h2>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ellalgo.oracles.profit_oracle <span class="im">import</span> ProfitOracle</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Cobb-Douglas production function</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># max p*A*y1^α*y2^β - v1*y1 - v2*y2</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># s.t. y1 ≤ k</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>oracle <span class="op">=</span> ProfitOracle(</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    params<span class="op">=</span>(unit_price, scale, limit),  <span class="co"># (p, A, k)</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    elasticities<span class="op">=</span>np.array([α, β]),      <span class="co"># [α, β]</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    price_out<span class="op">=</span>np.array([v1, v2])        <span class="co"># [v1, v2]</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<h3 id="mathematical-model">Mathematical Model</h3>
+<p><strong>Production Function:</strong> <span
+class="math display"><em>f</em>(<em>y</em>) = <em>p</em> ⋅ <em>A</em> ⋅ <em>y</em><sub>1</sub><sup><em>α</em></sup> ⋅ <em>y</em><sub>2</sub><sup><em>β</em></sup></span></p>
+<p><strong>Profit:</strong> <span
+class="math display"><em>π</em>(<em>y</em>) = <em>p</em><em>A</em><em>y</em><sub>1</sub><sup><em>α</em></sup><em>y</em><sub>2</sub><sup><em>β</em></sup> − <em>v</em><sub>1</sub><em>y</em><sub>1</sub> − <em>v</em><sub>2</sub><em>y</em><sub>2</sub></span></p>
+<p><strong>Constraint:</strong> <span
+class="math display"><em>y</em><sub>1</sub> ≤ <em>k</em></span></p>
+<h3 id="solution-in-log-space">Solution in Log-Space</h3>
+<pre class="mermaid"><code>graph LR
+    A[y in ℝ] --&gt; B[&quot;log-space: x = log(y)&quot;]
+    B --&gt; C[Oracle Assessment]
+    C --&gt; D{Feasible?}
+    D --&gt;|No| E[Feasibility Cut]
+    D --&gt;|Yes| F[Compute Profit]
+    F --&gt; G[Optimality Cut]
+
+    style E fill:#ffcdd2
+    style G fill:#c8e6c9</code></pre>
+<h3 id="variations">Variations</h3>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Robust Profit Oracle - handles uncertainty</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ellalgo.oracles.profit_oracle <span class="im">import</span> ProfitRbOracle</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>oracle_rb <span class="op">=</span> ProfitRbOracle(</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    params<span class="op">=</span>(unit_price, scale, limit),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    elasticities<span class="op">=</span>np.array([α, β]),</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    price_out<span class="op">=</span>np.array([v1, v2]),</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    vparams<span class="op">=</span>(ε<span class="dv">1</span>, ε<span class="dv">2</span>, ε<span class="dv">3</span>, ε<span class="dv">4</span>, ε<span class="dv">5</span>)  <span class="co"># uncertainty params</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Discrete Profit Oracle - integer inputs</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ellalgo.oracles.profit_oracle <span class="im">import</span> ProfitQOracle</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>oracle_q <span class="op">=</span> ProfitQOracle(params, elasticities, price_out)</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Maximizes profit with y ∈ ℕ²</span></span></code></pre></div>
+<hr />
+<h2 id="lowpass-oracle---fir-filter-design">5.3 Lowpass Oracle - FIR
+Filter Design 📡</h2>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ellalgo.oracles.lowpass_oracle <span class="im">import</span> LowpassOracle, create_lowpass_case</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Design FIR lowpass filter</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>oracle <span class="op">=</span> LowpassOracle(</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    ndim<span class="op">=</span><span class="dv">48</span>,      <span class="co"># Number of coefficients</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    wpass<span class="op">=</span><span class="fl">0.12</span>,   <span class="co"># Passband edge (normalized)</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    wstop<span class="op">=</span><span class="fl">0.20</span>,   <span class="co"># Stopband edge</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    lp_sq<span class="op">=</span><span class="fl">0.99</span>,   <span class="co"># Lower passband bound (squared)</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    up_sq<span class="op">=</span><span class="fl">1.01</span>,   <span class="co"># Upper passband bound (squared)</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    sp_sq<span class="op">=</span><span class="fl">0.01</span>    <span class="co"># Stopband bound (squared)</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Or use default case</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>oracle <span class="op">=</span> create_lowpass_case()</span></code></pre></div>
+<h3 id="filter-design-problem">Filter Design Problem</h3>
+<p><strong>Objective:</strong> Minimize maximum stopband response</p>
+<p><span
+class="math display">min<sub><em>x</em></sub>max<sub><em>w</em> ∈ stopband</sub>|<em>H</em>(<em>w</em>)|</span></p>
+<p><strong>Subject to:</strong> <span class="math display">$$
+\frac{1}{\delta} \leq |H(w)| \leq \delta \quad \text{for } w \in
+\text{passband}
+$$</span> <span class="math display">|<em>H</em>(<em>w</em>)| ≤ stopband
+bound  for <em>w</em> ∈ stopband</span></p>
+<h3 id="spectral-factorization">Spectral Factorization</h3>
+<pre class="mermaid"><code>graph TD
+    A[Impulse Response h] --&gt; B[Spectral Factorization]
+    B --&gt; C[Autocorrelation r]
+    C --&gt; D[&quot;Frequency Response |H(w)|²&quot;]
+
+    style A fill:#e1f5fe
+    style D fill:#c8e6c9</code></pre>
+<p>Using <strong>Kolmogorov 1939</strong> method:</p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ellalgo.oracles.spectral_fact <span class="im">import</span> spectral_fact</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">0.5</span>, <span class="fl">0.2</span>])  <span class="co"># Autocorrelation</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> spectral_fact(r)  <span class="co"># Minimum-phase impulse response</span></span></code></pre></div>
+<h3 id="constraint-checking">Constraint Checking</h3>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Passband constraints</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> response <span class="op">&gt;</span> upper_bound:</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> gradient, (violation_lower, violation_upper)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Stopband constraints  </span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> response <span class="op">&gt;</span> stopband_limit:</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> gradient, (stopband_violation, response)</span></code></pre></div>
+<hr />
+<h1 id="deep-dive-ellipsoid-updates">6. Deep Dive: Ellipsoid Updates
+🧮</h1>
+<h2 id="the-update-formulas">The Update Formulas</h2>
+<p>Given a cut <span
+class="math inline">(<em>g</em>, <em>β</em>)</span>:</p>
+<h3 id="step-1-compute-key-values">Step 1: Compute Key Values</h3>
+<p><span class="math display">$$
+\begin{aligned}
+\omega &amp;= g^T M g \\
+\rho &amp;= \frac{\kappa \beta + \sqrt{\kappa^2 + \omega (\kappa +
+\beta)^2}}{\omega + \kappa} \\
+\sigma &amp;= \frac{\kappa + \beta}{\kappa + \beta + \rho \omega} \\
+\delta &amp;= \frac{\kappa + \beta + \rho \omega}{\kappa (n + 1)}
+\end{aligned}
+$$</span></p>
+<h3 id="step-2-update-parameters">Step 2: Update Parameters</h3>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># In Python (from ell.py)</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>grad_t <span class="op">=</span> M <span class="op">@</span> grad              <span class="co"># M * g</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>omega <span class="op">=</span> grad.dot(grad_t)       <span class="co"># g^T * M * g</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>rho, sigma, delta <span class="op">=</span> result     <span class="co"># From EllCalc</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Update center</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>xc_new <span class="op">=</span> xc <span class="op">-</span> (rho <span class="op">/</span> omega) <span class="op">*</span> grad_t</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Update shape matrix</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>M_new <span class="op">=</span> M <span class="op">-</span> (sigma <span class="op">/</span> omega) <span class="op">*</span> outer(grad_t, grad_t)</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Update scaling</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>kappa_new <span class="op">=</span> kappa <span class="op">*</span> delta</span></code></pre></div>
+<h3 id="visual-interpretation">Visual Interpretation</h3>
+<pre class="mermaid"><code>graph TD
+    subgraph Ellipsoid Update
+        A[Original Ellipsoid] --&gt; B[Apply Cut]
+        B --&gt; C[Shrink &amp; Reshape]
+        C --&gt; D[New Ellipsoid]
+    end
+
+    B --&gt; E[Cut Hyperplane]
+    E --&gt; F[Exclude Infeasible Region]
+    F --&gt; G[Volume Reduction]
+
+    style A fill:#e1f5fe
+    style D fill:#c8e6c9</code></pre>
+<h3 id="volume-reduction-guarantee">Volume Reduction Guarantee</h3>
+<p>The ellipsoid method guarantees at least <strong><span
+class="math inline"><em>e</em><sup>−1/(<em>n</em> + 1)</sup></span></strong>
+volume reduction per iteration!</p>
+<p>For <span class="math inline"><em>n</em> = 10</span>: <span
+class="math inline"> ≈ 0.95<sup>11</sup> ≈ 57%</span> reduction</p>
+<hr />
+<h1 id="real-world-applications">7. Real-World Applications 🌐</h1>
+<h2 id="application-overview">Application Overview</h2>
+<table>
+<thead>
+<tr>
+<th>Application</th>
+<th>Oracle</th>
+<th>Problem Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>📐 Control Systems</td>
+<td>LMIOracle</td>
+<td>Stability verification</td>
+</tr>
+<tr>
+<td>💰 Portfolio Optimization</td>
+<td>ProfitOracle</td>
+<td>Resource allocation</td>
+</tr>
+<tr>
+<td>📡 Signal Processing</td>
+<td>LowpassOracle</td>
+<td>Filter design</td>
+</tr>
+<tr>
+<td>🔬 Robust Optimization</td>
+<td>ProfitRbOracle</td>
+<td>Uncertainty handling</td>
+</tr>
+</tbody>
+</table>
+<h2 id="lmi-in-control-systems">LMI in Control Systems</h2>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify: A^T P + P A + Q &lt; 0 has solution P ⪰ 0</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Lyapunov stability condition</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>F1 <span class="op">=</span> ...  <span class="co"># Coefficients</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>F2 <span class="op">=</span> ...</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>B <span class="op">=</span> ...   <span class="co"># Constraint matrix</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>oracle <span class="op">=</span> LMIOracle([F1, F2], B)</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>cut <span class="op">=</span> oracle.assess_feas(P)</span></code></pre></div>
+<h2 id="filter-design-example">Filter Design Example</h2>
+<pre class="mermaid"><code>graph LR
+    subgraph Design Process
+        A[Initialize r] --&gt; B[Ellipsoid Method]
+        B --&gt; C{Converged?}
+        C --&gt;|No| D[Spectral Factorization]
+        D --&gt; B
+        C --&gt;|Yes| E[Optimal Filter]
+    end
+
+    style E fill:#c8e6c9</code></pre>
+<hr />
+<h1 id="code-example-putting-it-all-together">8. Code Example: Putting
+It All Together 🛠️</h1>
+<h2 id="complete-example-filter-design">Complete Example: Filter
+Design</h2>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ellalgo.ell <span class="im">import</span> Ell</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ellalgo.cutting_plane <span class="im">import</span> cutting_plane_optim</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ellalgo.ell_config <span class="im">import</span> Options</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ellalgo.oracles.lowpass_oracle <span class="im">import</span> create_lowpass_case</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Create oracle and initial ellipsoid</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>oracle <span class="op">=</span> create_lowpass_case(<span class="dv">48</span>)</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>x0 <span class="op">=</span> np.zeros(<span class="dv">48</span>)</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>space <span class="op">=</span> Ell(<span class="fl">10.0</span>, x0)</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Run optimization</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>options <span class="op">=</span> Options()</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>options.max_iters <span class="op">=</span> <span class="dv">2000</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>options.tolerance <span class="op">=</span> <span class="fl">1e-8</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>x, gamma, niter <span class="op">=</span> cutting_plane_optim(oracle, space, <span class="fl">0.5</span>, options)</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Iterations: </span><span class="sc">{</span>niter<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Stopband attenuation: </span><span class="sc">{</span>gamma<span class="sc">:.4f}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<hr />
+<h1 id="summary">9. Summary 📝</h1>
+<h2 id="key-takeaways">Key Takeaways</h2>
+<ol type="1">
+<li>🎯 <strong>Ellipsoid Method</strong>: Polynomial-time algorithm for
+convex optimization</li>
+<li>📦 <strong>Search Space</strong>: Ellipsoid defined by center, shape
+matrix, and scaling</li>
+<li>🗡️ <strong>Cuts</strong>: Deep cuts, central cuts, parallel cuts for
+different strategies</li>
+<li>🔮 <strong>Oracles</strong>: Problem-specific implementations that
+provide cutting planes</li>
+<li>📐 <strong>LMI Oracle</strong>: Linear Matrix Inequalities for
+control &amp; systems</li>
+<li>💰 <strong>Profit Oracle</strong>: Economic optimization with
+Cobb-Douglas production</li>
+<li>📡 <strong>Lowpass Oracle</strong>: FIR filter design via spectral
+factorization</li>
+</ol>
+<h2 id="architecture-diagram">Architecture Diagram</h2>
+<pre class="mermaid"><code>graph TD
+    subgraph ellalgo
+        A[cutting_plane.py] --&gt; B[ell.py]
+        B --&gt; C[ell_calc.py]
+        C --&gt; D[ell_calc_core.py]
+
+        A --&gt; E[oracles/]
+        E --&gt; E1[LMI Oracle]
+        E --&gt; E2[Profit Oracle]
+        E --&gt; E3[Lowpass Oracle]
+    end
+
+    style A fill:#fff3e0
+    style B fill:#fff3e0
+    style C fill:#fff3e0
+    style E1 fill:#e8eaf6
+    style E2 fill:#e8eaf6
+    style E3 fill:#e8eaf6</code></pre>
+<hr />
+<h1 id="questions">❓ Questions?</h1>
+<h2 id="resources">Resources</h2>
+<ul>
+<li>📚 Documentation: <a
+href="https://ellalgo.readthedocs.io/">ellalgo.readthedocs.io</a></li>
+<li>💻 Source Code: <a
+href="https://github.com/luk036/ellalgo">github.com/luk036/ellalgo</a></li>
+<li>📖 Paper: Khachiyan, L.G. (1979) “Polynomial algorithms in linear
+programming”</li>
+</ul>
+<hr />
+<h1 id="thank-you">Thank You! 🎉</h1>
+<p><em>Made with ❤️ using Python + NumPy</em></p>
+</body>
+</html>
