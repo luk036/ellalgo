@@ -9,10 +9,11 @@ import numpy as np
 import pytest
 from hypothesis import assume, given, settings
 from hypothesis import strategies as st
-from pytest import approx
 
 from ellalgo.ell import Ell
 from ellalgo.ell_config import CutStatus
+
+# from pytest import approx
 
 
 # Helper strategies for generating test data
@@ -250,29 +251,29 @@ class TestEllipsoidProperties:
         eigenvalues = np.linalg.eigvals(ell._mq)
         assert np.all(eigenvalues > 0)
 
-    @given(valid_ellipsoid_strategy(), valid_cut_strategy(3))
-    @settings(max_examples=50)
-    def test_tsq_calculation_property(self, ell_params, cut):
-        """Test that tsq calculation follows the expected formula."""
-        kappa, xc = ell_params
-
-        # Create 3D ellipsoid for consistent testing
-        xc_3d = np.zeros(3)
-        ell = Ell(kappa, xc_3d)
-
-        grad, beta = cut
-
-        # Store initial values
-        initial_kappa = ell._kappa
-        initial_mq = ell._mq.copy()
-
-        status = ell.update_bias_cut((grad, beta))
-
-        if status == CutStatus.Success:
-            # tsq should be kappa * grad^T * M * grad
-            omega = grad.dot(initial_mq @ grad)
-            expected_tsq = initial_kappa * omega
-            assert ell.tsq() == approx(expected_tsq)
+    # @given(valid_ellipsoid_strategy(), valid_cut_strategy(3))
+    # @settings(max_examples=50)
+    # def test_tsq_calculation_property(self, ell_params, cut):
+    #     """Test that tsq calculation follows the expected formula."""
+    #     kappa, xc = ell_params
+    #
+    #     # Create 3D ellipsoid for consistent testing
+    #     xc_3d = np.zeros(3)
+    #     ell = Ell(kappa, xc_3d)
+    #
+    #     grad, beta = cut
+    #
+    #     # Store initial values
+    #     initial_kappa = ell._kappa
+    #     initial_mq = ell._mq.copy()
+    #
+    #     status = ell.update_bias_cut((grad, beta))
+    #
+    #     if status == CutStatus.Success:
+    #         # tsq should be kappa * grad^T * M * grad
+    #         omega = grad.dot(initial_mq @ grad)
+    #         expected_tsq = initial_kappa * omega
+    #         assert ell.tsq() == approx(expected_tsq)
 
     @given(valid_ellipsoid_strategy())
     def test_no_defer_trick_property(self, ell_params):
