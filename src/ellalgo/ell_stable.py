@@ -4,7 +4,7 @@ import numpy as np
 
 from .ell_calc import EllCalc
 from .ell_config import CutStatus
-from .ell_typing import ArrayType, SearchSpace2, SearchSpaceQ
+from .ell_typing import ArrayType, SearchSpace
 
 Matrix = np.ndarray
 CutChoice = Union[float, ArrayType]  # single or parallel
@@ -12,7 +12,7 @@ Cut = Tuple[ArrayType, CutChoice]
 
 
 # The `EllStable` class represents an ellipsoidal search space with stability properties.
-class EllStable(SearchSpaceQ[ArrayType], SearchSpace2[ArrayType]):
+class EllStable(SearchSpace[ArrayType]):
     """Ellipsoid Search Space
 
     The `EllStable` class represents an ellipsoidal search space with stability properties.

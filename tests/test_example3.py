@@ -10,12 +10,12 @@ import numpy as np
 
 from ellalgo.cutting_plane import BSearchAdaptor, Options, bsearch
 from ellalgo.ell_stable import EllStable
-from ellalgo.ell_typing import OracleFeas2
+from ellalgo.ell_typing import OracleFeas
 
 num_constraints = 4
 
 
-class MyOracle3(OracleFeas2):
+class MyOracle3(OracleFeas):
     """
     The `MyOracle3` class defines functions and gradients for mathematical operations, with a method to
     assess feasibility based on positive function values and corresponding gradients.

@@ -11,7 +11,7 @@ import numpy as np
 from ellalgo.cutting_plane import cutting_plane_optim, cutting_plane_optim_q
 from ellalgo.ell import Ell
 from ellalgo.ell_stable import EllStable
-from ellalgo.ell_typing import ArrayType, SearchSpace, SearchSpaceQ
+from ellalgo.ell_typing import SearchSpace
 from ellalgo.oracles.profit_oracle import ProfitOracle, ProfitQOracle, ProfitRbOracle
 
 price, amplitude, constant = 20.0, 40.0, 30.5
@@ -67,7 +67,7 @@ def run_profit_rb(E: Type[SearchSpace]) -> int:
     return num_iters
 
 
-def run_profit_q(E: Type[SearchSpaceQ[ArrayType]]) -> int:
+def run_profit_q(E: Type[SearchSpace]) -> int:
     """
     The function `run_profit_q` optimizes a profit function using a cutting plane optimization
     algorithm.

@@ -19,13 +19,7 @@ from ellalgo.cutting_plane import (
 )
 from ellalgo.ell import Ell
 from ellalgo.ell_stable import EllStable
-from ellalgo.ell_typing import (
-    OracleBS,
-    OracleFeas,
-    OracleFeas2,
-    OracleOptim,
-    OracleOptimQ,
-)
+from ellalgo.ell_typing import OracleBS, OracleFeas, OracleOptim, OracleOptimQ
 
 
 @pytest.fixture
@@ -272,7 +266,7 @@ def test_cutting_plane_optim_q_no_effect(options: Options) -> None:
     assert num_iters == 2  # Actual behavior: returns after 2 iterations
 
 
-class MyOracleBS2(OracleFeas2):
+class MyOracleBS2(OracleFeas):
     """Oracle for binary search with update method."""
 
     def __init__(self) -> None:

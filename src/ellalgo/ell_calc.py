@@ -123,7 +123,9 @@ class EllCalc:
             return self.calc_bias_cut(beta, tsq)
         elif len(beta) < 2 or not self.use_parallel_cut:  # unlikely
             return self.calc_bias_cut(beta[0], tsq)
-        return self.calc_parallel(beta[0], beta[1], tsq)
+        b1 = beta[1]
+        assert b1 is not None
+        return self.calc_parallel(beta[0], b1, tsq)
 
     def calc_single_or_parallel_central_cut(
         self, beta: CutChoice, tsq: float
@@ -153,12 +155,14 @@ class EllCalc:
         """
         if isinstance(beta, (int, float)) or len(beta) < 2 or not self.use_parallel_cut:
             return (CutStatus.Success, self.helper.calc_central_cut(sqrt(tsq)))
-        if beta[1] < 0.0:
+        b1 = beta[1]
+        assert b1 is not None
+        if b1 < 0.0:
             return (CutStatus.NoSoln, None)
-        b1sq = beta[1] * beta[1]
+        b1sq = b1 * b1
         if tsq <= b1sq:
             return (CutStatus.Success, self.helper.calc_central_cut(sqrt(tsq)))
-        return (CutStatus.Success, self.helper.calc_parallel_central_cut(beta[1], tsq))
+        return (CutStatus.Success, self.helper.calc_parallel_central_cut(b1, tsq))
 
     def calc_parallel(
         self, beta0: float, beta1: float, tsq: float
@@ -253,7 +257,9 @@ class EllCalc:
             return self.calc_bias_cut_q(beta, tsq)
         elif len(beta) < 2 or not self.use_parallel_cut:  # unlikely
             return self.calc_bias_cut_q(beta[0], tsq)
-        return self.calc_parallel_q(beta[0], beta[1], tsq)
+        b1 = beta[1]
+        assert b1 is not None
+        return self.calc_parallel_q(beta[0], b1, tsq)
 
     def calc_parallel_q(
         self, beta0: float, beta1: float, tsq: float

@@ -37,19 +37,14 @@ oracles.
 import copy
 from typing import Any, MutableSequence, Optional, Tuple, Union
 
-import numpy as np
-
 from .ell_config import CutStatus, Options
-from .ell_typing import ArrayType  # OracleFeasQ,
 from .ell_typing import (
+    ArrayType,
     OracleBS,
     OracleFeas,
-    OracleFeas2,
     OracleOptim,
     OracleOptimQ,
     SearchSpace,
-    SearchSpace2,
-    SearchSpaceQ,
 )
 
 CutChoice = Union[float, MutableSequence]  # Single cut or parallel cuts
@@ -267,7 +262,7 @@ def cutting_plane_optim(
 
 def cutting_plane_optim_q(
     omega: OracleOptimQ[ArrayType],
-    space_q: SearchSpaceQ[ArrayType],
+    space_q: SearchSpace[ArrayType],
     gamma: float,
     options: Options = Options(),
 ) -> Tuple[Optional[ArrayType], float, int]:
@@ -370,7 +365,7 @@ class BSearchAdaptor(OracleBS):
     """
 
     def __init__(
-        self, omega: OracleFeas2, space: SearchSpace2, options: Options = Options()
+        self, omega: OracleFeas, space: SearchSpace, options: Options = Options()
     ) -> None:
         """
         :param omega: g-parameterized feasibility oracle
@@ -382,7 +377,7 @@ class BSearchAdaptor(OracleBS):
         self.options = options  # Subproblem solver parameters
 
     @property
-    def x_best(self) -> np.ndarray:
+    def x_best(self) -> Any:
         """Current best feasible solution candidate."""
         return self.space.xc()
 

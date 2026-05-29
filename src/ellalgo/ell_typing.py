@@ -8,40 +8,38 @@ import numpy as np
 from .ell_config import CutStatus
 
 ArrayType = TypeVar("ArrayType", bound=np.ndarray)
-CutChoice = Union[float, List[float], Tuple[float, ...]]  # single or parallel
+
+# --- Cut types ---
+# Single cut:  gᵀ(x - xc) + β ≤ 0
+SingleCut = float
+# Parallel cut:  β₀ ≤ gᵀ(x - xc) ≤ β₁
+ParallelCut = Union[Tuple[float, Optional[float]], List[float]]
+CutChoice = Union[float, ParallelCut]  # single or parallel cut
 Cut = Tuple[ArrayType, CutChoice]
 Num = Union[float, int]
 
 
 class OracleFeas(Generic[ArrayType]):
+    """Feasibility oracle with optional gamma update.
+
+    Implement assess_feas to check feasibility.
+    Override update() if the oracle needs to respond to gamma changes
+    (used by BSearchAdaptor).
+    """
+
     @abstractmethod
     def __init__(
         self, mat_f: List[np.ndarray], mat_b: Optional[np.ndarray] = None
     ) -> None:
-        """
-        Constructor for OracleFeas.
-        """
+        ...
 
     @abstractmethod
     def assess_feas(self, x_center: ArrayType) -> Optional[Cut]:
-        """
-        The `assess_feas` function assesses the feasibility of a given input and returns a cut if it is
-        not feasible.
+        ...
 
-        :param x_center: An array of type ArrayType
-        :type x_center: ArrayType
-        """
-
-
-class OracleFeas2(OracleFeas[ArrayType]):
-    @abstractmethod
     def update(self, gamma: Any) -> None:
-        """
-        The `update` function updates a gamma object.
-
-        :param gamma: The `gamma` parameter is of type `Any`, which means it can accept any type of value.
-            It is used as an argument to update the gamma object
-        """
+        """Default no-op. Override for gamma-sensitive oracles."""
+        return
 
 
 class OracleOptim(Generic[ArrayType]):
@@ -49,40 +47,7 @@ class OracleOptim(Generic[ArrayType]):
     def assess_optim(
         self, x_center: ArrayType, gamma: Any
     ) -> Tuple[Cut, Optional[float]]:
-        """
-        The `assess_optim` function assesses the feasibility based on the given `x_center` and `gamma`
-        parameters.
-
-        :param x_center: An array of values that represents the current solution or point in the optimization
-            process
-
-        :type x_center: ArrayType
-
-        :param gamma: The `gamma` parameter is the value that we are trying to optimize or minimize. It
-            could be a numerical value, a function, or any other type of object that represents the optimization
-            goal
-        """
-
-
-# class OracleFeasQ(Generic[ArrayType]):
-#     @abstractmethod
-#     def assess_feas_q(
-#         self, x_center: ArrayType, retry: bool
-#     ) -> Tuple[Optional[Cut], Optional[ArrayType], bool]:
-#         """assessment of feasibility (discrete)
-#
-#         The function assess_feas_q assesses the feasibility of a given input and returns a tuple containing
-#         a cut, an array, and a boolean value.
-#
-#         :param x_center: An array of some type. It represents a variable or a set of variables that need to be
-#             assessed for feasibility
-#
-#         :type x_center: ArrayType
-#
-#         :param retry: A boolean flag indicating whether to retry the assessment if it fails initially
-#
-#         :type retry: bool
-#         """
+        ...
 
 
 class OracleOptimQ(Generic[ArrayType]):
@@ -90,117 +55,47 @@ class OracleOptimQ(Generic[ArrayType]):
     def assess_optim_q(
         self, x_center: ArrayType, gamma: Any, retry: bool
     ) -> Tuple[Cut, ArrayType, Optional[float], bool]:
-        """assessment of optimization (discrete)
-
-        The function `assess_optim_q` assesses the feasibility of a design variable and returns a tuple
-        containing a cut, an array, an optional float, and a boolean value.
-
-        :param x_center: An array or list representing the current solution or configuration being assessed for
-            optimization
-
-        :type x_center: ArrayType
-
-        :param gamma: The `gamma` parameter is the desired value or condition that the optimization
-            algorithm is trying to achieve. It could be a specific value, a range of values, or a certain
-            condition that needs to be satisfied
-
-        :param retry: A boolean flag indicating whether to retry the optimization if it fails
-
-        :type retry: bool
-        """
+        ...
 
 
 class OracleBS(ABC):
     @abstractmethod
     def assess_bs(self, gamma: Any) -> bool:
-        """
-        The `assess_bs` function is a binary search assessment function that takes a gamma value as input
-        and returns a boolean value.
-
-        :param gamma: The gamma parameter is the value that we are searching for in the binary search
-        """
+        ...
 
 
-# The `SearchSpace` class is an abstract base class that defines methods for updating deep-cut and
-# central cut, as well as accessing the xc and tsq attributes.
 class SearchSpace(Generic[ArrayType]):
+    """Search space for cutting-plane methods.
+
+    Unified interface that replaces SearchSpace, SearchSpaceQ, and SearchSpace2.
+    - update_q() defaults to update_bias_cut; override for custom quantized behavior.
+    - set_xc() defaults to no-op; override to allow external center updates.
+    """
+
     @abstractmethod
     def __init__(self, val: Union[float, ArrayType], x_center: ArrayType) -> None:
-        """
-        Constructor for SearchSpace.
-        """
+        ...
 
     @abstractmethod
     def update_bias_cut(self, cut: Cut) -> CutStatus:
-        """
-        The `update_bias_cut` function is an abstract method that takes a `Cut` object as input and returns
-        a `CutStatus` object.
-
-        :param cut: The `cut` parameter is an instance of the `Cut` class. It represents a deep-cut that
-            needs to be updated
-
-        :type cut: Cut
-        """
+        ...
 
     @abstractmethod
     def update_central_cut(self, cut: Cut) -> CutStatus:
-        """
-        The `update_central_cut` function is an abstract method that updates the central cut and returns the
-        status of the cut.
+        ...
 
-        :param cut: The "cut" parameter is an instance of the Cut class. It represents the central cut that
-            needs to be updated
-
-        :type cut: Cut
-        """
-
-    @abstractmethod
-    def xc(self) -> ArrayType:
-        """
-        The function `xc` returns the value of the `_xc` attribute.
-        :return: The method `xc` is returning the value of the attribute `_xc`.
-        """
-
-    @abstractmethod
-    def tsq(self) -> float:
-        """
-        The function `tsq` returns the measure of the distance between `xc` and `x*`.
-        :return: The method is returning a float value, which represents the measure of the distance between xc and x*.
-        """
-
-
-class SearchSpaceQ(Generic[ArrayType]):
-    @abstractmethod
     def update_q(self, cut: Cut) -> CutStatus:
-        """
-        The `update_q` function is an abstract method that updates a shadow cut and returns a `CutStatus`
-        object.
-
-        :param cut: The `cut` parameter is an object of type `Cut`
-        :type cut: Cut
-        """
+        """Quantized update. Default delegates to update_bias_cut."""
+        return self.update_bias_cut(cut)
 
     @abstractmethod
     def xc(self) -> ArrayType:
-        """
-        The function `xc` returns the value of the `_xc` attribute.
-        :return: The method `xc` is returning the value of the attribute `_xc`.
-        """
+        ...
 
     @abstractmethod
     def tsq(self) -> float:
-        """
-        The function `tsq` returns the measure of the distance between `xc` and `x*`.
-        :return: The method is returning a float value, which represents the measure of the distance between xc and x*.
-        """
+        ...
 
-
-class SearchSpace2(SearchSpace[ArrayType]):
-    @abstractmethod
     def set_xc(self, x_center: ArrayType) -> None:
-        """
-        The function sets the value of the variable `_xc` to the input `x`.
-
-        :param x_center: The parameter `x_center` is of type `ArrayType`
-        :type x_center: ArrayType
-        """
+        """Default no-op. Override to allow external center updates."""
+        return
