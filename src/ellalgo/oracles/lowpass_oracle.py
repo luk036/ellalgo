@@ -1,43 +1,21 @@
 """
-Lowpass Oracle
+FIR low-pass filter design oracle via spectral factorization.
 
-This code implements a LowpassOracle, which is used to design a low-pass filter
-for signal processing. A low-pass filter allows low-frequency signals to pass
-through while attenuating high-frequency signals. The main purpose of this code
-is to help optimize the design of such a filter by providing a way to assess
-whether a given set of filter coefficients meets certain specifications.
+This module implements the approach from:
+    S.-P. Wu, S. Boyd, and L. Vandenberghe, "FIR Filter Design via Spectral
+    Factorization and Convex Optimization"
 
-The code defines a class called LowpassOracle that takes several inputs when initialized:
+The `LowpassOracle` class formulates the FIR filter design problem as a convex
+optimization over the auto-correlation coefficients. It checks passband ripple
+and stopband attenuation constraints using a pre-computed spectrum matrix for
+efficient frequency response evaluation at discretized frequency points.
 
-1. ndim: The number of filter coefficients
-2. wpass: The end of the passband (frequencies that should pass through)
-3. wstop: The end of the stopband (frequencies that should be attenuated)
-4. lp_sq: The lower bound for the squared magnitude response in the passband
-5. up_sq: The upper bound for the squared magnitude response in the passband
-6. sp_sq: The upper bound for the squared magnitude response in the stopband
+Key methods:
+    - assess_feas: Check whether filter coefficients meet passband/stopband specs.
+    - assess_optim: Assess optimality, returning the maximum stopband response.
 
-The main outputs of this code are produced by two methods: assess_feas and assess_optim. These methods take a set of filter coefficients as input and determine whether they meet the specified requirements or how close they are to meeting them.
-
-The LowpassOracle achieves its purpose through a series of checks on the
-frequency response of the filter. It uses a pre-computed spectrum matrix to
-efficiently calculate the frequency response at different points. The code then
-checks if the response falls within the specified bounds for the passband and
-stopband.
-
-The important logic flow in this code involves iterating through different
-frequency points and checking the filter's response at each point. If any
-violations of the specifications are found, the code returns information about
-the violation, which can be used to adjust the filter coefficients.
-
-A key data transformation happening in this code is the conversion from filter coefficients to frequency response. This is done using the pre-computed spectrum matrix, which allows for efficient calculation of the response at many frequency points.
-
-The code also includes a helper function called create_lowpass_case, which sets up a specific instance of the LowpassOracle with predefined parameters. This function can be used to quickly create a standard test case for filter design.
-
-Overall, this code provides a tool for iteratively designing and optimizing
-low-pass filters by giving feedback on how well a set of coefficients meets the
-desired specifications. It's part of a larger optimization process where the
-coefficients would be adjusted based on the feedback from this oracle until a
-satisfactory filter design is achieved.
+Also provides `create_lowpass_case()` for a standard test case with typical
+parameters (passband 0-0.12π, stopband 0.20-π, ±0.025dB ripple).
 """
 
 from math import floor

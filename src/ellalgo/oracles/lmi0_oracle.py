@@ -1,3 +1,12 @@
+"""
+LMI oracle with zero constant term.
+
+This module provides a feasibility oracle for Linear Matrix Inequality (LMI)
+constraints of the form F(x) = Σ x_k F_k ⪰ 0, where the constant matrix B
+is zero. It uses LDL^T factorization to check positive semidefiniteness and
+returns separating hyperplanes for infeasible points.
+"""
+
 from typing import List, Optional, Tuple
 
 import numpy as np
@@ -26,12 +35,12 @@ class LMI0Oracle:
     """
 
     def __init__(self, mat_f: List[np.ndarray]):
-        """Initialize LMI oracle with coefficient matrices
+        """Initialize LMI oracle with coefficient matrices.
 
         Args:
-            mat_f (List[np.ndarray]): List of symmetric coefficient matrices [F₁, F₂, ..., Fₙ]
-                Each F_k must be square matrix of same dimension
-                mat_f[0] determines the matrix size m×m
+            mat_f: List of symmetric coefficient matrices [F₁, F₂, ..., Fₙ].
+                Each F_k must be a square matrix of the same dimension.
+                mat_f[0] determines the matrix size m×m.
         """
         self.mat_f = mat_f  # Store coefficient matrices
         # Initialize LDLT factorization manager with matrix dimension from F₁

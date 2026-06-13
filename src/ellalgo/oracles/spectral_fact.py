@@ -1,85 +1,18 @@
-"""Spectral Factorization Code
+"""
+Spectral factorization for minimum-phase impulse response computation.
 
-This code implements spectral factorization, which is a mathematical
-technique used in signal processing. The main purpose of this code is to
-compute a minimum-phase impulse response that satisfies a given
-auto-correlation. In simpler terms, it's trying to find a special sequence
-of numbers (the impulse response) that, when processed in a certain way,
-matches a given pattern of relationships between data points (the
-auto-correlation).
+Implements the Kolmogorov 1939 spectral factorization approach as described
+in A. Papoulis, "Signal Analysis" (pp. 232-233). This is used by the
+LowpassOracle to convert between auto-correlation coefficients and the
+minimum-phase impulse response of an FIR filter.
 
-The code contains two main functions: spectral_fact and inverse_spectral_fact.
+Functions:
+    - spectral_fact(r): Compute minimum-phase impulse response from auto-correlation.
+    - inverse_spectral_fact(h): Reconstruct auto-correlation from impulse response.
 
-The spectral_fact function takes one input: r, which is the top-half of the
-auto-correlation coefficients. This input should be a list or array of
-numbers. The function outputs h, which is the impulse response that gives the
-desired auto-correlation.
-
-To achieve its purpose, the spectral_fact function follows these steps:
-
-1. It determines the length of the input and creates an oversampled version of it.
-2. It computes a logarithmic representation of the input in the frequency domain.
-3. It applies a mathematical operation called the Hilbert transform.
-4. It combines the results of steps 2 and 3 to create a complex representation.
-5. Finally, it converts this representation back to the time domain to get the impulse response.
-
-The function uses several mathematical operations like Fourier transforms,
-logarithms, and complex number manipulations to achieve this. These
-operations help transform the data between different representations (time
-domain and frequency domain) and extract the necessary information to compute
-the impulse response.
-
-The inverse_spectral_fact function does the opposite of spectral_fact. It
-takes the impulse response h as input and attempts to reconstruct the original
-auto-correlation coefficients. This function is simpler and uses a mathematical
-operation called convolution to compute its result.
-
-Overall, this code provides tools for working with signal processing problems,
-particularly those involving auto-correlations and impulse responses. It's
-useful in fields like audio processing, communications, and data analysis
-where understanding the relationships between data points over time is
-important.
-
-Spectral Factorization Process Diagram::
-
-    ```svgbob
-           Auto-correlation
-                 |
-                 v
-        +-------------------+
-        |  Oversampling     |
-        +-------------------+
-                 |
-                 v
-        +-------------------+
-        | Log computation   |
-        |  alpha(w) = 1/2*  |
-        |  ln(R(w))         |
-        +-------------------+
-                 |
-                 v
-        +-------------------+
-        | Hilbert Transform |
-        |  phi(w) = H[alpha]|
-        +-------------------+
-                 |
-                 v
-        +-------------------+
-        | Complex Rep.      |
-        |  H(exp(jTw)) =    |
-        |  alpha(w) + j*phi |
-        +-------------------+
-                 |
-                 v
-        +-------------------+
-        | Inverse FFT       |
-        |  (Time Domain)    |
-        +-------------------+
-                 |
-                 v
-         Impulse Response
-    ```
-
+The spectral factorization pipeline:
+    auto-correlation → oversampling → log(|R(w)|) → Hilbert transform →
+    complex log-spectrum → IFFT → impulse response
 """
 
 import numpy as np

@@ -1,44 +1,20 @@
-"""This module contains the `EllCalcCore` class.
+"""
+Core mathematical computations for ellipsoid updates.
 
-This code defines a class called EllCalcCore, which is designed to perform
-calculations related to ellipsoids in mathematics. An ellipsoid is a 3D shape
-that's like a stretched or squashed sphere. The class provides methods to
-calculate various parameters of ellipsoids under different conditions.
+The `EllCalcCore` class implements the low-level formulas that compute the
+ellipsoid update parameters (rho, sigma, delta) for various types of cuts.
+These three parameters define the transformation applied to the ellipsoid's
+center and shape matrix after each cutting-plane iteration.
 
-The main purpose of this code is to provide a set of tools for working with
-ellipsoids in optimization problems. It takes in various numerical inputs
-representing different aspects of an ellipsoid or cuts through it, and produces
-output values that describe how the ellipsoid should be adjusted or analyzed.
+Supported cut calculations:
+    - calc_central_cut: Central cut through the ellipsoid center.
+    - calc_bias_cut / calc_bias_cut_fast: Deep (non-central) cuts.
+    - calc_parallel_central_cut: Parallel central cut.
+    - calc_parallel_bias_cut / calc_parallel_bias_cut_fast: Parallel deep cuts.
+    - calc_parallel_bias_cut_fast2 / _old variants: Alternative formulations.
 
-The class is initialized with a single input 'n_f', which represents the dimension of the space the ellipsoid exists in. This value is used to set up several constant values that are used in later calculations.
-
-The class provides several methods, each performing a different type of calculation:
-
-1. calc_central_cut: This calculates parameters for a cut through the center of the ellipsoid.
-2. calc_bias_cut and calc_bias_cut_fast: These calculate parameters for a cut that doesn't go through the center.
-3. calc_parallel_central_cut and calc_parallel_central_cut_old: These handle cuts that are parallel to a central cut.
-4. calc_parallel_bias_cut, calc_parallel_bias_cut_fast, and calc_parallel_bias_cut_old: These deal with parallel cuts that don't go through the center.
-
-Each of these methods takes in one or more numerical inputs (like 'tau', 'beta',
-'tsq') that represent different aspects of the cut or the ellipsoid. They then
-perform a series of mathematical calculations using these inputs and the
-constants set up during initialization. The calculations involve basic
-arithmetic, square roots, and some more complex formulas specific to ellipsoid
-geometry.
-
-The output of each method is typically a tuple of three float values, often represented as (rho, sigma, delta). These values describe how the ellipsoid should be adjusted based on the cut that was calculated.
-
-The code achieves its purpose by encapsulating all these complex mathematical
-calculations into easy-to-use methods. A programmer can create an instance of
-EllCalcCore and then call these methods as needed, without having to understand
-all the underlying mathematics.
-
-The main logic flow in this code is from the input parameters, through the
-mathematical calculations, to the output tuple. The data transformations
-happening are primarily mathematical: converting the input parameters into the
-desired output parameters using the formulas of ellipsoid geometry.
-
-This code is a tool for more complex algorithms that might be using these ellipsoid calculations as part of a larger optimization or analysis process. It provides a clean, object-oriented way to perform these specific mathematical operations.
+All methods return (rho, sigma, delta) — the center displacement, shape scaling,
+and size adjustment factor respectively.
 """
 
 from math import sqrt
@@ -73,19 +49,15 @@ class EllCalcCore:
     def __init__(self, n_f: float) -> None:
         """Initialize EllCalcCore instance.
 
-        The __init__ method initializes the EllCalcCore object with the provided
-        n_f parameter. This sets up internal variables used in calculations.
-
-        The initialization computes several constants that are frequently used in
-        the ellipsoid calculations to avoid repeated computation:
+        Precomputes frequently used constants for ellipsoid calculations:
         - _half_n: Half of the dimension n_f
         - _n_plus_1: n_f + 1
         - _inv_n: 1/n_f
         - _n_sq: n_f squared
-        - _cst0 to _cst3: Various precomputed constants used in cut calculations
+        - _cst0 to _cst3: Various constants used in cut calculations
 
-        :param n_f: Float value representing the dimension of the space
-        :type n_f: float
+        Args:
+            n_f: The dimension of the space.
 
         Examples:
             >>> calc = EllCalcCore(3)
@@ -630,31 +602,26 @@ class EllCalcCore:
     ) -> Tuple[float, float, float]:
         r"""Calculation Parallel Deep Cut (13 mul/div + 1 sqrt)
 
-        Optimized version of parallel biased cut calculation that takes precomputed
-        b0b1 (β₀β₁) and eta (η) values as input to reduce computation.
+        Alternative formulation of the parallel biased cut calculation that
+        takes precomputed b0b1 (β₀β₁) and eta (η) values as input. This
+        version uses a different sigma formula than `calc_parallel_bias_cut_fast`.
 
-        This version is more efficient when the calling code can precompute these
-        values, saving redundant calculations.
+        Args:
+            beta0: First bias parameter (for the reference cut).
+            beta1: Second bias parameter (for the parallel cut).
+            tsq: Square of the distance parameter (τ²).
+            b0b1: Precomputed product of beta0 and beta1 (β₀β₁).
+            eta: Precomputed value of τ² + n⋅β₀β₁.
 
-        :param beta0: First bias parameter (for the reference cut)
-        :type beta0: float
-        :param beta1: Second bias parameter (for the parallel cut)
-        :type beta1: float
-        :param tsq: Square of the distance parameter (τ²)
-        :type tsq: float
-        :param b0b1: Precomputed product of beta0 and beta1 (β₀β₁)
-        :type b0b1: float
-        :param eta: Precomputed value of τ² + n⋅β₀β₁
-        :type eta: float
-        :return: Tuple of (ρ, σ, δ) values for the parallel biased cut
-        :rtype: Tuple[float, float, float]
+        Returns:
+            Tuple of (ρ, σ, δ) values for the parallel biased cut.
 
         Examples:
             >>> calc = EllCalcCore(4)
             >>> calc.calc_parallel_bias_cut_fast2(0.11, 0.01, 0.01, 0.0011, 0.0144)
-            (0.027228509068282114, 0.45380848447136857, 1.0443438549074862)
-            >>> calc.calc_parallel_bias_cut_fast2(-0.25, 0.25, 1.0, -0.0625, 0.75)
-            (0.0, 0.8, 1.25)
+            (0.02722850906828212, 0.4538084844713687, 1.0443438549074862)
+            >>> calc.calc_parallel_bias_cut_fast2(0.0, 0.09, 0.01, 0.0, 0.01)
+            (0.020941836487980856, 0.46537414417735234, 1.082031295477563)
         """
         b0sq = beta0 * beta0
         b1sq = beta1 * beta1

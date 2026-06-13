@@ -1,3 +1,17 @@
+"""
+Numerically stable ellipsoid implementation using LDL^T factorization.
+
+The `EllStable` class implements the ellipsoid method using a square-root-free
+Cholesky (LDL^T) decomposition of the shape matrix. This approach avoids
+explicit matrix inversion and provides better numerical stability, especially
+for ill-conditioned problems.
+
+Key differences from `Ell`:
+    - Stores the LDL^T factors of the shape matrix directly
+    - Uses forward/backward substitution instead of matrix-vector products
+    - Implements rank-one updates for the LDL^T factors
+"""
+
 from typing import Callable, Tuple, Union
 
 import numpy as np
@@ -11,11 +25,13 @@ CutChoice = Union[float, ArrayType]  # single or parallel
 Cut = Tuple[ArrayType, CutChoice]
 
 
-# The `EllStable` class represents an ellipsoidal search space with stability properties.
 class EllStable(SearchSpace[ArrayType]):
-    """Ellipsoid Search Space
+    """Numerically stable ellipsoid search space using LDL^T factorization.
 
-    The `EllStable` class represents an ellipsoidal search space with stability properties.
+    This class stores the ellipsoid's shape matrix in LDL^T factored form and
+    performs rank-one updates directly on the factors, avoiding the need for
+    explicit matrix inversion. This provides better numerical stability for
+    ill-conditioned problems.
 
     Examples:
         >>> import numpy as np

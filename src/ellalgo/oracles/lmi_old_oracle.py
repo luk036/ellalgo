@@ -1,3 +1,11 @@
+"""
+Legacy LMI oracle with explicit matrix construction.
+
+This module provides a feasibility oracle for Linear Matrix Inequality (LMI)
+constraints. Unlike LMIOracle (which uses lazy element-wise evaluation), this
+implementation constructs the full LMI matrix explicitly before factorization.
+"""
+
 from typing import List, Optional, Tuple
 
 import numpy as np
@@ -35,8 +43,9 @@ class LMIOldOracle(OracleFeas):
     def __init__(self, mat_f: List[np.ndarray], mat_b: np.ndarray):
         """Initialize the LMI oracle with coefficient matrices.
 
-        :param mat_f: List of coefficient matrices [F₁, F₂, ..., Fₙ] where each F_i ∈ ℝ^{m×m}
-        :param mat_b: Constant matrix B ∈ ℝ^{m×m} defining the LMI constraint
+        Args:
+            mat_f: List of coefficient matrices [F₁, F₂, ..., Fₙ] where each F_i ∈ ℝ^{m×m}.
+            mat_b: Constant matrix B ∈ ℝ^{m×m} defining the LMI constraint.
         """
         self.mat_f = mat_f
         self.mat_f0 = mat_b
@@ -49,10 +58,12 @@ class LMIOldOracle(OracleFeas):
         (B − F₁x₁ − F₂x₂ − ... − Fₙxₙ) ⪰ 0 by constructing the full matrix
         and performing LDLT factorization.
 
-        :param xc: The candidate solution vector x
-        :returns: `None` if feasible, otherwise a tuple `(g, ep)` containing the
-            subgradient `g` and the negative eigenvalue measure `ep`
-        :raises: None
+        Args:
+            xc: The candidate solution vector x.
+
+        Returns:
+            `None` if feasible, otherwise a tuple `(g, ep)` containing the
+            subgradient `g` and the negative eigenvalue measure `ep`.
 
         Examples:
             >>> import numpy as np

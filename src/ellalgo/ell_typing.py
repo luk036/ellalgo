@@ -1,3 +1,14 @@
+"""
+Type definitions, abstract base classes, and type aliases for the ellipsoid method.
+
+This module provides:
+    - ArrayType: A generic TypeVar bound to numpy.ndarray for type-safe array operations
+    - Cut-related type aliases (SingleCut, ParallelCut, CutChoice, Cut, Num)
+    - Abstract oracle interfaces defining the contract between cutting-plane
+      algorithms and problem-specific feasibility/optimization logic
+    - SearchSpace: Abstract interface for ellipsoidal search spaces
+"""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -43,24 +54,74 @@ class OracleFeas(Generic[ArrayType]):
 
 
 class OracleOptim(Generic[ArrayType]):
+    """Optimization oracle for convex optimization problems.
+
+    Implement assess_optim to assess optimality at a candidate point and
+    optionally return an improved objective value.
+    """
+
     @abstractmethod
     def assess_optim(
         self, x_center: ArrayType, gamma: Any
     ) -> Tuple[Cut, Optional[float]]:
+        """Assess optimality of candidate solution x_center at level gamma.
+
+        Args:
+            x_center: Current center point of the search space.
+            gamma: Current best objective value.
+
+        Returns:
+            A tuple (cut, gamma_new) where cut is a separating hyperplane,
+            and gamma_new is an improved objective value (or None if not improved).
+        """
         ...
 
 
 class OracleOptimQ(Generic[ArrayType]):
+    """Optimization oracle for discrete/quantized convex optimization.
+
+    Implement assess_optim_q to handle quantized solutions with a retry
+    mechanism for discrete feasibility checks.
+    """
+
     @abstractmethod
     def assess_optim_q(
         self, x_center: ArrayType, gamma: Any, retry: bool
     ) -> Tuple[Cut, ArrayType, Optional[float], bool]:
+        """Assess optimality with quantized/rounded solutions.
+
+        Args:
+            x_center: Current continuous center point.
+            gamma: Current best objective value.
+            retry: Whether this is a retry with a rounded discrete solution.
+
+        Returns:
+            Tuple of (cut, x_q, gamma_new, more_alt) where:
+                - cut: Separating hyperplane
+                - x_q: Evaluation point (continuous or rounded)
+                - gamma_new: Improved objective or None
+                - more_alt: Whether alternative cuts remain available
+        """
         ...
 
 
 class OracleBS(ABC):
+    """Binary search oracle for monotonic objectives.
+
+    Implement assess_bs to test feasibility at a given parameter value,
+    enabling binary search over the parameter space.
+    """
+
     @abstractmethod
     def assess_bs(self, gamma: Any) -> bool:
+        """Test feasibility at the given parameter value.
+
+        Args:
+            gamma: Parameter value to test.
+
+        Returns:
+            True if feasible, False otherwise.
+        """
         ...
 
 

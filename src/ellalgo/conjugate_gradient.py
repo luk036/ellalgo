@@ -1,4 +1,11 @@
-# conjugate_gradient.py
+"""
+Conjugate Gradient method for solving symmetric positive-definite linear systems.
+
+This module implements the Conjugate Gradient (CG) iterative algorithm for
+solving Ax = b where A is a symmetric positive-definite matrix. The CG method
+generates A-orthogonal search directions and is guaranteed to converge in at
+most n iterations in exact arithmetic.
+"""
 
 from typing import Optional
 
