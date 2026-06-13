@@ -1,3 +1,4 @@
+import pytest
 from pytest import approx
 
 from ellalgo.ell_calc_core import EllCalcCore
@@ -128,3 +129,17 @@ def test_calc_parallel_bias_cut_fast_k_le_eta() -> None:
     assert rho is not None
     assert sigma is not None
     assert delta is not None
+
+
+def test_calc_parallel_bias_cut_fast2_zerodiv() -> None:
+    """Demonstrate ZeroDivisionError when beta0 = -beta1.
+
+    In `calc_parallel_bias_cut_fast2`, the formula computes
+    `bsumsq = (beta0 + beta1) ** 2`. When beta0 = -beta1,
+    this evaluates to zero and causes a division by zero
+    when computing sigma. Use `calc_parallel_bias_cut_fast`
+    instead for such symmetric cases.
+    """
+    ell_calc_core = EllCalcCore(4)
+    with pytest.raises(ZeroDivisionError):
+        ell_calc_core.calc_parallel_bias_cut_fast2(-0.25, 0.25, 1.0, -0.0625, 0.75)
