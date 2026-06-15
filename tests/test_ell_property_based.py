@@ -9,6 +9,7 @@ import numpy as np
 import pytest
 from hypothesis import assume, given, settings
 from hypothesis import strategies as st
+from hypothesis.strategies import DrawFn
 
 from ellalgo.ell import Ell
 from ellalgo.ell_config import CutStatus
@@ -18,15 +19,16 @@ from ellalgo.ell_config import CutStatus
 
 # Helper strategies for generating test data
 @st.composite
-def valid_ellipsoid_strategy(draw):
+def valid_ellipsoid_strategy(draw: DrawFn) -> tuple[float, np.ndarray]:
     """Generate valid ellipsoid parameters."""
     ndim = draw(st.integers(min_value=2, max_value=10))  # EllCalc requires ndim >= 2
 
     # Generate center point
-    xc = draw(
-        st.lists(st.floats(min_value=-10, max_value=10), min_size=ndim, max_size=ndim)
+    xc: np.ndarray = np.array(
+        draw(
+            st.lists(st.floats(min_value=-10, max_value=10), min_size=ndim, max_size=ndim)
+        )
     )
-    xc = np.array(xc)
 
     # Generate kappa (positive)
     kappa = draw(st.floats(min_value=0.001, max_value=10))
@@ -35,16 +37,17 @@ def valid_ellipsoid_strategy(draw):
 
 
 @st.composite
-def valid_cut_strategy(draw, ndim):
+def valid_cut_strategy(draw: DrawFn, ndim: int) -> tuple[np.ndarray, float]:
     """Generate valid cuts for given dimension."""
     # Ensure ndim >= 2 for EllCalc
     assume(ndim >= 2)
 
     # Generate gradient (non-zero)
-    grad = draw(
-        st.lists(st.floats(min_value=-10, max_value=10), min_size=ndim, max_size=ndim)
+    grad: np.ndarray = np.array(
+        draw(
+            st.lists(st.floats(min_value=-10, max_value=10), min_size=ndim, max_size=ndim)
+        )
     )
-    grad = np.array(grad)
 
     # Ensure gradient is not zero
     assume(np.any(grad != 0))
@@ -56,16 +59,17 @@ def valid_cut_strategy(draw, ndim):
 
 
 @st.composite
-def valid_parallel_cut_strategy(draw, ndim):
+def valid_parallel_cut_strategy(draw: DrawFn, ndim: int) -> tuple[np.ndarray, list[float]]:
     """Generate valid parallel cuts for given dimension."""
     # Ensure ndim >= 2 for EllCalc
     assume(ndim >= 2)
 
     # Generate gradient (non-zero)
-    grad = draw(
-        st.lists(st.floats(min_value=-10, max_value=10), min_size=ndim, max_size=ndim)
+    grad: np.ndarray = np.array(
+        draw(
+            st.lists(st.floats(min_value=-10, max_value=10), min_size=ndim, max_size=ndim)
+        )
     )
-    grad = np.array(grad)
 
     # Ensure gradient is not zero
     assume(np.any(grad != 0))
@@ -82,7 +86,7 @@ class TestEllipsoidProperties:
     """Property-based tests for ellipsoid mathematical properties."""
 
     @given(valid_ellipsoid_strategy())
-    def test_ellipsoid_initialization_properties(self, ell_params):
+    def test_ellipsoid_initialization_properties(self, ell_params: tuple[float, np.ndarray]) -> None:
         """Test that ellipsoid initialization preserves basic properties."""
         kappa, xc = ell_params
         ell = Ell(kappa, xc)
@@ -103,7 +107,7 @@ class TestEllipsoidProperties:
 
     @given(valid_ellipsoid_strategy(), valid_cut_strategy(4))
     @settings(max_examples=100)
-    def test_central_cut_preserves_positive_definiteness(self, ell_params, cut):
+    def test_central_cut_preserves_positive_definiteness(self, ell_params: tuple[float, np.ndarray], cut: tuple[np.ndarray, float]) -> None:
         """Test that central cuts preserve positive definiteness of shape matrix."""
         kappa, xc = ell_params
 
@@ -125,7 +129,7 @@ class TestEllipsoidProperties:
 
     @given(valid_ellipsoid_strategy(), valid_cut_strategy(4))
     @settings(max_examples=100)
-    def test_bias_cut_preserves_positive_definiteness(self, ell_params, cut):
+    def test_bias_cut_preserves_positive_definiteness(self, ell_params: tuple[float, np.ndarray], cut: tuple[np.ndarray, float]) -> None:
         """Test that bias cuts preserve positive definiteness of shape matrix."""
         kappa, xc = ell_params
 
@@ -150,7 +154,7 @@ class TestEllipsoidProperties:
 
     @given(valid_ellipsoid_strategy(), valid_parallel_cut_strategy(4))
     @settings(max_examples=100)
-    def test_parallel_cut_properties(self, ell_params, cut):
+    def test_parallel_cut_properties(self, ell_params: tuple[float, np.ndarray], cut: tuple[np.ndarray, list[float]]) -> None:
         """Test properties of parallel cuts."""
         kappa, xc = ell_params
 
@@ -182,7 +186,7 @@ class TestEllipsoidProperties:
             assert np.all(eigenvalues >= 0)
 
     @given(valid_ellipsoid_strategy())
-    def test_ellipsoid_volume_monotonicity(self, ell_params):
+    def test_ellipsoid_volume_monotonicity(self, ell_params: tuple[float, np.ndarray]) -> None:
         """Test that ellipsoid volume decreases or stays the same after cuts."""
         kappa, xc = ell_params
 
@@ -204,7 +208,7 @@ class TestEllipsoidProperties:
 
     @given(valid_ellipsoid_strategy(), valid_cut_strategy(3))
     @settings(max_examples=50)
-    def test_cut_consistency(self, ell_params, cut):
+    def test_cut_consistency(self, ell_params: tuple[float, np.ndarray], cut: tuple[np.ndarray, float]) -> None:
         """Test that different cut methods are consistent for equivalent cuts."""
         kappa, xc = ell_params
 
@@ -231,7 +235,7 @@ class TestEllipsoidProperties:
         st.floats(min_value=0.001, max_value=10),
         st.lists(st.floats(min_value=0.1, max_value=5), min_size=3, max_size=3),
     )
-    def test_diagonal_initialization_properties(self, kappa, diag_vals):
+    def test_diagonal_initialization_properties(self, kappa: float, diag_vals: np.ndarray) -> None:
         """Test properties of diagonal matrix initialization."""
         # Ensure diagonal values are positive for positive definiteness
         assume(np.all(np.array(diag_vals) > 0))
@@ -253,7 +257,7 @@ class TestEllipsoidProperties:
 
     # @given(valid_ellipsoid_strategy(), valid_cut_strategy(3))
     # @settings(max_examples=50)
-    # def test_tsq_calculation_property(self, ell_params, cut):
+    # def test_tsq_calculation_property(self, ell_params, cut) -> None:
     #     """Test that tsq calculation follows the expected formula."""
     #     kappa, xc = ell_params
     #
@@ -276,7 +280,7 @@ class TestEllipsoidProperties:
     #         assert ell.tsq() == approx(expected_tsq)
 
     @given(valid_ellipsoid_strategy())
-    def test_no_defer_trick_property(self, ell_params):
+    def test_no_defer_trick_property(self, ell_params: tuple[float, np.ndarray]) -> None:
         """Test the no_defer_trick property."""
         kappa, xc = ell_params
 
@@ -296,7 +300,7 @@ class TestEllipsoidProperties:
             assert ell._kappa == 1.0
 
     @given(st.lists(st.floats(min_value=0, max_value=0), min_size=2, max_size=5))
-    def test_zero_gradient_error(self, grad_values):
+    def test_zero_gradient_error(self, grad_values: list[float]) -> None:
         """Test that zero gradient raises ValueError."""
         # Create zero gradient of appropriate dimension
         ndim = len(grad_values)

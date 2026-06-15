@@ -10,13 +10,14 @@ import math
 import numpy as np
 from hypothesis import assume, given, settings
 from hypothesis import strategies as st
+from hypothesis.strategies import DrawFn
 from pytest import approx
 
 from ellalgo.oracles.profit_oracle import ProfitOracle, ProfitQOracle, ProfitRbOracle
 
 
 @st.composite
-def valid_profit_params(draw):
+def valid_profit_params(draw: DrawFn) -> tuple[float, float, float]:
     """Generate valid profit oracle parameters."""
     # Unit price (positive)
     unit_price = draw(st.floats(min_value=0.1, max_value=100.0))
@@ -29,7 +30,7 @@ def valid_profit_params(draw):
 
 
 @st.composite
-def valid_elasticities(draw):
+def valid_elasticities(draw: DrawFn) -> np.ndarray:
     """Generate valid elasticity parameters."""
     # Elasticities should be positive and sum to less than 1 for diminishing returns
     alpha = draw(st.floats(min_value=0.01, max_value=0.8))
@@ -42,7 +43,7 @@ def valid_elasticities(draw):
 
 
 @st.composite
-def valid_price_out(draw):
+def valid_price_out(draw: DrawFn) -> np.ndarray:
     """Generate valid output price parameters."""
     v1 = draw(st.floats(min_value=0.1, max_value=10.0))
     v2 = draw(st.floats(min_value=0.1, max_value=10.0))
@@ -51,7 +52,7 @@ def valid_price_out(draw):
 
 
 @st.composite
-def valid_solution_point(draw):
+def valid_solution_point(draw: DrawFn) -> np.ndarray:
     """Generate valid solution points in log-space."""
     # Log-space values (can be negative)
     x1 = draw(st.floats(min_value=-3.0, max_value=3.0))
@@ -61,7 +62,7 @@ def valid_solution_point(draw):
 
 
 @st.composite
-def valid_robust_params(draw):
+def valid_robust_params(draw: DrawFn) -> tuple[tuple[float, float, float], tuple[float, float, float, float, float]]:
     """Generate valid robust oracle parameters."""
     # Base parameters
     unit_price = draw(st.floats(min_value=1.0, max_value=100.0))
@@ -84,7 +85,7 @@ class TestProfitOracleProperties:
     """Property-based tests for ProfitOracle mathematical properties."""
 
     @given(valid_profit_params(), valid_elasticities(), valid_price_out())
-    def test_initialization_properties(self, params, elasticities, price_out):
+    def test_initialization_properties(self, params: tuple[float, float, float], elasticities: np.ndarray, price_out: np.ndarray) -> None:
         """Test that ProfitOracle initialization preserves basic properties."""
         oracle = ProfitOracle(params, elasticities, price_out)
 
@@ -111,7 +112,7 @@ class TestProfitOracleProperties:
         valid_solution_point(),
     )
     @settings(max_examples=100)
-    def test_constraint_fn1_properties(self, params, elasticities, price_out, x):
+    def test_constraint_fn1_properties(self, params: tuple[float, float, float], elasticities: np.ndarray, price_out: np.ndarray, x: np.ndarray) -> None:
         """Test properties of the first constraint function."""
         oracle = ProfitOracle(params, elasticities, price_out)
 
@@ -134,7 +135,7 @@ class TestProfitOracleProperties:
         st.floats(min_value=0.0, max_value=100.0),
     )
     @settings(max_examples=100)
-    def test_constraint_fn2_properties(self, params, elasticities, price_out, x, gamma):
+    def test_constraint_fn2_properties(self, params: tuple[float, float, float], elasticities: np.ndarray, price_out: np.ndarray, x: np.ndarray, gamma: float) -> None:
         """Test properties of the second constraint function."""
         oracle = ProfitOracle(params, elasticities, price_out)
 
@@ -169,7 +170,7 @@ class TestProfitOracleProperties:
         st.floats(min_value=0.0, max_value=100.0),
     )
     @settings(max_examples=100)
-    def test_gradient_fn2_properties(self, params, elasticities, price_out, x, gamma):
+    def test_gradient_fn2_properties(self, params: tuple[float, float, float], elasticities: np.ndarray, price_out: np.ndarray, x: np.ndarray, gamma: float) -> None:
         """Test properties of the second constraint gradient."""
         oracle = ProfitOracle(params, elasticities, price_out)
 
@@ -192,8 +193,8 @@ class TestProfitOracleProperties:
     )
     @settings(max_examples=50)
     def test_feasibility_assessment_properties(
-        self, params, elasticities, price_out, x, gamma
-    ):
+        self, params: tuple[float, float, float], elasticities: np.ndarray, price_out: np.ndarray, x: np.ndarray, gamma: float
+    ) -> None:
         """Test properties of feasibility assessment."""
         oracle = ProfitOracle(params, elasticities, price_out)
 
@@ -221,8 +222,8 @@ class TestProfitOracleProperties:
     )
     @settings(max_examples=50)
     def test_optimality_assessment_properties(
-        self, params, elasticities, price_out, x, gamma
-    ):
+        self, params: tuple[float, float, float], elasticities: np.ndarray, price_out: np.ndarray, x: np.ndarray, gamma: float
+    ) -> None:
         """Test properties of optimality assessment."""
         oracle = ProfitOracle(params, elasticities, price_out)
 
@@ -242,7 +243,7 @@ class TestProfitOracleProperties:
             assert gamma_new >= 0.0
 
     @given(valid_profit_params(), valid_elasticities(), valid_price_out())
-    def test_economic_feasibility_properties(self, params, elasticities, price_out):
+    def test_economic_feasibility_properties(self, params: tuple[float, float, float], elasticities: np.ndarray, price_out: np.ndarray) -> None:
         """Test economic feasibility properties."""
         oracle = ProfitOracle(params, elasticities, price_out)
 
@@ -273,8 +274,8 @@ class TestProfitRbOracleProperties:
         valid_price_out(),
     )
     def test_robust_initialization_properties(
-        self, robust_params, elasticities, price_out
-    ):
+        self, robust_params: tuple[tuple[float, float, float], tuple[float, float, float, float, float]], elasticities: np.ndarray, price_out: np.ndarray
+    ) -> None:
         """Test that ProfitRbOracle initialization preserves robust properties."""
         params, vparams = robust_params
         oracle = ProfitRbOracle(params, elasticities, price_out, vparams)
@@ -298,8 +299,8 @@ class TestProfitRbOracleProperties:
     )
     @settings(max_examples=50)
     def test_robust_adjustment_properties(
-        self, robust_params, elasticities, price_out, x, gamma
-    ):
+        self, robust_params: tuple[tuple[float, float, float], tuple[float, float, float, float, float]], elasticities: np.ndarray, price_out: np.ndarray, x: np.ndarray, gamma: float
+    ) -> None:
         """Test properties of robust parameter adjustments."""
         params, vparams = robust_params
         oracle = ProfitRbOracle(params, elasticities, price_out, vparams)
@@ -334,7 +335,7 @@ class TestProfitQOracleProperties:
         valid_elasticities(),
         valid_price_out(),
     )
-    def test_discrete_initialization_properties(self, params, elasticities, price_out):
+    def test_discrete_initialization_properties(self, params: tuple[float, float, float], elasticities: np.ndarray, price_out: np.ndarray) -> None:
         """Test that ProfitQOracle initialization preserves discrete properties."""
         oracle = ProfitQOracle(params, elasticities, price_out)
 
@@ -354,8 +355,8 @@ class TestProfitQOracleProperties:
     )
     @settings(max_examples=50)
     def test_discrete_rounding_properties(
-        self, params, elasticities, price_out, x, gamma
-    ):
+        self, params: tuple[float, float, float], elasticities: np.ndarray, price_out: np.ndarray, x: np.ndarray, gamma: float
+    ) -> None:
         """Test properties of discrete rounding mechanism."""
         oracle = ProfitQOracle(params, elasticities, price_out)
 
@@ -394,7 +395,7 @@ class TestProfitQOracleProperties:
         valid_elasticities(),
         valid_price_out(),
     )
-    def test_integer_solution_properties(self, params, elasticities, price_out):
+    def test_integer_solution_properties(self, params: tuple[float, float, float], elasticities: np.ndarray, price_out: np.ndarray) -> None:
         """Test properties of integer solutions."""
         oracle = ProfitQOracle(params, elasticities, price_out)
 
