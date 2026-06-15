@@ -55,7 +55,9 @@ class TestEllCalcProperties:
         st.floats(min_value=0.001, max_value=10.0),
     )
     @settings(max_examples=100)
-    def test_parallel_cut_ordering(self, n: int, beta0: float, beta1: float, tsq: float) -> None:
+    def test_parallel_cut_ordering(
+        self, n: int, beta0: float, beta1: float, tsq: float
+    ) -> None:
         """Test that parallel cuts respect ordering constraints."""
         calc = EllCalc(n)
 
@@ -82,7 +84,9 @@ class TestEllCalcProperties:
         st.floats(min_value=-5.0, max_value=5.0),
     )
     @settings(max_examples=50)
-    def test_parallel_cut_no_solution_when_invalid(self, n: int, beta0: float, beta1: float) -> None:
+    def test_parallel_cut_no_solution_when_invalid(
+        self, n: int, beta0: float, beta1: float
+    ) -> None:
         """Test that parallel cuts return NoSoln when beta1 < beta0."""
         calc = EllCalc(n)
 
@@ -130,7 +134,9 @@ class TestEllCalcProperties:
         st.floats(min_value=0.001, max_value=10.0),
     )
     @settings(max_examples=100)
-    def test_parallel_central_cut_properties(self, n: int, beta0: float, beta1: float, tsq: float) -> None:
+    def test_parallel_central_cut_properties(
+        self, n: int, beta0: float, beta1: float, tsq: float
+    ) -> None:
         """Test properties of parallel central cuts."""
         calc = EllCalc(n)
 
@@ -183,7 +189,9 @@ class TestEllCalcProperties:
         st.floats(min_value=0.001, max_value=10.0),
     )
     @settings(max_examples=100)
-    def test_parallel_cut_q_properties(self, n: int, beta0: float, beta1: float, tsq: float) -> None:
+    def test_parallel_cut_q_properties(
+        self, n: int, beta0: float, beta1: float, tsq: float
+    ) -> None:
         """Test properties of parallel cut Q (discrete optimization version)."""
         calc = EllCalc(n)
 
@@ -209,7 +217,9 @@ class TestEllCalcProperties:
         st.floats(min_value=0.001, max_value=10.0),
     )
     @settings(max_examples=50)
-    def test_single_vs_parallel_consistency(self, n: int, beta: float, tsq: float) -> None:
+    def test_single_vs_parallel_consistency(
+        self, n: int, beta: float, tsq: float
+    ) -> None:
         """Test that single and parallel cuts are consistent when appropriate."""
         calc = EllCalc(n)
 
@@ -274,7 +284,9 @@ class TestEllCalcProperties:
         st.floats(min_value=0.001, max_value=10.0),
     )
     @settings(max_examples=50)
-    def test_central_vs_bias_cut_relationship(self, n: int, beta: float, tsq: float) -> None:
+    def test_central_vs_bias_cut_relationship(
+        self, n: int, beta: float, tsq: float
+    ) -> None:
         """Test relationship between central and bias cuts."""
         calc = EllCalc(n)
 
@@ -315,7 +327,9 @@ class TestEllCalcProperties:
         st.floats(min_value=0.001, max_value=10.0),
     )
     @settings(max_examples=50)
-    def test_dimension_scaling_properties(self, n: int, beta: float, tsq: float) -> None:
+    def test_dimension_scaling_properties(
+        self, n: int, beta: float, tsq: float
+    ) -> None:
         """Test how results scale with dimension."""
         assume(beta >= 0.0)
 
