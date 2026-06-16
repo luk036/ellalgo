@@ -11,7 +11,7 @@ Functions:
     - inverse_spectral_fact(h): Reconstruct auto-correlation from impulse response.
 
 The spectral factorization pipeline:
-    auto-correlation → oversampling → log(|R(w)|) → Hilbert transform →
+    auto-correlation → oversampling → ``log(|R(w)|)`` → Hilbert transform →
     complex log-spectrum → IFFT → impulse response
 """
 
