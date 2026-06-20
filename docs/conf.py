@@ -58,25 +58,28 @@ try:
         with open(package_rst, "r", encoding="utf-8") as f:
             content = f.read()
 
-        # Remove the package-level automodule directive
+        # Remove the package-level automodule directive only
         lines = content.split("\n")
         new_lines = []
-        skip_next = False
+        skip = 0  # lines to skip counter
         for i, line in enumerate(lines):
-            if skip_next:
-                skip_next = False
+            if skip > 0:
+                skip -= 1
                 continue
-            if ".. automodule:: ellalgo" in line:
-                # Skip this line and the next 4 lines (options)
-                skip_next = True
+            # Exact match to avoid deleting submodule automodule directives
+            if line.strip() == ".. automodule:: ellalgo":
+                # Skip this line and the next 3 lines (members/options)
+                skip = 3
                 continue
-            if i > 0 and lines[i - 1] == "" and line == "Subpackages":
-                # Add a blank line before Subpackages
-                new_lines.append("")
             new_lines.append(line)
 
+        # Remove empty "Module contents" section (heading without automodule)
+        cleaned = "\n".join(new_lines)
+        cleaned = cleaned.replace("Module contents\n---------------\n\n", "")
+        cleaned = cleaned.replace("Module contents\n---------------\n", "")
+
         with open(package_rst, "w", encoding="utf-8") as f:
-            f.write("\n".join(new_lines))
+            f.write(cleaned)
 
 except Exception as e:
     print("Running `sphinx-apidoc` failed!\n{}".format(e))

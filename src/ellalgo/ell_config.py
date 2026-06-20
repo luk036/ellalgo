@@ -2,9 +2,10 @@
 Configuration types for the ellipsoid method.
 
 This module defines the core enumeration and options data classes used
-throughout the ellipsoid method implementation:
-    - CutStatus: Outcome status of a cutting-plane update
-    - Options: Algorithm control parameters (iterations, tolerance, verbosity)
+throughout the ellipsoid method implementation.
+
+- CutStatus: Outcome status of a cutting-plane update
+- Options: Algorithm control parameters (iterations, tolerance, verbosity)
 """
 
 from enum import Enum
