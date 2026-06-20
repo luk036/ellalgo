@@ -19,37 +19,38 @@ def conjugate_gradient(
     tol: float = 1e-5,
     max_iter: int = 1000,
 ) -> np.ndarray:
-    """
-    Solves the linear system of equations Ax = b using the Conjugate Gradient method.
+    r"""Solve :math:`\mathbf{Ax} = \mathbf{b}` using the Conjugate Gradient method.
 
-    The Conjugate Gradient method is an iterative algorithm designed for solving
-    large, sparse linear systems where the matrix A is symmetric and
-    positive-definite. It is one of the most popular and efficient methods for
-    such problems.
+    The CG method generates :math:`\mathbf{A}`-orthogonal (conjugate) search
+    directions and converges in at most :math:`n` iterations in exact arithmetic.
+    The iteration proceeds as follows:
 
-    The key idea of the method is to generate a sequence of search directions
-    that are A-orthogonal (or conjugate) to each other. This property ensures
+    .. math::
 
-    that the algorithm converges to the exact solution in at most n iterations,
-    where n is the dimension of the system (assuming no rounding errors).
+       \mathbf{r}_0 &= \mathbf{b} - \mathbf{A}\mathbf{x}_0,\qquad
+       \mathbf{p}_0 = \mathbf{r}_0 \\[4pt]
+       \alpha_k &= \frac{\mathbf{r}_k^T \mathbf{r}_k}
+                         {\mathbf{p}_k^T \mathbf{A} \mathbf{p}_k} \\[4pt]
+       \mathbf{x}_{k+1} &= \mathbf{x}_k + \alpha_k \mathbf{p}_k \\[4pt]
+       \mathbf{r}_{k+1} &= \mathbf{r}_k - \alpha_k \mathbf{A} \mathbf{p}_k \\[4pt]
+       \beta_k &= \frac{\mathbf{r}_{k+1}^T \mathbf{r}_{k+1}}
+                       {\mathbf{r}_k^T \mathbf{r}_k} \\[4pt]
+       \mathbf{p}_{k+1} &= \mathbf{r}_{k+1} + \beta_k \mathbf{p}_k
+
+    The algorithm terminates when :math:`\|\mathbf{r}_k\| < \text{tol}`.
 
     Args:
-        A (numpy.ndarray): The coefficient matrix of the linear system. It must be
-            a symmetric and positive-definite matrix.
-        b (numpy.ndarray): The right-hand side vector of the linear system.
-        x0 (numpy.ndarray, optional): An initial guess for the solution. If not
-            provided, a zero vector is used. Defaults to None.
-        tol (float, optional): The tolerance for convergence. The iteration stops
-            when the norm of the residual is less than this value. Defaults to 1e-5.
-        max_iter (int, optional): The maximum number of iterations to perform.
-            Defaults to 1000.
+        A: Symmetric positive-definite coefficient matrix.
+        b: Right-hand side vector.
+        x0: Initial guess (default: zero vector).
+        tol: Convergence tolerance on residual norm (default: 1e-5).
+        max_iter: Maximum iterations (default: 1000).
 
     Returns:
-        numpy.ndarray: The solution vector x that satisfies Ax = b.
+        Solution vector :math:`\mathbf{x}` satisfying :math:`\mathbf{Ax} = \mathbf{b}`.
 
     Raises:
-        ValueError: If the method does not converge within the specified maximum
-            number of iterations.
+        ValueError: If the method does not converge within ``max_iter`` iterations.
     """
     dimension = len(b)
     if x0 is None:

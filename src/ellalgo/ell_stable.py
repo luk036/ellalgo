@@ -156,22 +156,28 @@ class EllStable(SearchSpace[ArrayType]):
     # private:
 
     def _update_core(self, cut: Cut, cut_strategy: Callable) -> CutStatus:
-        """
-        The `_update_core` function updates an ellipsoid by applying a cut and a cut strategy.
+        r"""Update the ellipsoid using :math:`LDL^T` factorization.
 
-        :param cut: The `cut` parameter is of type `_type_` and represents the cut to be applied to the
-        ellipsoid. The specific type of `_type_` is not specified in the code snippet provided
+        The shape matrix is stored as :math:`\mathbf{M} = \kappa \mathbf{LDL}^T`.
+        Forward/backward substitution replaces explicit matrix–vector products:
 
-        :param cut_strategy: The `cut_strategy` parameter is a callable object that represents the
-        strategy for determining the cut status. It takes two arguments: `beta` and `tsq`. `beta` is a
-        scalar value and `tsq` is a scalar value representing the squared norm of the current cut.
+        .. math::
 
-        :type cut_strategy: Callable
+           \mathbf{w} &= \mathbf{L}^{-1}\mathbf{g} \\[4pt]
+           \mathbf{z} &= \mathbf{D}^{-1}\mathbf{w} \\[4pt]
+           \omega &= \mathbf{w}^T\mathbf{z} = \sum_i w_i z_i \\[4pt]
+           \mathbf{q} &= \mathbf{L}^{-T}\mathbf{z} \\[4pt]
+           \mathbf{x}_c &\leftarrow \mathbf{x}_c -
+                        \frac{\rho}{\omega}\,\mathbf{q} \\[4pt]
+           \mathbf{LDL}^T &\leftarrow \text{rank-one update}(\mathbf{LDL}^T,
+                           \mathbf{g}, \sigma, \omega)
 
-        :return: a `CutStatus` object.
+        The rank-one update modifies the :math:`LDL^T` factors directly
+        (Gill, Murray, Wright, *Practical Optimization*, p43).
 
-        Reference:
-            Gill, Murray, and Wright, "Practical Optimization", p43.
+        :param cut: Tuple :math:`(\mathbf{g}, \beta)` for the cut
+        :param cut_strategy: Strategy function to compute :math:`\rho,\sigma,\delta`
+        :return: A :class:`CutStatus` object
 
         Examples:
             >>> ell = EllStable(1.0, [1.0, 1.0, 1.0, 1.0])

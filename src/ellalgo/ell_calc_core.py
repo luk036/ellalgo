@@ -85,22 +85,27 @@ class EllCalcCore:
         self._cst3 = self._n_f * self._cst0
 
     def calc_central_cut(self, tau: float) -> Tuple[float, float, float]:
-        r"""
-        Calculates the update parameters for a central cut.
+        r"""Update parameters for a central cut.
 
-        A central cut is a special case where the cutting hyperplane passes
-        through the center of the ellipsoid. This method computes the parameters
-        (rho, sigma, and delta) required to update the ellipsoid for such a cut.
+        A central cut passes through the ellipsoid center. The update
+        parameters :math:`\rho, \sigma, \delta` are dimension-dependent
+        constants scaled by :math:`\tau`:
 
-        The `tau` parameter represents the distance from the center to the
-        intersection of the ellipsoid's boundary with the cutting hyperplane.
+        .. math::
+
+           \rho &= \frac{1}{n+1}\,\tau \\[4pt]
+           \sigma &= \frac{2}{n+1} \\[4pt]
+           \delta &= \frac{n^2}{n^2-1}
+
+        where :math:`n` is the dimension of the space and :math:`\tau`
+        is the distance from the center to the ellipsoid boundary along
+        the cut direction.
 
         Args:
-            tau (float): The distance parameter for the central cut.
+            tau: The distance parameter for the central cut.
 
         Returns:
-            Tuple[float, float, float]: A tuple containing the update parameters
-            (rho, sigma, delta).
+            Tuple (rho, sigma, delta) for the ellipsoid update.
         """
         rho = self._cst0 * tau
         sigma = self._cst2
@@ -110,23 +115,20 @@ class EllCalcCore:
     def calc_bias_cut_fast(
         self, beta: float, tau: float, eta: float
     ) -> Tuple[float, float, float]:
-        r"""Calculates the deep cut ellipsoid parameters using precomputed eta values.
+        r"""Deep cut ellipsoid parameters (with precomputed :math:`\eta`).
 
-        This is an optimized version of calc_bias_cut that takes a precomputed eta value
-        (η = τ + n⋅β) as input to avoid redundant calculations when eta is already known.
+        A deep (non-central) cut at distance :math:`\beta` from the center.
+        The auxiliary variable :math:`\eta = \tau + n \beta` is passed in
+        to avoid recomputation.
 
-        The method computes parameters for a biased (non-central) cut of the ellipsoid,
-        where the cut doesn't pass through the center. The parameters determine how to
-        transform the ellipsoid after the cut.
+        .. math::
 
-        :param beta: The bias parameter (distance from center to cut hyperplane)
-        :type beta: float
-        :param tau: The distance parameter for the cut
-        :type tau: float
-        :param eta: Precomputed value of τ + n⋅β
-        :type eta: float
-        :return: Tuple of (ρ, σ, δ) values for the biased cut
-        :rtype: Tuple[float, float, float]
+           \eta &= \tau + n \beta \\[4pt]
+           \rho &= \frac{\eta}{n+1} \\[4pt]
+           \sigma &= \frac{2\rho}{\tau + \beta}
+                 = \frac{2\eta}{(n+1)(\tau + \beta)} \\[4pt]
+           \delta &= \frac{n^2}{n^2-1}\,
+                    \frac{\tau^2 - \beta^2}{\tau^2}
 
         .. svgbob::
            :align: center
@@ -144,19 +146,10 @@ class EllCalcCore:
                 |       |           |
                "-τ"     "-β"       +τ
 
-                      η
-                ϱ = ─────
-                    n + 1
-
-                    2 ⋅ ϱ
-                σ = ─────
-                    τ + β
-
-                       2       2    2
-                      n       τ  - β
-                δ = ────── ⋅  ───────
-                     2           2
-                    n  - 1      τ
+        :param beta: Bias distance from center to cut hyperplane
+        :param tau: Distance parameter for the cut
+        :param eta: Precomputed :math:`\tau + n \beta`
+        :return: Tuple :math:`(\rho, \sigma, \delta)` for the biased cut
 
         Examples:
             >>> calc = EllCalcCore(3)
@@ -172,21 +165,19 @@ class EllCalcCore:
         return (rho, sigma, delta)
 
     def calc_bias_cut(self, beta: float, tau: float) -> Tuple[float, float, float]:
-        r"""Calculate deep cut values.
+        r"""Deep cut ellipsoid parameters (standard version).
 
-        Calculates the deep cut values ρ, σ, δ for given β and τ. This is the standard
-        version that computes η internally before calling calc_bias_cut_fast.
+        Deep cut where the hyperplane does **not** pass through the center.
+        Computes :math:`\eta = \tau + n \beta` internally and delegates to
+        :meth:`calc_bias_cut_fast`.
 
-        A deep cut is a generalization of a central cut where the cutting hyperplane
-        doesn't necessarily pass through the center of the ellipsoid. The parameters
-        determine how to transform the ellipsoid after the cut.
+        .. math::
 
-        :param beta: The bias parameter (distance from center to cut hyperplane)
-        :type beta: float
-        :param tau: The distance parameter for the cut
-        :type tau: float
-        :return: Tuple of (ρ, σ, δ) values for the biased cut
-        :rtype: Tuple[float, float, float]
+           \eta &= \tau + n \beta \\[4pt]
+           \rho &= \frac{\eta}{n+1} \\[4pt]
+           \sigma &= \frac{2\eta}{(n+1)(\tau + \beta)} \\[4pt]
+           \delta &= \frac{n^2}{n^2-1}\,
+                    \frac{\tau^2 - \beta^2}{\tau^2}
 
         .. svgbob::
            :align: center
@@ -204,21 +195,9 @@ class EllCalcCore:
                 |      |            |
                "-τ"     "-β"       +τ
 
-                η = τ + n ⋅ β
-
-                      η
-                ϱ = ─────
-                    n + 1
-
-                    2 ⋅ ϱ
-                σ = ─────
-                    τ + β
-
-                       2       2    2
-                      n       τ  - β
-                δ = ────── ⋅  ───────
-                     2           2
-                    n  - 1      τ
+        :param beta: Bias distance from center to cut hyperplane
+        :param tau: Distance parameter for the cut
+        :return: Tuple :math:`(\rho, \sigma, \delta)` for the biased cut
 
         Examples:
             >>> calc = EllCalcCore(3)
@@ -232,22 +211,20 @@ class EllCalcCore:
     def calc_parallel_central_cut(
         self, beta1: float, tsq: float
     ) -> Tuple[float, float, float]:
-        r"""Calculate Parallel Central Cut (7 mul/div + 1 sqrt)
+        r"""Parallel central cut parameters.
 
-        Computes parameters for a cut that is parallel to a central cut but offset by beta1.
-        This optimized version uses fewer operations than the old version.
+        A cut parallel to a central cut, offset by :math:`\beta_1`.
+        The auxiliary variable :math:`\alpha = \beta_1 / \tau` and
+        :math:`k = \frac{n}{2}\alpha^2` define the root :math:`r`:
 
-        The method calculates:
-        - ρ: Determines the shift of the ellipsoid center
-        - σ: Scaling factor for the ellipsoid
-        - δ: Stretching factor for the ellipsoid
+        .. math::
 
-        :param beta1: Offset parameter for the parallel cut
-        :type beta1: float
-        :param tsq: Square of the distance parameter (τ²)
-        :type tsq: float
-        :return: Tuple of (ρ, σ, δ) values for the parallel central cut
-        :rtype: Tuple[float, float, float]
+           \alpha^2 &= \frac{\beta_1^2}{\tau^2} \\[4pt]
+           k &= \frac{n}{2}\,\alpha^2 \\[4pt]
+           r &= k + \sqrt{k^2 + 1 - \alpha^2} \\[4pt]
+           \rho &= \frac{\beta_1}{r+1} \\[4pt]
+           \sigma &= \frac{2}{r+1} \\[4pt]
+           \delta &= \frac{r}{r - 1/n}
 
         .. svgbob::
            :align: center
@@ -266,27 +243,9 @@ class EllCalcCore:
                "-τ" "-β"  0        +τ
                       1
 
-             2    2    2
-            α  = β  / τ
-
-                n    2
-            k = ─ ⋅ α
-                2
-                       ___________
-                      ╱ 2        2
-            r = k + ╲╱ k  + 1 - α
-
-                  β
-            ϱ = ─────
-                r + 1
-
-                  2
-            σ = ─────
-                r + 1
-
-                    r
-            δ = ─────────
-                r - 1 / n
+        :param beta1: Offset parameter for the parallel cut
+        :param tsq: Square of the distance parameter :math:`\tau^2`
+        :return: Tuple :math:`(\rho, \sigma, \delta)`
 
         Examples:
             >>> calc = EllCalcCore(4)
@@ -304,21 +263,19 @@ class EllCalcCore:
     def calc_parallel_central_cut_old(
         self, beta1: float, tsq: float
     ) -> Tuple[float, float, float]:
-        r"""Calculate Parallel Central Cut
+        r"""Parallel central cut (original formulation).
 
-        Original version of the parallel central cut calculation. This version
-        uses more operations than the optimized version.
+        Original (slower) formulation of the parallel central cut.
 
-        The method calculates parameters for transforming an ellipsoid after
-        a parallel central cut, where the cut is parallel to a central cut
-        but offset by beta1.
+        .. math::
 
-        :param beta1: Offset parameter for the parallel cut
-        :type beta1: float
-        :param tsq: Square of the distance parameter (τ²)
-        :type tsq: float
-        :return: Tuple of (ρ, σ, δ) values for the parallel central cut
-        :rtype: Tuple[float, float, float]
+           \xi &= \sqrt{(\tau^2 - \beta_1^2)\,\tau^2 +
+                        \left(\frac{n \beta_1^2}{2}\right)^{\!2}} \\[6pt]
+           \sigma &= \frac{n}{n+1} +
+                     \frac{2(\tau^2 - \xi)}{(n+1)\beta_1^2} \\[4pt]
+           \rho &= \frac{\sigma \beta_1}{2} \\[4pt]
+           \delta &= \frac{n^2}{(n^2-1)\tau^2}\,
+                    \left(\tau^2 - \frac{\beta_1^2}{2} + \frac{\xi}{n}\right)
 
         .. svgbob::
            :align: center
@@ -336,34 +293,10 @@ class EllCalcCore:
                 |   |     |         |
                "-τ" "-β"  0        +τ
                       1
-                           __________________________
-                          ╱                         2
-                         ╱                  ⎛     2⎞
-                        ╱                   ⎜n ⋅ β ⎟
-                       ╱   ⎛ 2    2⎞    2   ⎜     1⎟
-                ξ =   ╱    ⎜τ  - β ⎟ ⋅ τ  + ⎜──────⎟
-                    ╲╱     ⎝      1⎠        ⎝   2  ⎠
 
-                                ⎛ 2    ⎞
-                      n     2 ⋅ ⎝τ  - ξ⎠
-                σ = ───── + ────────────
-                    n + 1              2
-                            (n + 1) ⋅ β
-                                       1
-
-                    σ ⋅ β
-                         1
-                ϱ = ──────
-                       2
-
-                         ⎛      2    ⎞
-                         ⎜     β     ⎟
-                     2   ⎜ 2    1   ξ⎟
-                    n  ⋅ ⎜τ  - ── + ─⎟
-                         ⎝      2   n⎠
-                δ = ──────────────────
-                       ⎛ 2    ⎞    2
-                       ⎝n  - 1⎠ ⋅ τ
+        :param beta1: Offset parameter for the parallel cut
+        :param tsq: Square of :math:`\tau`
+        :return: Tuple :math:`(\rho, \sigma, \delta)`
 
         Examples:
             >>> calc = EllCalcCore(4)
@@ -384,25 +317,24 @@ class EllCalcCore:
     def calc_parallel_bias_cut(
         self, beta0: float, beta1: float, tsq: float
     ) -> Tuple[float, float, float]:
-        r"""Calculation Parallel Deep Cut (15 mul/div + 1 sqrt)
+        r"""Parallel deep cut (standard version).
 
-        Computes parameters for a biased cut that is parallel to another biased cut.
-        This version computes intermediate values (b0b1 and eta) internally before
-        calling the fast version.
+        Two parallel biased cuts at :math:`\beta_0` and :math:`\beta_1`.
+        Computes intermediates :math:`\eta = \tau^2 + n \beta_0 \beta_1`
+        and delegates to :meth:`calc_parallel_bias_cut_fast`.
 
-        The method calculates:
-        - ρ: Center shift parameter
-        - σ: Scaling parameter
-        - δ: Stretching parameter
+        .. math::
 
-        :param beta0: First bias parameter (for the reference cut)
-        :type beta0: float
-        :param beta1: Second bias parameter (for the parallel cut)
-        :type beta1: float
-        :param tsq: Square of the distance parameter (τ²)
-        :type tsq: float
-        :return: Tuple of (ρ, σ, δ) values for the parallel biased cut
-        :rtype: Tuple[float, float, float]
+           \eta &= \tau^2 + n\,\beta_0 \beta_1 \\[4pt]
+           \bar\beta &= \frac{\beta_0 + \beta_1}{2} \\[4pt]
+           h &= \tfrac12\bigl(\tau^2 + \beta_0 \beta_1\bigr) +
+                n\,\bar\beta^{\,2} \\[4pt]
+           k &= h + \sqrt{h^2 - (n+1)\,\eta\,\bar\beta^{\,2}} \\[4pt]
+           \sigma &= \frac{\eta}{k} \\[4pt]
+           \rho &= \bar\beta\,\sigma \\[4pt]
+           \frac{1}{\mu} &= \frac{\eta}{k - \eta} \\[4pt]
+           \delta &= 1 + \frac{1}{\mu\tau^2}\,
+                    \bigl(\bar\beta^{\,2}\sigma - \beta_0\beta_1\bigr)
 
         .. svgbob::
            :align: center
@@ -420,34 +352,11 @@ class EllCalcCore:
                 |   |    |          |
                "-τ" "-β" "-β"      +τ
                       1    0
-                 2
-            η = τ  + n ⋅ β  ⋅ β
-                          0    1
-                β  + β
-                 0    1
-            β = ───────
-                   2
 
-                1   ⎛ 2          ⎞        2
-            h = ─ ⋅ ⎜τ  + β  ⋅ β ⎟ + n ⋅ β
-                2   ⎝      0    1⎠
-                       _____________________
-                      ╱ 2                  2
-            k = h + ╲╱ h  - (n + 1) ⋅ η ⋅ β
-
-                  1     η
-            σ = ───── = ─
-                μ + 1   k
-
-            1     η
-            ─ = ─────
-            μ   k - η
-
-            ϱ = β ⋅ σ
-
-                 2    2   1   ⎛ 2              ⎞
-            δ ⋅ τ  = τ  + ─ ⋅ ⎜β  ⋅ σ - β  ⋅ β ⎟
-                          μ   ⎝          0    1⎠
+        :param beta0: First bias parameter
+        :param beta1: Second bias parameter
+        :param tsq: Square of :math:`\tau`
+        :return: Tuple :math:`(\rho, \sigma, \delta)`
 
         Examples:
             >>> calc = EllCalcCore(4)
@@ -466,26 +375,22 @@ class EllCalcCore:
     def calc_parallel_bias_cut_fast_old(
         self, beta0: float, beta1: float, tsq: float, b0b1: float, eta: float
     ) -> Tuple[float, float, float]:
-        r"""Calculation Parallel Deep Cut (13 mul/div + 1 sqrt)
+        r"""Parallel deep cut (original fast formulation).
 
-        Optimized version of parallel biased cut calculation that takes precomputed
-        b0b1 (β₀β₁) and eta (η) values as input to reduce computation.
+        Uses :math:`\bar\beta = (\beta_0+\beta_1)/2` and the same
+        :math:`h, k` computation as the standard version, but expressed
+        as :math:`\sigma = 1/(\mu+1)`.
 
-        This version is more efficient when the calling code can precompute these
-        values, saving redundant calculations.
+        .. math::
 
-        :param beta0: First bias parameter (for the reference cut)
-        :type beta0: float
-        :param beta1: Second bias parameter (for the parallel cut)
-        :type beta1: float
-        :param tsq: Square of the distance parameter (τ²)
-        :type tsq: float
-        :param b0b1: Precomputed product of beta0 and beta1 (β₀β₁)
-        :type b0b1: float
-        :param eta: Precomputed value of τ² + n⋅β₀β₁
-        :type eta: float
-        :return: Tuple of (ρ, σ, δ) values for the parallel biased cut
-        :rtype: Tuple[float, float, float]
+           \bar\beta &= \frac{\beta_0 + \beta_1}{2} \\[4pt]
+           h &= \frac12(\tau^2 + \beta_0\beta_1) + n\,\bar\beta^{\,2} \\[4pt]
+           k &= h + \sqrt{h^2 - (n+1)\,\eta\,\bar\beta^{\,2}} \\[4pt]
+           \sigma &= \frac{\eta}{k} \\[4pt]
+           \rho &= \bar\beta\,\sigma \\[4pt]
+           \frac{1}{\mu} &= \frac{\eta}{k-\eta} \\[4pt]
+           \delta &= 1 + \frac{1}{\mu\tau^2}\,
+                    \bigl(\bar\beta^{\,2}\sigma - \beta_0\beta_1\bigr)
 
         .. svgbob::
            :align: center
@@ -504,31 +409,12 @@ class EllCalcCore:
                "-τ" "-β" "-β"      +τ
                       1    0
 
-                β  + β
-                 0    1
-            β = ───────
-                   2
-
-                1   ⎛ 2          ⎞        2
-            h = ─ ⋅ ⎜τ  + β  ⋅ β ⎟ + n ⋅ β
-                2   ⎝      0    1⎠
-                       _____________________
-                      ╱ 2                  2
-            k = h + ╲╱ h  - (n + 1) ⋅ η ⋅ β
-
-                  1     η
-            σ = ───── = ─
-                μ + 1   k
-
-            1     η
-            ─ = ─────
-            μ   k - η
-
-            ϱ = β ⋅ σ
-
-                 2    2   1   ⎛ 2              ⎞
-            δ ⋅ τ  = τ  + ─ ⋅ ⎜β  ⋅ σ - β  ⋅ β ⎟
-                          μ   ⎝          0    1⎠
+        :param beta0: First bias parameter
+        :param beta1: Second bias parameter
+        :param tsq: Square of :math:`\tau`
+        :param b0b1: Precomputed :math:`\beta_0\beta_1`
+        :param eta: Precomputed :math:`\tau^2 + n\beta_0\beta_1`
+        :return: Tuple :math:`(\rho, \sigma, \delta)`
 
         Examples:
             >>> calc = EllCalcCore(4)
@@ -557,26 +443,29 @@ class EllCalcCore:
     def calc_parallel_bias_cut_fast(
         self, beta0: float, beta1: float, tsq: float, b0b1: float, eta: float
     ) -> Tuple[float, float, float]:
-        r"""Calculation Parallel Deep Cut (13 mul/div + 1 sqrt)
+        r"""Parallel deep cut (optimized formulation).
 
-        Optimized version of parallel biased cut calculation that takes precomputed
-        b0b1 (β₀β₁) and eta (η) values as input to reduce computation.
+        Uses auxiliary variables :math:`\zeta_0 = \tau^2 - \beta_0^2` and
+        :math:`\zeta_1 = \tau^2 - \beta_1^2` to compute:
 
-        This version is more efficient when the calling code can precompute these
-        values, saving redundant calculations.
+        .. math::
 
-        :param beta0: First bias parameter (for the reference cut)
-        :type beta0: float
-        :param beta1: Second bias parameter (for the parallel cut)
-        :type beta1: float
-        :param tsq: Square of the distance parameter (τ²)
-        :type tsq: float
-        :param b0b1: Precomputed product of beta0 and beta1 (β₀β₁)
-        :type b0b1: float
-        :param eta: Precomputed value of τ² + n⋅β₀β₁
-        :type eta: float
-        :return: Tuple of (ρ, σ, δ) values for the parallel biased cut
-        :rtype: Tuple[float, float, float]
+           \zeta_0 &= \tau^2 - \beta_0^2 \\[4pt]
+           \zeta_1 &= \tau^2 - \beta_1^2 \\[4pt]
+           \xi &= \sqrt{\zeta_0 \zeta_1 +
+                        \left(\frac{n}{2}(\beta_1^2 - \beta_0^2)\right)^{\!2}} \\[6pt]
+           \sigma &= \frac{2\eta}{\tau^2 + \beta_0\beta_1 +
+                        \frac{n}{2}(\beta_0+\beta_1)^2 + \xi} \\[4pt]
+           \rho &= \sigma\,\frac{\beta_0 + \beta_1}{2} \\[4pt]
+           \delta &= \frac{n^2}{(n^2-1)\,\tau^2}\,
+                    \left(\frac{\zeta_0 + \zeta_1}{2} + \frac{\xi}{n}\right)
+
+        :param beta0: First bias parameter
+        :param beta1: Second bias parameter
+        :param tsq: Square of :math:`\tau`
+        :param b0b1: Precomputed :math:`\beta_0\beta_1`
+        :param eta: Precomputed :math:`\tau^2 + n\beta_0\beta_1`
+        :return: Tuple :math:`(\rho, \sigma, \delta)`
 
         Examples:
             >>> calc = EllCalcCore(4)
@@ -600,21 +489,33 @@ class EllCalcCore:
     def calc_parallel_bias_cut_fast2(
         self, beta0: float, beta1: float, tsq: float, b0b1: float, eta: float
     ) -> Tuple[float, float, float]:
-        r"""Calculation Parallel Deep Cut (13 mul/div + 1 sqrt)
+        r"""Parallel deep cut (alternative sigma formulation).
 
-        Alternative formulation of the parallel biased cut calculation that
-        takes precomputed b0b1 (β₀β₁) and eta (η) values as input. This
-        version uses a different sigma formula than `calc_parallel_bias_cut_fast`.
+        Same :math:`\zeta` and :math:`\xi` as :meth:`calc_parallel_bias_cut_fast`
+        but uses an alternative :math:`\sigma` formula:
+
+        .. math::
+
+           \zeta_0 &= \tau^2 - \beta_0^2 \\[4pt]
+           \zeta_1 &= \tau^2 - \beta_1^2 \\[4pt]
+           \xi &= \sqrt{\zeta_0 \zeta_1 +
+                        \left(\frac{n}{2}(\beta_1^2 - \beta_0^2)\right)^{\!2}} \\[6pt]
+           \sigma &= \frac{n}{n+1} +
+                    \frac{2(\tau^2 + \beta_0\beta_1 - \xi)}
+                         {(n+1)(\beta_0+\beta_1)^2}
+
+        The :math:`\rho` and :math:`\delta` formulas are identical to
+        :meth:`calc_parallel_bias_cut_fast`.
 
         Args:
-            beta0: First bias parameter (for the reference cut).
-            beta1: Second bias parameter (for the parallel cut).
-            tsq: Square of the distance parameter (τ²).
-            b0b1: Precomputed product of beta0 and beta1 (β₀β₁).
-            eta: Precomputed value of τ² + n⋅β₀β₁.
+            beta0: First bias parameter
+            beta1: Second bias parameter
+            tsq: Square of :math:`\tau`
+            b0b1: Precomputed :math:`\beta_0\beta_1`
+            eta: Precomputed :math:`\tau^2 + n\beta_0\beta_1`
 
         Returns:
-            Tuple of (ρ, σ, δ) values for the parallel biased cut.
+            Tuple :math:`(\rho, \sigma, \delta)`
 
         Examples:
             >>> calc = EllCalcCore(4)
@@ -638,23 +539,24 @@ class EllCalcCore:
     def calc_parallel_bias_cut_old(
         self, beta0: float, beta1: float, tsq: float
     ) -> Tuple[float, float, float]:
-        r"""Calculation Parallel Deep Cut
+        r"""Parallel deep cut (original slower formulation).
 
-        Original version of the parallel biased cut calculation. This version
-        uses a different mathematical formulation that requires more computations
-        than the optimized versions.
+        This version shares the same :math:`\zeta_0, \zeta_1, \xi`
+        computation as :meth:`calc_parallel_bias_cut_fast2` but the
+        formulas are written in an expanded form.
 
-        The method calculates parameters for transforming an ellipsoid after
-        a parallel biased cut, where the cut is parallel to another biased cut.
+        .. math::
 
-        :param beta0: First bias parameter (for the reference cut)
-        :type beta0: float
-        :param beta1: Second bias parameter (for the parallel cut)
-        :type beta1: float
-        :param tsq: Square of the distance parameter (τ²)
-        :type tsq: float
-        :return: Tuple of (ρ, σ, δ) values for the parallel biased cut
-        :rtype: Tuple[float, float, float]
+           \zeta_0 &= \tau^2 - \beta_0^2 \\[4pt]
+           \zeta_1 &= \tau^2 - \beta_1^2 \\[4pt]
+           \xi &= \sqrt{\zeta_0\zeta_1 +
+                        \left(\frac{n(\beta_1^2 - \beta_0^2)}{2}\right)^{\!2}} \\[6pt]
+           \sigma &= \frac{n}{n+1} +
+                    \frac{2(\tau^2 + \beta_0\beta_1 - \xi)}
+                         {(n+1)(\beta_0 + \beta_1)^2} \\[4pt]
+           \rho &= \frac{\sigma(\beta_0 + \beta_1)}{2} \\[4pt]
+           \delta &= \frac{n^2}{(n^2-1)\tau^2}\,
+                    \left(\frac{\zeta_0 + \zeta_1}{2} + \frac{\xi}{n}\right)
 
         .. svgbob::
            :align: center
@@ -673,41 +575,10 @@ class EllCalcCore:
                "-τ" "-β" "-β"      +τ
                       1    0
 
-                      2    2
-                ζ  = τ  - β
-                 0         0
-
-                      2    2
-                ζ  = τ  - β
-                 1         1
-                           __________________________
-                          ╱                         2
-                         ╱           ⎛    ⎛ 2    2⎞⎞
-                        ╱            ⎜n ⋅ ⎜β  - β ⎟⎟
-                       ╱             ⎜    ⎝ 1    0⎠⎟
-                ξ =   ╱    ζ  ⋅ ζ  + ⎜─────────────⎟
-                    ╲╱      0    1   ⎝      2      ⎠
-
-                                ⎛ 2              ⎞
-                            2 ⋅ ⎜τ  + β  ⋅ β  - ξ⎟
-                      n         ⎝      0    1    ⎠
-                σ = ───── + ──────────────────────
-                    n + 1                       2
-                             (n + 1) ⋅ ⎛β  + β ⎞   <---- Oop!!!
-                                       ⎝ 0    1⎠
-
-                    σ ⋅ ⎛β  + β ⎞
-                        ⎝ 0    1⎠
-                ϱ = ─────────────
-                          2
-
-                         ⎛ζ  + ζ     ⎞
-                     2   ⎜ 0    1   ξ⎟
-                    n  ⋅ ⎜─────── + ─⎟
-                         ⎝   2      n⎠
-                δ = ──────────────────
-                       ⎛ 2    ⎞    2
-                       ⎝n  - 1⎠ ⋅ τ
+        :param beta0: First bias parameter
+        :param beta1: Second bias parameter
+        :param tsq: Square of :math:`\tau`
+        :return: Tuple :math:`(\rho, \sigma, \delta)`
 
         Examples:
             >>> calc = EllCalcCore(4)

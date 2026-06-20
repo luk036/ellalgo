@@ -192,20 +192,31 @@ class Ell(SearchSpace[ArrayType]):
     # private:
 
     def _update_core(self, cut: Cut, cut_strategy: Callable) -> CutStatus:
-        """
-        Core method for updating the ellipsoid based on a cut and strategy.
+        r"""Update the ellipsoid by applying a cutting plane.
 
-        This method:
-        1. Extracts gradient and beta from the cut
-        2. Calculates grad_t = M * grad
-        3. Computes omega = grad^T * grad_t
-        4. Updates tsq = kappa * omega
-        5. Uses the cut strategy to get update parameters
-        6. Updates the center, matrix, and kappa if successful
+        Given a gradient :math:`\mathbf{g}` and offset :math:`\beta`,
+        the ellipsoid :math:`\{ \mathbf{x} : (\mathbf{x} -
+        \mathbf{x}_c)^T \mathbf{M}^{-1} (\mathbf{x} - \mathbf{x}_c)
+        \le \kappa^2 \}` is updated as follows:
+
+        .. math::
+
+           \tilde{\mathbf{g}} &= \mathbf{M}\,\mathbf{g} \\[4pt]
+           \omega &= \mathbf{g}^T \tilde{\mathbf{g}} \\[4pt]
+           \tau^2 &= \kappa\,\omega \\[4pt]
+           \mathbf{x}_c &\leftarrow \mathbf{x}_c -
+                        \frac{\rho}{\omega}\,\tilde{\mathbf{g}} \\[4pt]
+           \mathbf{M} &\leftarrow \mathbf{M} -
+                       \frac{\sigma}{\omega}\,
+                       \tilde{\mathbf{g}} \tilde{\mathbf{g}}^T \\[4pt]
+           \kappa &\leftarrow \kappa \cdot \delta
+
+        where :math:`\rho, \sigma, \delta` are returned by the cut
+        strategy (see :class:`~ellalgo.ell_calc_core.EllCalcCore`).
 
         Args:
-            cut: A tuple containing (gradient, beta) for the cut
-            cut_strategy: The strategy function to calculate update parameters
+            cut: Tuple :math:`(\mathbf{g}, \beta)` for the cut
+            cut_strategy: Strategy function to compute :math:`\rho,\sigma,\delta`
 
         Returns:
             CutStatus indicating success or failure of the update
