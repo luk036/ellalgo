@@ -103,6 +103,20 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "sphinxcontrib.svgbob",  # ASCII to SVG diagrams
+    "matplotlib.sphinxext.plot_directive",
+]
+
+# -- matplotlib.sphinxext.plot_directive configuration -----------------------
+plot_html_show_source_link = True
+plot_html_show_formats = False
+plot_include_source = True
+plot_working_directory = os.path.join(__location__, "examples")
+plot_pre_code = [
+    "import matplotlib.pyplot as plt",
+    "import numpy as np",
+    "from ellalgo import Ell, cutting_plane_feas",
+    "from ellalgo.oracles.lmi_oracle import LMIOracle",
+    "plt.rcParams['figure.dpi'] = 100",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
