@@ -8,6 +8,7 @@ The ellipsoid (blue) shrinks toward the feasible region (green).
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import Ellipse as MplEllipse
+
 from ellalgo import Ell, cutting_plane_feas
 from ellalgo.oracles.lmi_oracle import LMIOracle
 
@@ -44,20 +45,40 @@ for i, (xc, mq, kappa) in enumerate(snapshots):
     h = 2 * kappa * np.sqrt(eigvals[1])
     angle = np.degrees(np.arctan2(eigvecs[1, 0], eigvecs[0, 0]))
     patch = MplEllipse(
-        xy=xc, width=w, height=h, angle=angle,
-        fill=False, edgecolor="#1565C0", linewidth=1.2, alpha=alpha
+        xy=xc,
+        width=w,
+        height=h,
+        angle=angle,
+        fill=False,
+        edgecolor="#1565C0",
+        linewidth=1.2,
+        alpha=alpha,
     )
     ax.add_patch(patch)
 
 # Plot center trajectory
 centers = np.array([s[0] for s in snapshots])
-ax.plot(centers[:, 0], centers[:, 1], "o-", color="#1565C0",
-        markersize=4, linewidth=0.8, alpha=0.6, label="Ellipsoid centers")
+ax.plot(
+    centers[:, 0],
+    centers[:, 1],
+    "o-",
+    color="#1565C0",
+    markersize=4,
+    linewidth=0.8,
+    alpha=0.6,
+    label="Ellipsoid centers",
+)
 
 # Mark final solution
 if x_best is not None:
-    ax.plot(x_best[0], x_best[1], "*", color="#E65100", markersize=15,
-            label=f"Solution ({x_best[0]:.2f}, {x_best[1]:.2f})")
+    ax.plot(
+        x_best[0],
+        x_best[1],
+        "*",
+        color="#E65100",
+        markersize=15,
+        label=f"Solution ({x_best[0]:.2f}, {x_best[1]:.2f})",
+    )
 
 ax.set_xlim(-6, 6)
 ax.set_ylim(-6, 6)
