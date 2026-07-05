@@ -240,6 +240,10 @@ class Ell(SearchSpace[ArrayType]):
         omega = grad.dot(grad_t)  # n multiplications
         if omega == 0.0:
             return CutStatus.NoEffect
+        # Guard against denormal omega that would overflow when
+        # computing sigma/omega in the rank-1 update below
+        if not (omega > np.finfo(float).tiny):
+            return CutStatus.NoEffect
         # Update tsq measure
         self._tsq = self._kappa * omega
 
