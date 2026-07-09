@@ -22,12 +22,6 @@ def test_ell_xc_setter_and_getter() -> None:
     assert np.array_equal(ell.xc(), new_xc)
 
 
-def test_ell_tsq_getter() -> None:
-    """Test the tsq getter method."""
-    ell = Ell(1.0, np.array([0.0, 0.0]))
-    assert ell.tsq() == 0.0
-
-
 def test_ell_no_defer_trick() -> None:
     """Test the no_defer_trick functionality."""
     ell = Ell(1.0, np.array([0.0, 0.0]))

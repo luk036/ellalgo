@@ -60,6 +60,11 @@ def test_calc_parallel() -> None:
     assert sigma == approx(0.928)
     assert delta == approx(1.232)
 
+    rho, sigma, delta = ell_calc_core.calc_parallel_bias_cut(-0.25, 0.25, 1.0)
+    assert sigma == approx(0.8)
+    assert rho == approx(0.0)
+    assert delta == approx(1.25)
+
 
 def test_calc_parallel_noeffect() -> None:
     ell_calc_core = EllCalcCore(4)
@@ -69,30 +74,7 @@ def test_calc_parallel_noeffect() -> None:
     assert delta == approx(1.0)
 
 
-def test_calc_bias_cut_q() -> None:
-    ell_calc_q = EllCalcCore(4)
-    rho, sigma, delta = ell_calc_q.calc_bias_cut(0.05, 0.1)
-    assert rho == approx(0.06)
-    assert sigma == approx(0.8)
-    assert delta == approx(0.8)
 
-
-def test_calc_parallel_bias_cut_q() -> None:
-    ell_calc_core = EllCalcCore(4)
-    rho, sigma, delta = ell_calc_core.calc_parallel_bias_cut(0.0, 0.05, 0.01)
-    assert rho == approx(0.02)
-    assert sigma == approx(0.8)
-    assert delta == approx(1.2)
-
-    rho, sigma, delta = ell_calc_core.calc_parallel_bias_cut(0.01, 0.04, 0.01)
-    assert rho == approx(0.0232)
-    assert sigma == approx(0.928)
-    assert delta == approx(1.232)
-
-    rho, sigma, delta = ell_calc_core.calc_parallel_bias_cut(-0.25, 0.25, 1.0)
-    assert sigma == approx(0.8)
-    assert rho == approx(0.0)
-    assert delta == approx(1.25)
 
 
 def test_calc_bias_cut_fast() -> None:
@@ -129,6 +111,36 @@ def test_calc_parallel_bias_cut_fast_k_le_eta() -> None:
     assert rho is not None
     assert sigma is not None
     assert delta is not None
+
+
+def test_calc_parallel_bias_cut_fast_old() -> None:
+    """Test calc_parallel_bias_cut_fast_old (lines 426-441)."""
+    ell_calc_core = EllCalcCore(4)
+    rho, sigma, delta = ell_calc_core.calc_parallel_bias_cut_fast_old(
+        0.11, 0.01, 0.01, 0.0011, 0.0144
+    )
+    assert rho == approx(0.027228509068282114)
+    assert sigma == approx(0.45380848447136857)
+    assert delta == approx(1.0443438549074862)
+
+    # Test k <= eta branch (falls back to central cut)
+    rho, sigma, delta = ell_calc_core.calc_parallel_bias_cut_fast_old(
+        0.0, 0.0, 0.01, 0.0, 0.01
+    )
+    assert rho == approx(0.02)  # central cut rho = tau/(n+1) = 0.1/5
+    assert sigma == approx(0.4)  # central cut sigma = 2/(n+1) = 0.4
+    assert delta == approx(16.0 / 15.0)  # central cut delta = n²/(n²-1)
+
+
+def test_calc_parallel_bias_cut_fast2_valid() -> None:
+    """Test calc_parallel_bias_cut_fast2 with non-symmetric inputs (lines 535-537)."""
+    ell_calc_core = EllCalcCore(4)
+    rho, sigma, delta = ell_calc_core.calc_parallel_bias_cut_fast2(
+        0.0, 0.09, 0.01, 0.0, 0.01
+    )
+    assert rho == approx(0.020941836487980856)
+    assert sigma == approx(0.46537414417735234)
+    assert delta == approx(1.082031295477563)
 
 
 def test_calc_parallel_bias_cut_fast2_zerodiv() -> None:

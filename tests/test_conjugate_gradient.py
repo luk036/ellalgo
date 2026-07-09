@@ -1,6 +1,7 @@
 # test_conjugate_gradient.py
 
 import numpy as np
+import pytest
 
 from ellalgo.conjugate_gradient import conjugate_gradient
 
@@ -46,6 +47,18 @@ def test_conjugate_gradient_non_convergence() -> None:
 
     with pytest.raises(ValueError, match="Conj Grad did not converge after"):
         conjugate_gradient(A, b, max_iter=10)
+
+
+def test_conjugate_gradient_max_iter_exhausted() -> None:
+    """Test CG raises ValueError when max_iter is exhausted without convergence (line 97).
+
+    CG needs at most n iterations for an n×n system. Using max_iter=1 on a 2×2 SPD
+    system forces the loop to finish without converging, hitting the post-loop raise.
+    """
+    A = np.array([[4.0, 1.0], [1.0, 3.0]])
+    b = np.array([1.0, 2.0])
+    with pytest.raises(ValueError, match="Conj Grad did not converge after"):
+        conjugate_gradient(A, b, max_iter=1, tol=1e-15)
 
 
 def test_conjugate_gradient_tolerance() -> None:

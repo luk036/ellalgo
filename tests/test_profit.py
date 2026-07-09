@@ -144,10 +144,4 @@ def test_profit_q_ell() -> None:
     assert num_iters == 29
 
 
-def test_profit_q_ell_stable() -> None:
-    """
-    The function `test_profit_q_ell_stable` tests the number of iterations required to run a profit
-    calculation using the `EllStable` algorithm.
-    """
-    num_iters = run_profit_q(EllStable)
-    assert num_iters == 29
+

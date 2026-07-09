@@ -148,6 +148,16 @@ def test_calc_single_or_parallel_central_cut_tsq_le_b1sq() -> None:
     # This should go through the central cut path
 
 
+def test_calc_single_or_parallel_central_cut_b1_negative() -> None:
+    """Test calc_single_or_parallel_central_cut with negative beta[1] (line 130)."""
+    ell_calc = EllCalc(4)
+    status, result = ell_calc.calc_single_or_parallel_central_cut(
+        [0.0, -0.05], 0.01
+    )
+    assert status == CutStatus.NoSoln
+    assert result is None
+
+
 def test_calc_single_or_parallel_q_no_parallel_cut() -> None:
     """Test case where use_parallel_cut is False to cover line 255."""
     ell_calc = EllCalc(4)
