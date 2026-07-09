@@ -74,9 +74,6 @@ def test_calc_parallel_noeffect() -> None:
     assert delta == approx(1.0)
 
 
-
-
-
 def test_calc_bias_cut_fast() -> None:
     ell_calc_core = EllCalcCore(3)
     rho, sigma, delta = ell_calc_core.calc_bias_cut_fast(0.0, 2.0, 2.0)

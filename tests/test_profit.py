@@ -142,6 +142,3 @@ def test_profit_q_ell() -> None:
     """
     num_iters = run_profit_q(EllStable)
     assert num_iters == 29
-
-
-
