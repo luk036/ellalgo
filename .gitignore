@@ -180,3 +180,5 @@ MANIFEST
 # Cache dirs
 .ruff_cache/
 .benchmarks/
+
+coverage.json
