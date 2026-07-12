@@ -25,7 +25,7 @@ ArrayType = TypeVar("ArrayType", bound=np.ndarray)
 SingleCut = float
 # Parallel cut:  β₀ ≤ gᵀ(x - xc) ≤ β₁
 ParallelCut = Union[Tuple[float, Optional[float]], List[float]]
-CutChoice = Union[float, ParallelCut]  # single or parallel cut
+CutChoice = Union[SingleCut, ParallelCut]  # single or parallel cut
 Cut = Tuple[ArrayType, CutChoice]
 Num = Union[float, int]
 

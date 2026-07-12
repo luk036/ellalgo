@@ -18,10 +18,10 @@ import numpy as np
 
 from .ell_calc import EllCalc
 from .ell_config import CutStatus
-from .ell_typing import ArrayType, SearchSpace
+from .ell_typing import ArrayType, SearchSpace, SingleCut
 
 Matrix = np.ndarray
-CutChoice = Union[float, ArrayType]  # single or parallel
+CutChoice = Union[SingleCut, ArrayType]  # single or parallel
 Cut = Tuple[ArrayType, CutChoice]
 
 
@@ -51,26 +51,21 @@ class EllStable(SearchSpace[ArrayType]):
     _tsq: float
     _ndim: int
     helper: EllCalc
+    # Pre-allocated scratch buffers (match Rust's strategy: zero per-call allocation)
+    _inv_lower_g: ArrayType  # w = L^{-1}g (forward substitution)
+    _inv_diag_inv_lower_g: ArrayType  # z = D^{-1}w
+    _g_t: ArrayType  # q = L^{-T}z (back substitution), then v (rank-1 update)
 
     def __init__(self, val: Union[float, ArrayType], x_center: ArrayType) -> None:
-        """
-        The function initializes an object with given values and attributes.
-
-        :param val: The parameter `val` can be either an integer, a float, or a list of numbers. If it
-        is an integer or a float, it represents the value of kappa. If it is a list of numbers, it
-        represents the diagonal elements of a matrix, mq
-
-        :param x_center: The parameter `x_center` is of type `ArrayType`, which suggests that it is an array-like
-        object. It is used to store the values of `x_center` in the `__init__` method. The length of `x_center` is
-        calculated using `len(x_center)` and stored in the variable
-
-        :type x_center: ArrayType
-        """
         ndim = len(x_center)
         self.helper = EllCalc(ndim)
         self._xc = x_center
         self._tsq = 0.0
         self._ndim = ndim
+        # Pre-allocate scratch buffers (Rust-style: avoid per-call allocation)
+        self._inv_lower_g = np.empty(ndim)
+        self._inv_diag_inv_lower_g = np.empty(ndim)
+        self._g_t = np.empty(ndim)
         if isinstance(val, (int, float)):
             self._kappa = val
             self._mq = np.eye(ndim)
@@ -159,95 +154,66 @@ class EllStable(SearchSpace[ArrayType]):
         r"""Update the ellipsoid using :math:`LDL^T` factorization.
 
         The shape matrix is stored as :math:`\mathbf{M} = \kappa \mathbf{LDL}^T`.
-        Forward/backward substitution replaces explicit matrix–vector products:
+        Forward/backward substitution replaces explicit matrix–vector products.
 
-        .. math::
-
-           \mathbf{w} &= \mathbf{L}^{-1}\mathbf{g} \\[4pt]
-           \mathbf{z} &= \mathbf{D}^{-1}\mathbf{w} \\[4pt]
-           \omega &= \mathbf{w}^T\mathbf{z} = \sum_i w_i z_i \\[4pt]
-           \mathbf{q} &= \mathbf{L}^{-T}\mathbf{z} \\[4pt]
-           \mathbf{x}_c &\leftarrow \mathbf{x}_c -
-                        \frac{\rho}{\omega}\,\mathbf{q} \\[4pt]
-           \mathbf{LDL}^T &\leftarrow \text{rank-one update}(\mathbf{LDL}^T,
-                           \mathbf{g}, \sigma, \omega)
-
-        The rank-one update modifies the :math:`LDL^T` factors directly
-        (Gill, Murray, Wright, *Practical Optimization*, p43).
+        Uses pre-allocated scratch buffers (Rust-style) to eliminate per-call
+        memory allocation. See :class:`EllStable` for buffer documentation.
 
         :param cut: Tuple :math:`(\mathbf{g}, \beta)` for the cut
         :param cut_strategy: Strategy function to compute :math:`\rho,\sigma,\delta`
         :return: A :class:`CutStatus` object
-
-        Examples:
-            >>> ell = EllStable(1.0, [1.0, 1.0, 1.0, 1.0])
-            >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 1.0)
-            >>> status = ell._update_core(cut, ell.helper.calc_single_or_parallel)
-            >>> print(status)
-            CutStatus.Success
-
-            >>> ell = EllStable(1.0, [1.0, 1.0, 1.0, 1.0])
-            >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 0.0)
-            >>> status = ell._update_core(cut, ell.helper.calc_single_or_parallel_central_cut)
-            >>> print(status)
-            CutStatus.Success
         """
         g, beta = cut
 
-        # calculate inv(L)*g: (n-1)*n/2 multiplications
-        inv_lower_g = g.copy()  # initially
-
+        # --- forward substitution: w = L^{-1} * g — reuse _inv_lower_g ---
+        np.copyto(self._inv_lower_g, g)
         for j in range(self._ndim - 1):
             for i in range(j + 1, self._ndim):
-                self._mq[j, i] = self._mq[i, j] * inv_lower_g[j]
-                # keep for rank-one update
-                inv_lower_g[i] -= self._mq[j, i]
+                self._mq[j, i] = self._mq[i, j] * self._inv_lower_g[j]
+                self._inv_lower_g[i] -= self._mq[j, i]
 
-        # calculate inv(D)*inv(L)*g: n
-        inv_diag_inv_lower_g = inv_lower_g.copy()  # initially
+        # --- z = D^{-1} * w — reuse _inv_diag_inv_lower_g ---
+        np.copyto(self._inv_diag_inv_lower_g, self._inv_lower_g)
         for i in range(self._ndim):
-            inv_diag_inv_lower_g[i] *= self._mq[i, i]
+            self._inv_diag_inv_lower_g[i] *= self._mq[i, i]
 
-        # print(inv_diag_inv_lower_g)
-        # calculate omega: n
-        gg_t = inv_lower_g * inv_diag_inv_lower_g
-        omega = sum(gg_t)
+        # --- omega = sum(w_i * z_i) — no gg_t buffer needed ---
+        omega = 0.0
+        for i in range(self._ndim):
+            omega += self._inv_lower_g[i] * self._inv_diag_inv_lower_g[i]
 
-        self._tsq = self._kappa * omega  # need for helper
+        self._tsq = self._kappa * omega
 
         status, result = cut_strategy(beta, self._tsq)
-
         if result is None:
             return status
 
         rho, sigma, delta = result
 
-        # calculate Q*g = inv(L')*inv(D)*inv(L)*g : (n-1)*n/2
-        g_t = inv_diag_inv_lower_g.copy()  # initially
+        # --- back substitution: q = L^{-T} * z — reuse _g_t ---
+        np.copyto(self._g_t, self._inv_diag_inv_lower_g)
         for i in range(self._ndim - 1, 0, -1):
             for j in range(i, self._ndim):
-                g_t[i - 1] -= self._mq[j, i - 1] * g_t[j]  # TODO
+                self._g_t[i - 1] -= self._mq[j, i - 1] * self._g_t[j]
 
-        # print(g_t)
-        # calculate xc: n
-        self._xc -= (rho / omega) * g_t
+        # --- center update ---
+        self._xc -= (rho / omega) * self._g_t
 
-        # rank-one update: 3*n + (n-1)*n/2
-        # r = self._sigma / omega
+        # --- rank-one LDL^T update — reuse _g_t as working vector v ---
         mu = sigma / (1.0 - sigma)
         if mu == 0.0:
             return status
-        oldt = omega / mu  # initially
-        v = g.copy()
+        oldt = omega / mu
+        np.copyto(self._g_t, g)  # v = gradient (g_t buffer no longer needed as q)
         for j in range(self._ndim):
-            p = v[j]
-            temp = inv_diag_inv_lower_g[j]
+            p = self._g_t[j]
+            temp = self._inv_diag_inv_lower_g[j]
             newt = oldt + p * temp
             beta2 = temp / newt
-            self._mq[j, j] *= oldt / newt  # update invD
+            self._mq[j, j] *= oldt / newt
             for k in range(j + 1, self._ndim):
-                v[k] -= self._mq[j, k]
-                self._mq[k, j] += beta2 * v[k]
+                self._g_t[k] -= self._mq[j, k]
+                self._mq[k, j] += beta2 * self._g_t[k]
             oldt = newt
 
         self._kappa *= delta

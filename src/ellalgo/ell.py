@@ -18,11 +18,11 @@ import numpy as np
 
 from .ell_calc import EllCalc
 from .ell_config import CutStatus
-from .ell_typing import ArrayType, SearchSpace
+from .ell_typing import ArrayType, SearchSpace, SingleCut
 
 # Type aliases for better code readability
 Mat = np.ndarray
-CutChoice = Union[float, ArrayType]  # single or parallel cut
+CutChoice = Union[SingleCut, ArrayType]  # single or parallel cut
 Cut = Tuple[ArrayType, CutChoice]  # A cut consists of a gradient and a beta value
 
 

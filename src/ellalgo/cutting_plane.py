@@ -26,9 +26,10 @@ from .ell_typing import (
     OracleOptim,
     OracleOptimQ,
     SearchSpace,
+    SingleCut,
 )
 
-CutChoice = Union[float, MutableSequence]  # Single cut or parallel cuts
+CutChoice = Union[SingleCut, MutableSequence]  # Single cut or parallel cuts
 Cut = Tuple[ArrayType, CutChoice]  # Cut representation: (gradient, intercept)
 
 Num = Union[float, int]
