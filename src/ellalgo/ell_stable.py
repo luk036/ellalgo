@@ -52,9 +52,9 @@ class EllStable(SearchSpace[ArrayType]):
     _ndim: int
     helper: EllCalc
     # Pre-allocated scratch buffers (match Rust's strategy: zero per-call allocation)
-    _inv_lower_g: ArrayType  # w = L^{-1}g (forward substitution)
-    _inv_diag_inv_lower_g: ArrayType  # z = D^{-1}w
-    _g_t: ArrayType  # q = L^{-T}z (back substitution), then v (rank-1 update)
+    _inv_lower_g: np.ndarray  # w = L^{-1}g (forward substitution)
+    _inv_diag_inv_lower_g: np.ndarray  # z = D^{-1}w
+    _g_t: np.ndarray  # q = L^{-T}z (back substitution), then v (rank-1 update)
 
     def __init__(self, val: Union[float, ArrayType], x_center: ArrayType) -> None:
         ndim = len(x_center)
