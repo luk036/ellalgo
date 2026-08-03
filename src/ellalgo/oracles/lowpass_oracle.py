@@ -60,7 +60,6 @@ ParallelCut = Tuple[Arr, CutChoice]
 # *********************************************************************
 # number of FIR coefficients (including zeroth)
 class LowpassOracle(OracleOptim):
-    # more_alt: bool = True
     idx1: int = 0
 
     def __init__(
@@ -218,7 +217,6 @@ class LowpassOracle(OracleOptim):
             grad[0] = -1.0
             return grad, -x[0]
 
-        # If all checks pass, return None (no violations)
         return None
 
     def assess_optim(

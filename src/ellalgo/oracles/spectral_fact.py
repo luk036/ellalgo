@@ -89,7 +89,6 @@ def spectral_fact(r: np.ndarray) -> np.ndarray:
                     f"Minimum value: {min_val:.6e}, Negative values: {np.sum(R < 0)}"
                 )
 
-        # alpha = ne.evaluate("0.5 * log(abs(R))")
         alpha = 0.5 * np.log(np.abs(R))
 
         # find the Hilbert transform
@@ -141,13 +140,3 @@ def inverse_spectral_fact(h: np.ndarray) -> np.ndarray:
     n = len(h)
     # Take bottom-half of the auto-corelation function due to symmetry ???
     return np.convolve(h, h[::-1])[n - 1 :]
-    # r = np.zeros(n)
-    # for t in range(n):
-    #     r[t] = h[t:] @ h[: n - t]
-    # return r
-
-
-# if __name__ == "__main__":
-#     r = np.random.rand(20)
-#     h = spectral_fact(r)
-#     print(h)

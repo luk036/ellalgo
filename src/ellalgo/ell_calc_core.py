@@ -304,9 +304,6 @@ class EllCalcCore:
             (0.02094183648798086, 0.46537414417735246, 1.082031295477563)
         """
         b1sq = beta1 * beta1
-        # if tsq < b1sq or not self.use_parallel_cut:
-        #     return self.calc_cc(tsq)
-        # Core calculation
         a1sq = b1sq / tsq
         xi = sqrt(1.0 - a1sq + (self._half_n * a1sq) ** 2)
         sigma = self._cst3 + self._cst2 * (1.0 - xi) / a1sq

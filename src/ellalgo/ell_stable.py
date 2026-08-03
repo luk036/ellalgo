@@ -74,26 +74,12 @@ class EllStable(SearchSpace[ArrayType]):
             self._mq = np.diag(val)
 
     def xc(self) -> ArrayType:
-        """
-        The function `xc` returns the value of the `_xc` attribute.
-        :return: The method `xc` is returning the value of the attribute `_xc`.
-        """
         return self._xc
 
     def set_xc(self, x_center: ArrayType) -> None:
-        """
-        The function sets the value of the variable `_xc` to the input `x_center`.
-
-        :param x_center: The parameter `x_center` is of type `ArrayType`
-        :type x_center: ArrayType
-        """
         self._xc = x_center
 
     def tsq(self) -> float:
-        """
-        The function `tsq` returns the measure of the distance between `xc` and `x*`.
-        :return: The method is returning a float value, which represents the measure of the distance between xc and x*.
-        """
         return self._tsq
 
     def update_bias_cut(self, cut: Cut) -> CutStatus:

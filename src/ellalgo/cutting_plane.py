@@ -198,50 +198,6 @@ def cutting_plane_optim(
     return x_best, gamma, options.max_iters
 
 
-# def cutting_plane_feas_q(
-#     omega: OracleFeasQ[ArrayType], space_q: SearchSpaceQ[ArrayType], options=Options()
-# ) -> Tuple[Optional[ArrayType], int]:
-#     """Cutting-plane method for solving convex discrete optimization problem
-#
-#     :param omega: The parameter "omega" is an instance of the OracleFeasQ class, which is used to
-#         perform assessments on the initial solution "xinit"
-#
-#     :type omega: OracleFeasQ[ArrayType]
-#
-#     :param space_q: The `space_q` parameter is an instance of the `SearchSpaceQ` class, which represents
-#         the search space for the discrete optimization problem. It contains information about the current
-#         solution candidate `x*` and provides methods for updating the search space based on the cutting
-#         plane information
-#
-#     :type space_q: SearchSpaceQ[ArrayType]
-#
-#     :param options: The `options` parameter is an instance of the `Options` class, which contains
-#         various options for the cutting-plane method. It is optional and has default values if not provided
-#
-#     :return: a tuple containing two elements:
-#         1. Optional[ArrayType]: A feasible solution to the convex discrete optimization problem. If no
-#         feasible solution is found, it returns None.
-#         2. int: The number of iterations performed by the cutting-plane method.
-#     """
-#     retry = False
-#     for niter in range(options.max_iters):
-#         cut, x_q, more_alt = omega.assess_feas_q(space_q.xc(), retry)
-#         if cut is None:  # better gamma obtained
-#             return x_q, niter
-#         status = space_q.update_q(cut)
-#         if status == CutStatus.Success:
-#             retry = False
-#         elif status == CutStatus.NoSoln:
-#             return None, niter
-#         elif status == CutStatus.NoEffect:
-#             if not more_alt:  # no more alternative cut
-#                 return None, niter
-#             retry = True
-#         if space_q.tsq() < options.tolerance:
-#             return None, niter
-#     return None, options.max_iters
-
-
 def cutting_plane_optim_q(
     omega: OracleOptimQ[ArrayType],
     space_q: SearchSpace[ArrayType],
