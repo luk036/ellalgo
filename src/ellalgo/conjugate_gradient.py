@@ -54,7 +54,9 @@ def conjugate_gradient(
     """
     dimension = len(b)
     if x0 is None:
-        solution = np.zeros(dimension)  # Initialize solution vector with zeros if no initial guess
+        solution = np.zeros(
+            dimension
+        )  # Initialize solution vector with zeros if no initial guess
     else:
         solution = x0.copy()  # Use provided initial guess
 
@@ -70,7 +72,9 @@ def conjugate_gradient(
         if direction_dot_A_direction == 0:
             raise ValueError(f"Conj Grad did not converge after {max_iter} iterations")
 
-        step_size = residual_norm_sq / direction_dot_A_direction  # Step size calculation
+        step_size = (
+            residual_norm_sq / direction_dot_A_direction
+        )  # Step size calculation
         solution += step_size * direction  # Update solution vector
         residual -= step_size * A_direction  # Update residual
         residual_norm_sq_new = np.dot(residual, residual)  # New residual norm squared
@@ -79,8 +83,14 @@ def conjugate_gradient(
         if np.sqrt(residual_norm_sq_new) < tol:
             return solution
 
-        improvement_ratio = residual_norm_sq_new / residual_norm_sq  # Calculate improvement ratio
-        direction = residual + improvement_ratio * direction  # Update search direction using conjugate gradient
-        residual_norm_sq = residual_norm_sq_new  # Update residual norm for next iteration
+        improvement_ratio = (
+            residual_norm_sq_new / residual_norm_sq
+        )  # Calculate improvement ratio
+        direction = (
+            residual + improvement_ratio * direction
+        )  # Update search direction using conjugate gradient
+        residual_norm_sq = (
+            residual_norm_sq_new  # Update residual norm for next iteration
+        )
 
     raise ValueError(f"Conj Grad did not converge after {max_iter} iterations")
