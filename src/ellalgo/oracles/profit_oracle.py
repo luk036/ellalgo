@@ -22,6 +22,7 @@ from typing import Optional, Tuple
 import numpy as np
 
 from ellalgo.cutting_plane import OracleOptim, OracleOptimQ
+from ellalgo.round_robin import RoundRobin
 
 Arr = np.ndarray
 Cut = Tuple[Arr, float]
@@ -78,6 +79,7 @@ class ProfitOracle(OracleOptim):
         self.log_k = math.log(limit)
         self.price_out = price_out
         self.elasticities = elasticities
+        self._rr = RoundRobin(2, start=-1)  # round-robin over the two constraints
         self.fns = (self.fn1, self.fn2)  # Constraint functions
         self.grads = (self.grad1, self.grad2)  # Gradient functions
 
@@ -149,9 +151,7 @@ class ProfitOracle(OracleOptim):
             None if all constraints satisfied
         """
         for _ in [0, 1]:
-            self.idx += 1
-            if self.idx == 2:
-                self.idx = 0  # Round-robin reset
+            self.idx = self._rr.next()
             if (fj := self.fns[self.idx](xc, gamma)) > 0:
                 return self.grads[self.idx](gamma), fj
         return None

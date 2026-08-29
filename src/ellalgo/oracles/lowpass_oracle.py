@@ -24,6 +24,7 @@ from typing import Optional, Tuple
 import numpy as np
 
 from ellalgo.ell_typing import CutChoice, OracleOptim
+from ellalgo.round_robin import RoundRobin
 
 Arr = np.ndarray
 ParallelCut = Tuple[Arr, CutChoice]
@@ -119,9 +120,11 @@ class LowpassOracle(OracleOptim):
         self.sp_sq = sp_sq  # Upper bound for stopband (squared)
 
         # Initialize indices for round-robin checking of frequency points
-        self.idx1 = 0  # Current index for passband checking
-        self.idx2 = self.nwpass  # Current index for transition band checking
-        self.idx3 = self.nwstop  # Current index for stopband checking
+        self.idx1 = RoundRobin(self.nwpass, start=0)  # passband: [0, nwpass)
+        self.idx2 = RoundRobin(
+            self.nwstop, lo=self.nwpass, start=self.nwpass
+        )  # transition band
+        self.idx3 = RoundRobin(mdim, lo=self.nwstop, start=self.nwstop)  # stopband
 
         # Variables to track maximum response in stopband
         self.fmax = float("-inf")  # Maximum response value found
@@ -154,11 +157,9 @@ class LowpassOracle(OracleOptim):
 
         # Check passband frequencies (0 to nwpass)
         for _ in range(self.nwpass):
-            self.idx1 += 1
-            if self.idx1 == self.nwpass:
-                self.idx1 = 0  # round robin - wrap around to start
-
-            col_k = self.spectrum[self.idx1, :]  # Get frequency point coefficients
+            col_k = self.spectrum[
+                self.idx1.next(), :
+            ]  # Get frequency point coefficients
             v = col_k.dot(x)  # Compute response at this frequency
 
             # Check upper bound violation
@@ -177,11 +178,8 @@ class LowpassOracle(OracleOptim):
 
         # Check stopband frequencies (nwstop to end)
         for _ in range(self.nwstop, mdim):
-            self.idx3 += 1
-            if self.idx3 == mdim:
-                self.idx3 = self.nwstop  # round robin - wrap around to start
-
-            col_k = self.spectrum[self.idx3, :]
+            idx = self.idx3.next()
+            col_k = self.spectrum[idx, :]
             v = col_k.dot(x)
 
             # Check upper bound violation in stopband
@@ -195,16 +193,12 @@ class LowpassOracle(OracleOptim):
             # Track maximum response in stopband (for optimization)
             if v > self.fmax:
                 self.fmax = v
-                self.kmax = self.idx3
+                self.kmax = idx
 
         # Check transition band frequencies (nwpass to nwstop)
         # Only need to ensure non-negativity here
         for _ in range(self.nwpass, self.nwstop):
-            self.idx2 += 1
-            if self.idx2 == self.nwstop:
-                self.idx2 = self.nwpass  # round robin - wrap around to start
-
-            col_k = self.spectrum[self.idx2, :]
+            col_k = self.spectrum[self.idx2.next(), :]
             v = col_k.dot(x)
 
             # Check non-negativity constraint
