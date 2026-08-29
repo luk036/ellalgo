@@ -198,6 +198,62 @@ def cutting_plane_optim(
     return x_best, gamma, options.max_iters
 
 
+class OptimQState:
+    """State machine for the discrete cutting-plane method.
+
+    Encapsulates the mutable state of `cutting_plane_optim_q`: the
+    best-so-far solution `x_best` and the `retry` phase flag. The `on_update`
+    transition maps a CutStatus (plus the oracle's `more_alt` hint) onto a
+    control-flow outcome.
+
+    Note:
+        State pattern: the driver loop asks the machine for its current phase
+        (retry), feeds it each oracle/space result, and stops when `on_update`
+        returns False. The retry/termination bookkeeping that used to be
+        scattered through the loop now lives in one place.
+
+    Args:
+        None.
+
+    Attributes:
+        x_best: Best-so-far discrete solution (None until first improvement).
+        retry: Whether the next assessment is a retry (reuse cached point).
+    """
+
+    def __init__(self) -> None:
+        self.x_best = None  # type: ignore[assignment]
+        self.retry = False
+
+    def on_shrunk(self, x_q: ArrayType) -> None:
+        """Transition on a newly obtained (shrunk) best solution.
+
+        Args:
+            x_q: The new best discrete point.
+        """
+        self.x_best = x_q
+
+    def on_update(self, status: CutStatus, more_alt: bool) -> bool:
+        """Transition on the space update result.
+
+        Args:
+            status: CutStatus returned by space.update_q.
+            more_alt: Whether the oracle has more alternative cuts.
+
+        Returns:
+            True to keep iterating; False to stop.
+        """
+        if status == CutStatus.Success:
+            self.retry = False
+            return True
+        if status == CutStatus.NoSoln:
+            return False
+        if status == CutStatus.NoEffect:
+            if not more_alt:  # Exhausted alternative cuts
+                return False
+            self.retry = True  # Retry with discrete solution
+        return True
+
+
 def cutting_plane_optim_q(
     omega: OracleOptimQ[ArrayType],
     space_q: SearchSpace[ArrayType],
@@ -226,27 +282,20 @@ def cutting_plane_optim_q(
     Returns:
         (Best discrete solution, achieved g, iterations)
     """
-    x_best = None
-    retry = False  # Discrete feasibility check flag
+    state = OptimQState()
     for niter in range(options.max_iters):
         # Get cut and possible discrete solution
-        cut, x_q, gamma1, more_alt = omega.assess_optim_q(space_q.xc(), gamma, retry)
+        cut, x_q, gamma1, more_alt = omega.assess_optim_q(
+            space_q.xc(), gamma, state.retry
+        )
         if gamma1 is not None:  # Improved objective value
             gamma = gamma1
-            x_best = x_q
-        # Update search space with quantized cut
-        status = space_q.update_q(cut)
-        if status == CutStatus.Success:
-            retry = False  # Valid cut applied
-        elif status == CutStatus.NoSoln:
-            return x_best, gamma, niter  # No solution exists
-        elif status == CutStatus.NoEffect:
-            if not more_alt:  # Exhausted alternative cuts
-                return x_best, gamma, niter
-            retry = True  # Retry with discrete solution
+            state.on_shrunk(x_q)
+        if not state.on_update(space_q.update_q(cut), more_alt):
+            return state.x_best, gamma, niter
         if space_q.tsq() < options.tolerance:
-            return x_best, gamma, niter
-    return x_best, gamma, options.max_iters
+            return state.x_best, gamma, niter
+    return state.x_best, gamma, options.max_iters
 
 
 def bsearch(
