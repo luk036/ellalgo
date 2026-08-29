@@ -10,22 +10,23 @@ Key differences from `Ell`:
     - Stores the LDL^T factors of the shape matrix directly
     - Uses forward/backward substitution instead of matrix-vector products
     - Implements rank-one updates for the LDL^T factors
+
+See :class:`EllBase` for the shared public API.
 """
 
-from typing import Callable, Tuple, Union
+from typing import Tuple, Union
 
 import numpy as np
 
-from .ell_calc import EllCalc
+from .ell_base import EllBase
 from .ell_config import CutStatus
-from .ell_typing import ArrayType, SearchSpace, SingleCut
 
 Matrix = np.ndarray
-CutChoice = Union[SingleCut, ArrayType]  # single or parallel
-Cut = Tuple[ArrayType, CutChoice]
+CutChoice = Union[float, np.ndarray]  # single or parallel
+Cut = Tuple[np.ndarray, CutChoice]
 
 
-class EllStable(SearchSpace[ArrayType]):
+class EllStable(EllBase[np.ndarray]):
     """Numerically stable ellipsoid search space using LDL^T factorization.
 
     This class stores the ellipsoid's shape matrix in LDL^T factored form and
@@ -43,100 +44,24 @@ class EllStable(SearchSpace[ArrayType]):
         0.0
     """
 
-    no_defer_trick: bool = False
-
-    _mq: Matrix
-    _xc: ArrayType
-    _kappa: float
-    _tsq: float
     _ndim: int
-    helper: EllCalc
     # Pre-allocated scratch buffers (match Rust's strategy: zero per-call allocation)
     _inv_lower_g: np.ndarray  # w = L^{-1}g (forward substitution)
     _inv_diag_inv_lower_g: np.ndarray  # z = D^{-1}w
     _g_t: np.ndarray  # q = L^{-T}z (back substitution), then v (rank-1 update)
 
-    def __init__(self, val: Union[float, ArrayType], x_center: ArrayType) -> None:
+    def __init__(self, val: Union[float, np.ndarray], x_center: np.ndarray) -> None:
         ndim = len(x_center)
-        self.helper = EllCalc(ndim)
-        self._xc = x_center
-        self._tsq = 0.0
+        super().__init__(val, x_center)
         self._ndim = ndim
         # Pre-allocate scratch buffers (Rust-style: avoid per-call allocation)
         self._inv_lower_g = np.empty(ndim)
         self._inv_diag_inv_lower_g = np.empty(ndim)
         self._g_t = np.empty(ndim)
-        if isinstance(val, (int, float)):
-            self._kappa = val
-            self._mq = np.eye(ndim)
-        else:
-            self._kappa = 1.0
-            self._mq = np.diag(val)
-
-    def xc(self) -> ArrayType:
-        return self._xc
-
-    def set_xc(self, x_center: ArrayType) -> None:
-        self._xc = x_center
-
-    def tsq(self) -> float:
-        return self._tsq
-
-    def update_bias_cut(self, cut: Cut) -> CutStatus:
-        """
-        The function `update_bias_cut` is an implementation of the `SearchSpace` interface that updates the
-        cut status based on a given cut.
-
-        :param cut: The `cut` parameter is of type `_type_` and it represents some kind of cut
-        :return: a `CutStatus` object.
-
-        Examples:
-            >>> ell = EllStable(1.0, [1.0, 1.0, 1.0, 1.0])
-            >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 1.0)
-            >>> status = ell.update_bias_cut(cut)
-            >>> print(status)
-            CutStatus.Success
-        """
-        return self._update_core(cut, self.helper.calc_single_or_parallel)
-
-    def update_central_cut(self, cut: Cut) -> CutStatus:
-        """
-        The function `update_central_cut` is an implementation of the `SearchSpace` interface that updates the
-        cut status based on a given cut.
-
-        :param cut: The `cut` parameter is of type `_type_` and it represents a cut
-        :return: a `CutStatus` object.
-
-        Examples:
-            >>> ell = EllStable(1.0, [1.0, 1.0, 1.0, 1.0])
-            >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), 0.0)
-            >>> status = ell.update_central_cut(cut)
-            >>> print(status)
-            CutStatus.Success
-        """
-        return self._update_core(cut, self.helper.calc_single_or_parallel_central_cut)
-
-    def update_q(self, cut: Cut) -> CutStatus:
-        """
-        The function `update_q` is an implementation of the `SearchSpaceQ` interface that updates the
-        cut status based on a given cut.
-
-        :param cut: The `cut` parameter is of type `_type_` and it represents the cut that needs to be
-            updated
-        :return: a `CutStatus` object.
-
-        Examples:
-            >>> ell = EllStable(1.0, [1.0, 1.0, 1.0, 1.0])
-            >>> cut = (np.array([1.0, 1.0, 1.0, 1.0]), -0.01)
-            >>> status = ell.update_q(cut)
-            >>> print(status)
-            CutStatus.Success
-        """
-        return self._update_core(cut, self.helper.calc_single_or_parallel_q)
 
     # private:
 
-    def _update_core(self, cut: Cut, cut_strategy: Callable) -> CutStatus:
+    def _update_core(self, cut: Cut, cut_strategy) -> CutStatus:
         r"""Update the ellipsoid using :math:`LDL^T` factorization.
 
         The shape matrix is stored as :math:`\mathbf{M} = \kappa \mathbf{LDL}^T`.
@@ -148,6 +73,15 @@ class EllStable(SearchSpace[ArrayType]):
         :param cut: Tuple :math:`(\mathbf{g}, \beta)` for the cut
         :param cut_strategy: Strategy function to compute :math:`\rho,\sigma,\delta`
         :return: A :class:`CutStatus` object
+
+        Examples:
+            >>> import numpy as np
+            >>> from ellalgo.ell_stable import EllStable
+            >>> ell = EllStable(1.0, np.array([0.0, 0.0]))
+            >>> cut = (np.array([1.0, 1.0]), 1.0)
+            >>> status = ell._update_core(cut, ell.helper.calc_single_or_parallel)
+            >>> status == CutStatus.Success
+            True
         """
         g, beta = cut
 
