@@ -76,6 +76,7 @@ from .ell_typing import (
     SearchSpace,
     SingleCut,
 )
+from .lmi_problem import LMIProblem
 from .oracles.lmi0_oracle import LMI0Oracle
 from .oracles.lmi_oracle import LMIOracle
 from .oracles.lowpass_oracle import LowpassOracle
@@ -104,6 +105,7 @@ __all__ = [
     "SingleCut",
     "LMIOracle",
     "LMI0Oracle",
+    "LMIProblem",
     "ProfitOracle",
     "ProfitRbOracle",
     "ProfitQOracle",
