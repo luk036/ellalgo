@@ -5,6 +5,8 @@ Extracts the repeated ``idx += 1; if idx == N: idx = 0`` idiom into a small
 stateful helper (used by LowpassOracle and ProfitOracle).
 """
 
+from __future__ import annotations
+
 
 class RoundRobin:
     """Round-robin index generator over a half-open range [lo, hi).

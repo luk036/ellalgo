@@ -7,6 +7,8 @@ created oracle and drives the cutting-plane feasibility method, hiding the
 single call.
 """
 
+from __future__ import annotations
+
 from typing import List, Optional, Tuple
 
 import numpy as np
