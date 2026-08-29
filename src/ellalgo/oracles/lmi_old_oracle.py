@@ -12,11 +12,12 @@ import numpy as np
 
 from ellalgo.cutting_plane import OracleFeas
 from ellalgo.oracles.ldlt_mgr import LDLTMgr
+from ellalgo.oracles.lmi_oracle_base import LMIBase
 
 Cut = Tuple[np.ndarray, float]
 
 
-class LMIOldOracle(OracleFeas):
+class LMIOldOracle(LMIBase, OracleFeas):
     """Oracle for Linear Matrix Inequality constraint.
 
     This oracle solves the following feasibility problem:
@@ -27,6 +28,11 @@ class LMIOldOracle(OracleFeas):
     This is a legacy implementation that constructs the full LMI matrix explicitly.
     For better performance with large matrices, use `LMIOracle` which uses lazy
     evaluation.
+
+    Concrete LMI oracle: builds the matrix ``A = B − Σ_k F_k x_k`` eagerly and
+    feeds a lambda element accessor with a positive ``sym_quad`` sign to the
+    shared LMIBase skeleton. Behaviorally identical to `LMIOracle`, which uses
+    lazy evaluation instead of a pre-built matrix.
 
     Examples:
         >>> import numpy as np
@@ -39,6 +45,10 @@ class LMIOldOracle(OracleFeas):
         >>> result is None or isinstance(result, tuple)
         True
     """
+
+    mat_f: List[np.ndarray]
+    mat_f0: np.ndarray
+    ldlt_mgr: LDLTMgr
 
     def __init__(self, mat_f: List[np.ndarray], mat_b: np.ndarray):
         """Initialize the LMI oracle with coefficient matrices.
@@ -78,8 +88,4 @@ class LMIOldOracle(OracleFeas):
         n = len(xc)
         A = self.mat_f0.copy()
         A -= sum(self.mat_f[k] * xc[k] for k in range(n))
-        if not self.ldlt_mgr.factorize(A):
-            ep = self.ldlt_mgr.witness()
-            g = np.array([self.ldlt_mgr.sym_quad(self.mat_f[i]) for i in range(n)])
-            return g, ep
-        return None
+        return self._assess(lambda i, j: A[i, j], +1)

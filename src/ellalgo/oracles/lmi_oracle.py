@@ -21,11 +21,12 @@ import numpy as np
 
 from ellalgo.cutting_plane import OracleFeas
 from ellalgo.oracles.ldlt_mgr import LDLTMgr
+from ellalgo.oracles.lmi_oracle_base import LMIBase
 
 Cut = Tuple[np.ndarray, float]
 
 
-class LMIOracle(OracleFeas):
+class LMIOracle(LMIBase, OracleFeas):
     """
     Oracle for Linear Matrix Inequality (LMI) constraints.
 
@@ -43,7 +44,15 @@ class LMIOracle(OracleFeas):
     constraint. If it does, the method returns `None`. If not, it returns a
     separating hyperplane (a "cut") that separates the infeasible point from
     the feasible set.
+
+    Concrete LMI oracle: supplies the lazy element accessor
+    ``A(i,j) = B(i,j) - Σ_k F_k(i,j) x_k`` with a positive ``sym_quad`` sign
+    to the shared LMIBase skeleton.
     """
+
+    mat_f: List[np.ndarray]
+    mat_f0: np.ndarray  # Constant term matrix in LMI
+    ldlt_mgr: LDLTMgr
 
     def __init__(self, mat_f: List[np.ndarray], mat_b: np.ndarray):
         """Initialize LMI Oracle with problem matrices.
@@ -88,11 +97,4 @@ class LMIOracle(OracleFeas):
             s = sum(Fk[i, j] * xk for Fk, xk in zip(self.mat_f, xc))
             return self.mat_f0[i, j] - s
 
-        if self.ldlt_mgr.factor(get_elem):
-            return None  # Matrix is PSD => feasible solution
-
-        # If infeasible, compute cut information:
-        ep = self.ldlt_mgr.witness()  # Witness vector for negative eigenvalue
-        # Compute subgradient components through symmetric quadratic form
-        g = np.array([self.ldlt_mgr.sym_quad(Fk) for Fk in self.mat_f])
-        return g, ep
+        return self._assess(get_elem, +1)

@@ -12,11 +12,12 @@ from typing import List, Optional, Tuple
 import numpy as np
 
 from ellalgo.oracles.ldlt_mgr import LDLTMgr
+from ellalgo.oracles.lmi_oracle_base import LMIBase
 
 Cut = Tuple[np.ndarray, float]
 
 
-class LMI0Oracle:
+class LMI0Oracle(LMIBase):
     """
     Oracle for the Linear Matrix Inequality (LMI) constraint: F(x) ⪰ 0.
 
@@ -32,7 +33,14 @@ class LMI0Oracle:
     constraint. If it does, the method returns `None`. If not, it returns a
     separating hyperplane (a "cut") that separates the infeasible point from
     the feasible set.
+
+    Concrete LMI oracle: supplies the lazy element accessor
+    ``A(i,j) = Σ_k F_k(i,j) x_k`` with a negative ``sym_quad`` sign to the
+    shared LMIBase skeleton.
     """
+
+    mat_f: List[np.ndarray]
+    ldlt_mgr: LDLTMgr
 
     def __init__(self, mat_f: List[np.ndarray]):
         """Initialize LMI oracle with coefficient matrices.
@@ -74,11 +82,4 @@ class LMI0Oracle:
             n = len(x)
             return sum(self.mat_f[k][i, j] * x[k] for k in range(n))
 
-        # Attempt LDLT factorization (fails if matrix not PSD)
-        if not self.ldlt_mgr.factor(get_elem):
-            # Compute infeasibility certificate
-            ep = self.ldlt_mgr.witness()  # Witness vector v such that vᵀF(x)v < 0
-            # Calculate subgradient components: g_k = -vᵀF_k v
-            g = np.array([-self.ldlt_mgr.sym_quad(Fk) for Fk in self.mat_f])
-            return g, ep
-        return None
+        return self._assess(get_elem, -1)
