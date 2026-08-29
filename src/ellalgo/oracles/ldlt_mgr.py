@@ -81,6 +81,51 @@ class LDLTMgr:
         """
         return self.factor(lambda i, j: mat[i, j])
 
+    def _factor_impl(
+        self,
+        get_elem: Callable[[int, int], float],
+        allow_semidefinite: bool,
+    ) -> bool:
+        """Shared LDL^T factorization skeleton.
+
+        Row-wise sweep identical for both public entry points; the
+        `allow_semidefinite` flag selects the pivot handling. With
+        `allow_semidefinite=False` the start index stays at 0 and any
+        `diag <= 0` stops the sweep (matching `factor`); with
+        `allow_semidefinite=True` a zero pivot advances the start index and
+        only `diag < 0` stops the sweep (matching
+        `factor_with_allow_semidefinite`).
+
+        Args:
+            get_elem: Function that returns matrix element at (i,j) position.
+            allow_semidefinite: If True, zero pivots advance the start index
+                instead of stopping the factorization.
+
+        Returns:
+            bool: True if the matrix is (semi)definite per the policy.
+        """
+        start: int = 0  # range start
+        self.pos = (0, 0)
+        for i in range(self._ndim):
+            diag = get_elem(i, start)
+            for j in range(start, i):
+                self._storage[j, i] = diag  # keep it for later use
+                self._storage[i, j] = diag / self._storage[j, j]  # the L[i, j]
+                stop = j + 1
+                diag = get_elem(i, stop) - self._storage[i, start:stop].dot(
+                    self._storage[start:stop, stop]
+                )
+            self._storage[i, i] = diag
+            if diag < 0.0:
+                self.pos = start, i + 1
+                break
+            if diag == 0.0:
+                if not allow_semidefinite:
+                    self.pos = start, i + 1
+                    break
+                start = i + 1  # T[i, i] == 0 (very unlikely), restart at i+1
+        return self.is_spd()
+
     def factor(self, get_elem: Callable[[int, int], float]) -> bool:
         """
         Performs LDLT factorization using lazy element access.
@@ -105,22 +150,7 @@ class LDLTMgr:
             >>> ldl.factor(lambda i, j: mat[i, j])
             True
         """
-        start: int = 0  # range start
-        self.pos = (0, 0)
-        for i in range(self._ndim):
-            diag = get_elem(i, start)
-            for j in range(start, i):
-                self._storage[j, i] = diag  # keep it for later use
-                self._storage[i, j] = diag / self._storage[j, j]  # the L[i, j]
-                stop = j + 1
-                diag = get_elem(i, stop) - self._storage[i, start:stop].dot(
-                    self._storage[start:stop, stop]
-                )
-            self._storage[i, i] = diag
-            if diag <= 0.0:
-                self.pos = start, i + 1
-                break
-        return self.is_spd()
+        return self._factor_impl(get_elem, allow_semidefinite=False)
 
     def factor_with_allow_semidefinite(
         self, get_elem: Callable[[int, int], float]
@@ -146,24 +176,7 @@ class LDLTMgr:
             >>> ldl.factor_with_allow_semidefinite(lambda i, j: mat[i, j])
             True
         """
-        start: int = 0  # range start
-        self.pos = (0, 0)
-        for i in range(self._ndim):
-            diag = get_elem(i, start)
-            for j in range(start, i):
-                self._storage[j, i] = diag  # keep it for later use
-                self._storage[i, j] = diag / self._storage[j, j]  # the L[i, j]
-                stop = j + 1
-                diag = get_elem(i, stop) - self._storage[i, start:stop].dot(
-                    self._storage[start:stop, stop]
-                )
-            self._storage[i, i] = diag
-            if diag < 0.0:
-                self.pos = start, i + 1
-                break
-            elif diag == 0:
-                start = i + 1  # T[i, i] == 0 (very unlikely), restart at i+1
-        return self.is_spd()
+        return self._factor_impl(get_elem, allow_semidefinite=True)
 
     def is_spd(self) -> bool:
         """
