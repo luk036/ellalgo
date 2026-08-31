@@ -1,5 +1,30 @@
 # Changelog
 
+## Version 0.7 (2026-08-31)
+
+### Features
+- **`LMIProblem` facade + LMI oracle factory**: New `LMIProblem` class owns the F/B matrices and drives `cutting_plane_feas` in a single call, plus `make_lmi_oracle` / `make_lmi0_oracle` / `make_lmi_old_oracle` factory entry points. Added `EllBase.from_radii` / `from_alpha` named constructors. Exported `LMIProblem` in `__init__`. (#8021f31)
+
+### Bug Fixes
+- **Python 3.9 import crash**: `round_robin` and `lmi_problem` used PEP 604 annotations (`X | None`, `float | np.ndarray`) evaluated at runtime on Python 3.9; added `from __future__ import annotations` to both, matching the `ell_typing` convention. (#d3735b7)
+- **Config dedup**: Removed duplicate `mypy.ini` config and fixed the `ArrayType` annotation. (#ba0116f)
+- **RTD build fix**: Added `matplotlib` and `numpy` to `docs/requirements.txt` so ReadTheDocs can build the docs. (#454d7b5)
+
+### Code Cleanup
+- **Shared `EllBase` (Strategy)**: Extracted the duplicated public API (constructor, `xc`/`set_xc`/`tsq`, `update_*` wrappers) of `Ell`/`EllStable` into `EllBase` with a `_update_core` Template-Method hook; each strategy overrides only its update core. (#1c305a1)
+- **Shared `LMIBase` (Template Method)**: Collapsed the identical `assess_feas` skeleton (factor → witness → sym_quad → pack cut) of `LMIOracle`/`LMI0Oracle`/`LMIOldOracle` into `LMIBase._assess`; subclasses supply only their `get_elem` closure and sign. (#5b6ac05)
+- **`RoundRobin` helper (Strategy)**: Extracted the duplicated `idx += 1; if idx == N: idx = 0` idiom; `ProfitOracle` keeps a readable `idx`, `LowpassOracle` keeps public `idx1`/`idx2`/`idx3` mirrors. (#b9d0ae4)
+- **`OptimQState` state machine**: Encapsulated the scattered `x_best` + retry bookkeeping of the discrete-optimization loop with `on_shrunk`/`on_update` transitions (exact return semantics preserved). (#fddc4c1)
+- **`LDLTMgr` factor skeleton**: Unified `factor` and `factor_with_allow_semidefinite` into a shared `_factor_impl(get_elem, allow_semidefinite)` differing only in pivot policy; public signatures and doctests unchanged. (#ba66b48)
+- **Docstring de-slop**: Removed AI-slop boilerplate from docstrings and comments. (#b3c4839)
+- **Formatting**: Applied black to `conjugate_gradient`. (#55b88dc)
+
+### Maintenance
+- **Config cleanup**: Migrated flake8 config to `.flake8` and fixed project URLs in metadata. (#f795342)
+
+### Build & CI
+- **CI cleanup**: Removed the stale `.bak` workflow file. (#56de147)
+
 ## Version 0.6 (2026-07-16)
 
 ### Features
