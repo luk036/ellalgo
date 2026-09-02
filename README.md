@@ -1,11 +1,3 @@
-[![Built Status](https://api.cirrus-ci.com/github/luk036/ellalgo.svg?branch=main)](https://cirrus-ci.com/github/luk036/ellalgo)
-[![ReadTheDocs](https://readthedocs.org/projects/ellalgo/badge/?version=latest)](https://ellalgo.readthedocs.io/en/stable/)
-[![Coveralls](https://img.shields.io/coveralls/github/luk036/ellalgo/main.svg)](https://coveralls.io/r/luk036/ellalgo)
-[![PyPI-Server](https://img.shields.io/pypi/v/ellalgo.svg)](https://pypi.org/project/ellalgo/)
-
-[![Coverage Status](https://coveralls.io/repos/github/luk036/ellalgo/badge.svg?branch=main)](https://coveralls.io/github/luk036/ellalgo?branch=main)
--->
-
 [![Project generated with PyScaffold](https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold)](https://pyscaffold.org/)
 [![Documentation Status](https://readthedocs.org/projects/ellalgo/badge/?version=latest)](https://ellalgo.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/luk036/ellalgo/branch/main/graph/badge.svg?token=6lpjUzPavX)](https://codecov.io/gh/luk036/ellalgo)
