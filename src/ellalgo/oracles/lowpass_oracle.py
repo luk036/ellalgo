@@ -153,57 +153,55 @@ class LowpassOracle(OracleOptim):
                     * The violation amount (or tuple of lower/upper violations)
         """
         # Get dimensions of the spectrum matrix
-        mdim, ndim = self.spectrum.shape
+        ndim = self.spectrum.shape[1]
 
         # Check passband frequencies (0 to nwpass)
-        for _ in range(self.nwpass):
-            col_k = self.spectrum[
-                self.idx1.next(), :
-            ]  # Get frequency point coefficients
-            v = col_k.dot(x)  # Compute response at this frequency
-
-            # Check upper bound violation
-            if v > self.up_sq:
+        v1 = self.spectrum[: self.nwpass] @ x
+        over1 = v1 > self.up_sq
+        under1 = v1 < self.lp_sq
+        j1 = self._first_rotated(over1 | under1, self.idx1.peek_next())
+        if j1 >= 0:
+            self.idx1.seek(j1)
+            col_k = self.spectrum[j1, :]
+            v = v1[j1]
+            if over1[j1]:
                 f = (v - self.up_sq, v - self.lp_sq)
                 return col_k, f  # Return gradient and violation amounts
-
-            # Check lower bound violation
-            if v < self.lp_sq:
-                f = (-v + self.lp_sq, -v + self.up_sq)
-                return -col_k, f  # Return negative gradient and violation amounts
+            f = (-v + self.lp_sq, -v + self.up_sq)
+            return -col_k, f  # Return negative gradient and violation amounts
 
         # Initialize tracking for stopband maximum response
         self.fmax = float("-inf")
         self.kmax = 0
 
         # Check stopband frequencies (nwstop to end)
-        for _ in range(self.nwstop, mdim):
-            idx = self.idx3.next()
-            col_k = self.spectrum[idx, :]
-            v = col_k.dot(x)
-
-            # Check upper bound violation in stopband
-            if v > self.sp_sq:
-                return col_k, (v - self.sp_sq, v)
-
-            # Check non-negativity constraint
-            if v < 0:
+        v3 = self.spectrum[self.nwstop :] @ x
+        if v3.size:
+            off3 = self.idx3.peek_next() - self.nwstop
+            over3 = v3 > self.sp_sq
+            neg3 = v3 < 0
+            j3 = self._first_rotated(over3 | neg3, off3)
+            if j3 >= 0:
+                idx = self.nwstop + j3
+                self.idx3.seek(idx)
+                col_k = self.spectrum[idx, :]
+                v = v3[j3]
+                if over3[j3]:
+                    return col_k, (v - self.sp_sq, v)
                 return -col_k, (-v, -v + self.sp_sq)
-
-            # Track maximum response in stopband (for optimization)
-            if v > self.fmax:
-                self.fmax = v
-                self.kmax = idx
+            vmax = v3.max()
+            self.fmax = float(vmax)
+            self.kmax = self.nwstop + self._first_rotated(v3 == vmax, off3)
 
         # Check transition band frequencies (nwpass to nwstop)
         # Only need to ensure non-negativity here
-        for _ in range(self.nwpass, self.nwstop):
-            col_k = self.spectrum[self.idx2.next(), :]
-            v = col_k.dot(x)
-
-            # Check non-negativity constraint
-            if v < 0:
-                return -col_k, -v  # Return single cut for non-negativity
+        v2 = self.spectrum[self.nwpass : self.nwstop] @ x
+        if v2.size:
+            j2 = self._first_rotated(v2 < 0, self.idx2.peek_next() - self.nwpass)
+            if j2 >= 0:
+                idx = self.nwpass + j2
+                self.idx2.seek(idx)
+                return -self.spectrum[idx, :], -v2[j2]
 
         # Additional check: First coefficient should be non-negative
         if x[0] < 0:
@@ -212,6 +210,34 @@ class LowpassOracle(OracleOptim):
             return grad, -x[0]
 
         return None
+
+    @staticmethod
+    def _first_rotated(mask: np.ndarray, offset: int) -> int:
+        """Return the first ``True`` index of ``mask`` starting at ``offset``.
+
+        The round-robin scan visits ``offset, offset + 1, ..., n - 1, 0, ...,
+        offset - 1``; this locates the first ``True`` in that order without
+        materialising the rotated index array.
+
+        Args:
+            mask: Boolean array of per-point violation flags.
+            offset: Starting position of the round-robin scan.
+
+        Returns:
+            Index of the first ``True`` in round-robin order, or -1 if none.
+
+        Examples:
+            >>> import numpy as np
+            >>> LowpassOracle._first_rotated(np.array([False, True, False]), 2)
+            1
+            >>> LowpassOracle._first_rotated(np.array([False, False]), 0)
+            -1
+        """
+        tail = mask[offset:]
+        if tail.any():
+            return offset + int(tail.argmax())
+        head = mask[:offset]
+        return int(head.argmax()) if head.any() else -1
 
     def assess_optim(
         self, xc: Arr, gamma: float

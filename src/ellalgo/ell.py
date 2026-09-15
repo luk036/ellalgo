@@ -27,6 +27,8 @@ Mat = np.ndarray
 CutChoice = Union[float, np.ndarray]  # single or parallel cut
 Cut = Tuple[np.ndarray, CutChoice]  # A cut consists of a gradient and a beta value
 
+_TINY = float(np.finfo(np.float64).tiny)
+
 
 class Ell(EllBase[np.ndarray]):
     """Ellipsoid Search Space (classic direct Q-update strategy).
@@ -88,7 +90,7 @@ class Ell(EllBase[np.ndarray]):
             True
         """
         grad, beta = cut
-        if np.all(grad == 0.0):
+        if not grad.any():
             raise ValueError("Gradient cannot be a zero vector.")
         # Calculate M * grad (matrix-vector multiplication)
         grad_t = self._mq @ grad  # n^2 multiplications
@@ -98,7 +100,7 @@ class Ell(EllBase[np.ndarray]):
             return CutStatus.NoEffect
         # Guard against denormal omega that would overflow when
         # computing sigma/omega in the rank-1 update below
-        if not (omega > np.finfo(float).tiny):
+        if not (omega > _TINY):
             return CutStatus.NoEffect
         # Update tsq measure
         self._tsq = self._kappa * omega
@@ -115,7 +117,7 @@ class Ell(EllBase[np.ndarray]):
         # Update center point: xc -= (rho/omega) * grad_t
         self._xc -= (rho / omega) * grad_t
         # Update matrix: M -= (sigma/omega) * grad_t * grad_t^T
-        self._mq -= (sigma / omega) * np.outer(grad_t, grad_t)
+        self._mq -= (sigma / omega) * (grad_t[:, None] * grad_t)
         # Update scaling factor
         self._kappa *= delta
 

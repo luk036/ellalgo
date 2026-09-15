@@ -46,3 +46,31 @@ class RoundRobin:
         if self._cur == self._hi:
             self._cur = self._lo
         return self._cur
+
+    def peek_next(self) -> int:
+        """Return the index the next :meth:`next` would yield, without advancing.
+
+        Examples:
+            >>> rr = RoundRobin(3)
+            >>> rr.peek_next()
+            0
+            >>> rr.next()
+            0
+            >>> rr.peek_next()
+            1
+        """
+        nxt = self._cur + 1
+        return self._lo if nxt == self._hi else nxt
+
+    def seek(self, idx: int) -> None:
+        """Set the cursor to ``idx`` so the next :meth:`next` yields ``idx + 1``.
+
+        Used to resume a scan right after the point at ``idx``.
+
+        Examples:
+            >>> rr = RoundRobin(4)
+            >>> rr.seek(2)
+            >>> [rr.next() for _ in range(3)]
+            [3, 0, 1]
+        """
+        self._cur = idx
