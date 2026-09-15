@@ -88,19 +88,16 @@ class EllStable(EllBase[np.ndarray]):
         # --- forward substitution: w = L^{-1} * g — reuse _inv_lower_g ---
         np.copyto(self._inv_lower_g, g)
         for j in range(self._ndim - 1):
-            for i in range(j + 1, self._ndim):
-                self._mq[j, i] = self._mq[i, j] * self._inv_lower_g[j]
-                self._inv_lower_g[i] -= self._mq[j, i]
+            col = self._mq[j + 1 :, j] * self._inv_lower_g[j]
+            self._mq[j, j + 1 :] = col
+            self._inv_lower_g[j + 1 :] -= col
 
         # --- z = D^{-1} * w — reuse _inv_diag_inv_lower_g ---
         np.copyto(self._inv_diag_inv_lower_g, self._inv_lower_g)
-        for i in range(self._ndim):
-            self._inv_diag_inv_lower_g[i] *= self._mq[i, i]
+        self._inv_diag_inv_lower_g *= np.diagonal(self._mq)
 
         # --- omega = sum(w_i * z_i) — no gg_t buffer needed ---
-        omega = 0.0
-        for i in range(self._ndim):
-            omega += self._inv_lower_g[i] * self._inv_diag_inv_lower_g[i]
+        omega = float(self._inv_lower_g @ self._inv_diag_inv_lower_g)
 
         self._tsq = self._kappa * omega
 
@@ -113,8 +110,7 @@ class EllStable(EllBase[np.ndarray]):
         # --- back substitution: q = L^{-T} * z — reuse _g_t ---
         np.copyto(self._g_t, self._inv_diag_inv_lower_g)
         for i in range(self._ndim - 1, 0, -1):
-            for j in range(i, self._ndim):
-                self._g_t[i - 1] -= self._mq[j, i - 1] * self._g_t[j]
+            self._g_t[i - 1] -= self._mq[i:, i - 1] @ self._g_t[i:]
 
         # --- center update ---
         self._xc -= (rho / omega) * self._g_t
@@ -126,14 +122,12 @@ class EllStable(EllBase[np.ndarray]):
         oldt = omega / mu
         np.copyto(self._g_t, g)  # v = gradient (g_t buffer no longer needed as q)
         for j in range(self._ndim):
-            p = self._g_t[j]
             temp = self._inv_diag_inv_lower_g[j]
-            newt = oldt + p * temp
+            newt = oldt + self._g_t[j] * temp
             beta2 = temp / newt
             self._mq[j, j] *= oldt / newt
-            for k in range(j + 1, self._ndim):
-                self._g_t[k] -= self._mq[j, k]
-                self._mq[k, j] += beta2 * self._g_t[k]
+            self._g_t[j + 1 :] -= self._mq[j, j + 1 :]
+            self._mq[j + 1 :, j] += beta2 * self._g_t[j + 1 :]
             oldt = newt
 
         self._kappa *= delta
