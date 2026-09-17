@@ -196,6 +196,29 @@ def test_bsearch_no_soln(options: Options) -> None:
     assert num_iters == 20
 
 
+class MyOracleBSOffset(OracleBS):
+    """Binary search oracle whose threshold is far from zero."""
+
+    def assess_bs(self, gamma: float) -> bool:
+        """Assess feasibility of `gamma`."""
+        return gamma > 500.0
+
+
+def test_bsearch_stops_at_float_resolution(options: Options) -> None:
+    """Binary search must stop once the bracket can no longer shrink.
+
+    When the threshold is far from zero the bracket collapses around it, so
+    ``tau`` bottoms out at the ulp of that value (~1e-13) and the default
+    ``tolerance = 1e-20`` is unreachable. Without a stall guard the loop spins
+    until ``max_iters`` without refining anything.
+    """
+    omega = MyOracleBSOffset()
+    options.max_iters = 2000
+    gamma, num_iters = bsearch(omega, (0.0, 1e6), options)
+    assert num_iters < 200
+    assert gamma == pytest.approx(500.0, rel=1e-9)
+
+
 class MyOracleFeas2(OracleFeas):
     """Oracle for feasibility problem that always returns a cut."""
 

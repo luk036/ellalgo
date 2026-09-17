@@ -334,6 +334,13 @@ def bsearch(
         if tau < options.tolerance:  # Convergence check
             return upper, niter
         gamma = T(lower + tau)
+        # The midpoint stops moving once the bracket reaches floating-point
+        # resolution. `tau < options.tolerance` is then unreachable for any
+        # realistic scale (tolerance defaults to 1e-20, while the interval
+        # underflows at ~1e-16 of its own magnitude), so without this guard the
+        # loop would spin until max_iters without refining anything.
+        if not lower < gamma < upper:
+            return upper, niter
         if omega.assess_bs(gamma):  # Feasible -> move upper bound down
             upper = gamma
         else:  # Infeasible -> move lower bound up
