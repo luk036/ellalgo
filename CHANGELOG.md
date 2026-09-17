@@ -1,5 +1,27 @@
 # Changelog
 
+## Version 0.8 (2026-09-17)
+
+### Features
+- **Chebyshev-center demo + benchmark**: New `demo/chebyshev_center.py` solves the Chebyshev center problem with the ellipsoid method and cross-checks it against a CVXPY reference; `benches/bench_chebyshev.py` benchmarks CVXPY vs the ellipsoid method across problem sizes, with SVG result plots. (#7f2ad95)
+- **FIR lowpass benchmark vs CVXPY**: Ports the Wu-Boyd-Vandenberghe spectral-factorization FIR lowpass design problem to a benchmark comparing CVXPY (reference LP) against `LowpassOracle` for filter lengths n = 24..80. (#a89a764)
+- **Run-time comparison plots**: Plotting scripts and generated SVG figures for the min-eigenvalue LMI (EVP) and FIR lowpass experiments, comparing CVXPY vs Python vs C++ ellipsoid run times. (#a8364eb)
+- **`RoundRobin.peek_next` / `RoundRobin.seek`**: New cursor accessors so the vectorized lowpass oracle can find the first violating band without advancing the round-robin cursor. (#ea14d4d)
+
+### Bug Fixes
+- **`bsearch` could never terminate early**: The stopping test `tau < options.tolerance` applies an *absolute* threshold to a scale-dependent bracket width. Once the bracket underflows at its own magnitude the test is unreachable, so `max_iters` becomes the only stopping rule and the loop spins without refining anything — on corr-solver's `lsq_corr_poly` (4 variables, `upper = 939`), `tau` reached 1.11e-16 after ~200 iterations and stayed pinned for the remaining 1800. Added a stall guard that stops when `lower + tau` is no longer strictly inside the bracket; the returned value is bit-identical and iterations drop from 2000 to 61. A 10-instance battery (varying grid, basis count and Y scale) gives identical or 1-ulp results throughout, and several instances also collapse their inner feasibility work (945,759 → 17,457 inner iterations at site=6x5 m=4). (#f51a943)
+
+### Performance
+- **`EllStable._update_core` vectorized**: Replaced the pure-Python O(n²) loops for forward substitution, D-scaling, back substitution and the rank-1 inner update with whole-slice numpy operations, leaving only the outer O(n) sweep in Python. ~2.3x faster at n=32 and ~4.5x at n=64 (a small n=2 regression from numpy slice overhead is accepted). (#b6e49cd)
+- **Lowpass oracle vectorized**: The oracle scanned the spectrum row by row, calling `ndarray.dot` ~1.6M times (45% of the benchmark). Each band is now evaluated with a single BLAS gemv and the first violation is found via boolean masks. Benchmark: 14.60s → 3.73s (3.91x) parallel and 35.29s → 8.16s (4.33x) single. Also hoisted `Ell._update_core`'s `np.finfo` constant, replaced `np.all(grad == 0.0)` with `not grad.any()`, and used `grad_t[:, None] * grad_t` instead of `np.outer` (Ell micro-benchmark 1.09–1.40x). (#ea14d4d)
+
+### Testing & Code Quality
+- **`bsearch` regression test**: Added `test_bsearch_stops_at_float_resolution`, which runs 2000 iterations against an unguarded `bsearch` and fails the assertion. (#f51a943)
+- **Generated-asset normalization**: Applied `pre-commit run --all-files`, which rewrote the line endings of the generated benchmark SVGs. (#482b24a)
+
+### Documentation
+- **README badge cleanup**: Removed the stale, commented-out Cirrus CI / Coveralls badge block, superseded by the current PyScaffold, ReadTheDocs and codecov badges. (#0580c18)
+
 ## Version 0.7 (2026-08-31)
 
 ### Features
