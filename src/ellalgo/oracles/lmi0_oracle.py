@@ -11,13 +11,14 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 
+from ellalgo.cutting_plane import OracleFeas
 from ellalgo.oracles.ldlt_mgr import LDLTMgr
 from ellalgo.oracles.lmi_oracle_base import LMIBase
 
 Cut = Tuple[np.ndarray, float]
 
 
-class LMI0Oracle(LMIBase):
+class LMI0Oracle(LMIBase, OracleFeas):
     """
     Oracle for the Linear Matrix Inequality (LMI) constraint: F(x) ⪰ 0.
 

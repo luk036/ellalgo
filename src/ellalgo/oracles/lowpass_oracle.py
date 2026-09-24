@@ -19,7 +19,7 @@ parameters (passband 0-0.12π, stopband 0.20-π, ±0.025dB ripple).
 """
 
 from math import floor
-from typing import Optional, Tuple
+from typing import Callable, Optional, Tuple, Union
 
 import numpy as np
 
@@ -56,12 +56,40 @@ ParallelCut = Tuple[Arr, CutChoice]
 # This is a convex problem (can be formulated as an SDP after sampling).
 
 
+class _Band:
+    """A frequency band scanned for its first constraint violation.
+
+    ``upper`` is a float, a zero-argument callable returning the current bound
+    (the stopband bound tracks gamma), or ``None`` for a one-sided
+    non-negativity band. ``track_max`` enables the stopband peak tracking used
+    by :meth:`LowpassOracle.assess_optim`.
+    """
+
+    __slots__ = ("start", "stop", "lower", "upper", "cursor", "track_max")
+
+    def __init__(
+        self,
+        start: int,
+        stop: int,
+        lower: float,
+        upper: Union[float, Callable[[], float], None],
+        cursor: RoundRobin,
+        track_max: bool = False,
+    ) -> None:
+        self.start = start
+        self.stop = stop
+        self.lower = lower
+        self.upper = upper
+        self.cursor = cursor
+        self.track_max = track_max
+
+
 # *********************************************************************
 # filter specs (for a low-pass filter)
 # *********************************************************************
 # number of FIR coefficients (including zeroth)
 class LowpassOracle(OracleOptim):
-    idx1: int = 0
+    idx1: RoundRobin
 
     def __init__(
         self,
@@ -90,9 +118,9 @@ class LowpassOracle(OracleOptim):
             lp_sq (float): The lower bound on the squared magnitude frequency response in the passband.
             up_sq (float): The upper bound on the squared magnitude frequency response in the passband.
             sp_sq (float): The upper bound on the squared magnitude frequency response in the stopband.
-            idx1 (int): The current index for the passband.
-            idx2 (int): The current index for the stopband.
-            idx3 (int): The current index for the stopband.
+            idx1 (RoundRobin): Round-robin cursor for the passband.
+            idx2 (RoundRobin): Round-robin cursor for the transition band.
+            idx3 (RoundRobin): Round-robin cursor for the stopband.
             fmax (float): The maximum value of the squared magnitude frequency response.
             kmax (int): The index of the maximum value of the squared magnitude frequency response.
         """
@@ -130,17 +158,26 @@ class LowpassOracle(OracleOptim):
         self.fmax = float("-inf")  # Maximum response value found
         self.kmax = 0  # Index where maximum response occurs
 
+        self._bands = (
+            _Band(0, self.nwpass, self.lp_sq, self.up_sq, self.idx1),
+            _Band(
+                self.nwstop,
+                self.spectrum.shape[0],
+                0.0,
+                lambda: self.sp_sq,
+                self.idx3,
+                track_max=True,
+            ),
+            _Band(self.nwpass, self.nwstop, 0.0, None, self.idx2),
+        )
+
     def assess_feas(self, x: Arr) -> Optional[ParallelCut]:
         """
         Assess whether the given filter coefficients meet the design specifications.
 
-        This method checks the frequency response at various points in three bands:
-        1. Passband (0 to nwpass): Checks if response is within [lp_sq, up_sq]
-        2. Stopband (nwstop to end): Checks if response is below sp_sq and non-negative
-        3. Transition band (nwpass to nwstop): Checks if response is non-negative
-
-        Uses a round-robin approach to check different frequency points on each call
-        to distribute the computational load across multiple iterations.
+        Scans the passband, stopband, and transition band (in that order) and
+        returns the first violating cut; each band resumes its round-robin
+        cursor so load is distributed across calls.
 
         Args:
             x (Arr): The filter coefficients (autocorrelation coefficients)
@@ -148,68 +185,62 @@ class LowpassOracle(OracleOptim):
         Returns:
             Optional[ParallelCut]:
                 - None if all specifications are met
-                - A tuple containing:
-                    * The gradient of the violating constraint
-                    * The violation amount (or tuple of lower/upper violations)
+                - A tuple containing the gradient of the violating constraint
+                  and the violation amount (a pair for two-sided bands, a scalar
+                  for the non-negativity band)
         """
-        # Get dimensions of the spectrum matrix
-        ndim = self.spectrum.shape[1]
+        for band in self._bands:
+            cut = self._band_cut(band, x)
+            if cut is not None:
+                return cut
 
-        # Check passband frequencies (0 to nwpass)
-        v1 = self.spectrum[: self.nwpass] @ x
-        over1 = v1 > self.up_sq
-        under1 = v1 < self.lp_sq
-        j1 = self._first_rotated(over1 | under1, self.idx1.peek_next())
-        if j1 >= 0:
-            self.idx1.seek(j1)
-            col_k = self.spectrum[j1, :]
-            v = v1[j1]
-            if over1[j1]:
-                f = (v - self.up_sq, v - self.lp_sq)
-                return col_k, f  # Return gradient and violation amounts
-            f = (-v + self.lp_sq, -v + self.up_sq)
-            return -col_k, f  # Return negative gradient and violation amounts
-
-        # Initialize tracking for stopband maximum response
-        self.fmax = float("-inf")
-        self.kmax = 0
-
-        # Check stopband frequencies (nwstop to end)
-        v3 = self.spectrum[self.nwstop :] @ x
-        if v3.size:
-            off3 = self.idx3.peek_next() - self.nwstop
-            over3 = v3 > self.sp_sq
-            neg3 = v3 < 0
-            j3 = self._first_rotated(over3 | neg3, off3)
-            if j3 >= 0:
-                idx = self.nwstop + j3
-                self.idx3.seek(idx)
-                col_k = self.spectrum[idx, :]
-                v = v3[j3]
-                if over3[j3]:
-                    return col_k, (v - self.sp_sq, v)
-                return -col_k, (-v, -v + self.sp_sq)
-            vmax = v3.max()
-            self.fmax = float(vmax)
-            self.kmax = self.nwstop + self._first_rotated(v3 == vmax, off3)
-
-        # Check transition band frequencies (nwpass to nwstop)
-        # Only need to ensure non-negativity here
-        v2 = self.spectrum[self.nwpass : self.nwstop] @ x
-        if v2.size:
-            j2 = self._first_rotated(v2 < 0, self.idx2.peek_next() - self.nwpass)
-            if j2 >= 0:
-                idx = self.nwpass + j2
-                self.idx2.seek(idx)
-                return -self.spectrum[idx, :], -v2[j2]
-
-        # Additional check: First coefficient should be non-negative
         if x[0] < 0:
-            grad = np.zeros(ndim)
+            grad = np.zeros(self.spectrum.shape[1])
             grad[0] = -1.0
             return grad, -x[0]
 
         return None
+
+    def _band_cut(self, band: _Band, x: Arr) -> Optional[ParallelCut]:
+        """Return the first violation cut in ``band``, or ``None``.
+
+        Two-sided bands return ``(g, (lo_viol, up_viol))``; a one-sided band
+        (``upper is None``) returns ``(g, violation)``. Stopband peak tracking
+        (``fmax``/``kmax``) is refreshed here when no violation is found.
+        """
+        upper = band.upper() if callable(band.upper) else band.upper
+        if band.track_max:
+            self.fmax = float("-inf")
+            self.kmax = 0
+
+        v = self.spectrum[band.start : band.stop] @ x
+        if v.size == 0:
+            return None
+
+        offset = band.cursor.peek_next() - band.start
+        if upper is None:
+            j = self._first_rotated(v < band.lower, offset)
+            if j < 0:
+                return None
+            idx = band.start + j
+            band.cursor.seek(idx)
+            return -self.spectrum[idx, :], band.lower - v[j]
+
+        over = v > upper
+        j = self._first_rotated(over | (v < band.lower), offset)
+        if j < 0:
+            if band.track_max:
+                vmax = v.max()
+                self.fmax = float(vmax)
+                self.kmax = band.start + self._first_rotated(v == vmax, offset)
+            return None
+        idx = band.start + j
+        band.cursor.seek(idx)
+        col = self.spectrum[idx, :]
+        val = v[j]
+        if over[j]:
+            return col, (val - upper, val - band.lower)
+        return -col, (band.lower - val, upper - val)
 
     @staticmethod
     def _first_rotated(mask: np.ndarray, offset: int) -> int:

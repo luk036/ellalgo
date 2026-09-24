@@ -4,9 +4,15 @@ Type definitions, abstract base classes, and type aliases for the ellipsoid meth
 This module provides:
     - ArrayType: A generic TypeVar bound to numpy.ndarray for type-safe array operations
     - Cut-related type aliases (SingleCut, ParallelCut, CutChoice, Cut, Num)
+    - Constraint: Abstract scalar constraint scanned by multi-constraint oracles
     - Abstract oracle interfaces defining the contract between cutting-plane
       algorithms and problem-specific feasibility/optimization logic
     - SearchSpace: Abstract interface for ellipsoidal search spaces
+
+``Cut`` is deliberately a plain ``(gradient, beta)`` tuple rather than a value
+object: it mirrors the POD cut representation used by the sibling C++
+(``ellalgo-cpp``) and Rust (``ellalgo-rs``) ports, keeping the three
+implementations structurally aligned across the hot cutting-plane loop.
 """
 
 from __future__ import annotations
@@ -102,6 +108,26 @@ class OracleOptimQ(Generic[ArrayType]):
                 - gamma_new: Improved objective or None
                 - more_alt: Whether alternative cuts remain available
         """
+        ...
+
+
+class Constraint(Generic[ArrayType]):
+    """A scalar constraint scanned by multi-constraint oracles.
+
+    A constraint reports a positive value when violated and supplies the
+    (sub)gradient of the violating constraint. Oracles such as
+    :class:`~ellalgo.oracles.profit_oracle.ProfitOracle` scan a list of these
+    in round-robin order and return the first violation as a cut.
+    """
+
+    @abstractmethod
+    def violation(self, x: ArrayType, gamma: float) -> Optional[float]:
+        """Return the violation amount (> 0 when violated, else <= 0)."""
+        ...
+
+    @abstractmethod
+    def gradient(self, gamma: float) -> ArrayType:
+        """Return the (sub)gradient of this constraint at the current point."""
         ...
 
 

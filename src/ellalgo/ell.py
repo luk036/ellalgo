@@ -15,12 +15,11 @@ Key operations:
     - update_q: Apply a cut for discrete/quantized optimization
 """
 
-from typing import Callable, Tuple, Union
+from typing import Optional, Tuple, Union
 
 import numpy as np
 
 from .ell_base import EllBase
-from .ell_config import CutStatus
 
 # Type aliases for better code readability
 Mat = np.ndarray
@@ -49,80 +48,49 @@ class Ell(EllBase[np.ndarray]):
 
     # private:
 
-    def _update_core(self, cut: Cut, cut_strategy: Callable) -> CutStatus:
-        r"""Update the ellipsoid by applying a cutting plane.
-
-        Given a gradient :math:`\mathbf{g}` and offset :math:`\beta`,
-        the ellipsoid :math:`\{ \mathbf{x} : (\mathbf{x} -
-        \mathbf{x}_c)^T \mathbf{M}^{-1} (\mathbf{x} - \mathbf{x}_c)
-        \le \kappa^2 \}` is updated as follows:
+    def _omega(self, g: np.ndarray) -> Optional[Tuple[float, Optional[np.ndarray]]]:
+        r"""Compute :math:`\omega` and the cached matrix-vector product.
 
         .. math::
 
            \tilde{\mathbf{g}} &= \mathbf{M}\,\mathbf{g} \\[4pt]
-           \omega &= \mathbf{g}^T \tilde{\mathbf{g}} \\[4pt]
-           \tau^2 &= \kappa\,\omega \\[4pt]
+           \omega &= \mathbf{g}^T \tilde{\mathbf{g}}
+
+        Returns ``None`` when :math:`\omega` is zero or denormal (so the cut
+        has no effect); otherwise returns ``(omega, \tilde{g})``.
+        """
+        if not g.any():
+            raise ValueError("Gradient cannot be a zero vector.")
+        g_t = self._mq @ g  # n^2 multiplications
+        omega = g.dot(g_t)  # n multiplications
+        if omega == 0.0:
+            return None
+        # Guard against denormal omega that would overflow when
+        # computing sigma/omega in the rank-1 update below
+        if not (omega > _TINY):
+            return None
+        return omega, g_t
+
+    def _apply_update(
+        self,
+        g: np.ndarray,
+        omega: float,
+        g_t: Optional[np.ndarray],
+        rho: float,
+        sigma: float,
+        delta: float,
+    ) -> bool:
+        r"""Apply the rank-1 center and shape-matrix update.
+
+        .. math::
+
            \mathbf{x}_c &\leftarrow \mathbf{x}_c -
                         \frac{\rho}{\omega}\,\tilde{\mathbf{g}} \\[4pt]
            \mathbf{M} &\leftarrow \mathbf{M} -
                        \frac{\sigma}{\omega}\,
-                       \tilde{\mathbf{g}} \tilde{\mathbf{g}}^T \\[4pt]
-           \kappa &\leftarrow \kappa \cdot \delta
-
-        where :math:`\rho, \sigma, \delta` are returned by the cut
-        strategy (see :class:`~ellalgo.ell_calc_core.EllCalcCore`).
-
-        Args:
-            cut: Tuple :math:`(\mathbf{g}, \beta)` for the cut
-            cut_strategy: Strategy function to compute :math:`\rho,\sigma,\delta`
-
-        Returns:
-            CutStatus indicating success or failure of the update
-
-        Examples:
-            >>> import numpy as np
-            >>> from ellalgo.ell import Ell
-            >>> from ellalgo.ell_config import CutStatus
-            >>> ell = Ell(1.0, np.array([0.0, 0.0]))
-            >>> cut = (np.array([1.0, 1.0]), 0.0)
-            >>> status = ell._update_core(cut, ell.helper.calc_single_or_parallel)
-            >>> status == CutStatus.Success
-            True
+                       \tilde{\mathbf{g}} \tilde{\mathbf{g}}^T
         """
-        grad, beta = cut
-        if not grad.any():
-            raise ValueError("Gradient cannot be a zero vector.")
-        # Calculate M * grad (matrix-vector multiplication)
-        grad_t = self._mq @ grad  # n^2 multiplications
-        # Calculate grad^T * (M * grad)
-        omega = grad.dot(grad_t)  # n multiplications
-        if omega == 0.0:
-            return CutStatus.NoEffect
-        # Guard against denormal omega that would overflow when
-        # computing sigma/omega in the rank-1 update below
-        if not (omega > _TINY):
-            return CutStatus.NoEffect
-        # Update tsq measure
-        self._tsq = self._kappa * omega
-
-        # Get update parameters from the strategy
-        status, result = cut_strategy(beta, self._tsq)
-
-        if result is None:
-            return status
-
-        # Extract update parameters
-        rho, sigma, delta = result
-
-        # Update center point: xc -= (rho/omega) * grad_t
-        self._xc -= (rho / omega) * grad_t
-        # Update matrix: M -= (sigma/omega) * grad_t * grad_t^T
-        self._mq -= (sigma / omega) * (grad_t[:, None] * grad_t)
-        # Update scaling factor
-        self._kappa *= delta
-
-        # Optional: apply scaling immediately rather than deferring
-        if self.no_defer_trick:
-            self._mq *= self._kappa
-            self._kappa = 1.0
-        return status
+        assert g_t is not None
+        self._xc -= (rho / omega) * g_t
+        self._mq -= (sigma / omega) * (g_t[:, None] * g_t)
+        return True

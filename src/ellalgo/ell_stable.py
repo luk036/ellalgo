@@ -14,12 +14,11 @@ Key differences from `Ell`:
 See :class:`EllBase` for the shared public API.
 """
 
-from typing import Tuple, Union
+from typing import Optional, Tuple, Union
 
 import numpy as np
 
 from .ell_base import EllBase
-from .ell_config import CutStatus
 
 Matrix = np.ndarray
 CutChoice = Union[float, np.ndarray]  # single or parallel
@@ -61,66 +60,50 @@ class EllStable(EllBase[np.ndarray]):
 
     # private:
 
-    def _update_core(self, cut: Cut, cut_strategy) -> CutStatus:
-        r"""Update the ellipsoid using :math:`LDL^T` factorization.
+    def _omega(self, g: np.ndarray) -> Optional[Tuple[float, Optional[np.ndarray]]]:
+        r"""Compute :math:`\omega` by forward substitution.
 
-        The shape matrix is stored as :math:`\mathbf{M} = \kappa \mathbf{LDL}^T`.
-        Forward/backward substitution replaces explicit matrix–vector products.
-
-        Uses pre-allocated scratch buffers (Rust-style) to eliminate per-call
-        memory allocation. See :class:`EllStable` for buffer documentation.
-
-        :param cut: Tuple :math:`(\mathbf{g}, \beta)` for the cut
-        :param cut_strategy: Strategy function to compute :math:`\rho,\sigma,\delta`
-        :return: A :class:`CutStatus` object
-
-        Examples:
-            >>> import numpy as np
-            >>> from ellalgo.ell_stable import EllStable
-            >>> ell = EllStable(1.0, np.array([0.0, 0.0]))
-            >>> cut = (np.array([1.0, 1.0]), 1.0)
-            >>> status = ell._update_core(cut, ell.helper.calc_single_or_parallel)
-            >>> status == CutStatus.Success
-            True
+        Solves :math:`\mathbf{w} = \mathbf{L}^{-1}\mathbf{g}` and
+        :math:`\mathbf{z} = \mathbf{D}^{-1}\mathbf{w}`, then
+        :math:`\omega = \mathbf{w}^T\mathbf{z}`. The factors of
+        :math:`\mathbf{M} = \kappa\mathbf{LDL}^T` are updated in place using
+        the pre-allocated scratch buffers.
         """
-        g, beta = cut
-
-        # --- forward substitution: w = L^{-1} * g — reuse _inv_lower_g ---
         np.copyto(self._inv_lower_g, g)
         for j in range(self._ndim - 1):
             col = self._mq[j + 1 :, j] * self._inv_lower_g[j]
             self._mq[j, j + 1 :] = col
             self._inv_lower_g[j + 1 :] -= col
-
-        # --- z = D^{-1} * w — reuse _inv_diag_inv_lower_g ---
         np.copyto(self._inv_diag_inv_lower_g, self._inv_lower_g)
         self._inv_diag_inv_lower_g *= np.diagonal(self._mq)
-
-        # --- omega = sum(w_i * z_i) — no gg_t buffer needed ---
         omega = float(self._inv_lower_g @ self._inv_diag_inv_lower_g)
+        return omega, None
 
-        self._tsq = self._kappa * omega
+    def _apply_update(
+        self,
+        g: np.ndarray,
+        omega: float,
+        g_t: Optional[np.ndarray],
+        rho: float,
+        sigma: float,
+        delta: float,
+    ) -> bool:
+        r"""Apply back-substitution, center move, and the rank-one LDL^T update.
 
-        status, result = cut_strategy(beta, self._tsq)
-        if result is None:
-            return status
-
-        rho, sigma, delta = result
-
-        # --- back substitution: q = L^{-T} * z — reuse _g_t ---
+        Solves :math:`\mathbf{q} = \mathbf{L}^{-T}\mathbf{z}`, moves the center
+        by :math:`-(\rho/\omega)\mathbf{q}`, then applies the rank-one
+        :math:`LDL^T` update in place. Returns ``False`` (skipping the scale
+        update) when :math:`\mu = \sigma/(1-\sigma)` is zero.
+        """
         np.copyto(self._g_t, self._inv_diag_inv_lower_g)
         for i in range(self._ndim - 1, 0, -1):
             self._g_t[i - 1] -= self._mq[i:, i - 1] @ self._g_t[i:]
-
-        # --- center update ---
         self._xc -= (rho / omega) * self._g_t
-
-        # --- rank-one LDL^T update — reuse _g_t as working vector v ---
         mu = sigma / (1.0 - sigma)
         if mu == 0.0:
-            return status
+            return False
         oldt = omega / mu
-        np.copyto(self._g_t, g)  # v = gradient (g_t buffer no longer needed as q)
+        np.copyto(self._g_t, g)
         for j in range(self._ndim):
             temp = self._inv_diag_inv_lower_g[j]
             newt = oldt + self._g_t[j] * temp
@@ -129,10 +112,4 @@ class EllStable(EllBase[np.ndarray]):
             self._g_t[j + 1 :] -= self._mq[j, j + 1 :]
             self._mq[j + 1 :, j] += beta2 * self._g_t[j + 1 :]
             oldt = newt
-
-        self._kappa *= delta
-
-        if self.no_defer_trick:
-            self._mq *= self._kappa
-            self._kappa = 1.0
-        return status
+        return True

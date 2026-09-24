@@ -15,7 +15,7 @@ the `SearchSpace` protocol (xc, tsq, update_*), and the update strategy is
 selected by choosing the concrete subclass.
 """
 
-from typing import Tuple, Union
+from typing import Callable, Optional, Tuple, Union
 
 import numpy as np
 
@@ -222,21 +222,60 @@ class EllBase(SearchSpace[ArrayType]):
 
     # private:
 
-    def _update_core(self, cut: Cut, cut_strategy) -> CutStatus:
-        """Apply the cutting plane using the strategy-specific matrix update.
+    def _update_core(self, cut: Cut, cut_strategy: Callable) -> CutStatus:
+        r"""Apply a cutting plane through the shared Template Method skeleton.
 
-        Template Method: the three public update_* entry points delegate here;
-        each concrete subclass implements the actual ellipsoid update.
+        The prologue (:math:`\omega`, :math:`\tau^2 = \kappa\omega`, cut
+        strategy dispatch, unpacking of :math:`\rho,\sigma,\delta`) and the
+        epilogue (scale update :math:`\kappa \leftarrow \kappa\delta` and the
+        optional ``no_defer_trick`` rescaling) are identical for every
+        concrete strategy; only the center/shape-matrix update differs, which
+        subclasses supply via :meth:`_omega` and :meth:`_apply_update`.
 
         Args:
-            cut: Tuple (gradient, beta) for the cut
-            cut_strategy: Strategy function to compute (rho, sigma, delta)
+            cut: Tuple :math:`(\mathbf{g}, \beta)` for the cut
+            cut_strategy: Strategy function to compute :math:`\rho,\sigma,\delta`
 
         Returns:
             CutStatus indicating success or failure of the update
+        """
+        g, beta = cut
+        omega_t = self._omega(g)
+        if omega_t is None:
+            return CutStatus.NoEffect
+        omega, g_t = omega_t
+        self._tsq = self._kappa * omega
+        status, result = cut_strategy(beta, self._tsq)
+        if result is None:
+            return status
+        rho, sigma, delta = result
+        if not self._apply_update(g, omega, g_t, rho, sigma, delta):
+            return status
+        self._kappa *= delta
+        if self.no_defer_trick:
+            self._mq *= self._kappa
+            self._kappa = 1.0
+        return status
 
-        Raises:
-            NotImplementedError: If the concrete subclass does not override
-                this method.
+    def _omega(self, g: ArrayType) -> Optional[Tuple[float, Optional[ArrayType]]]:
+        r"""Compute :math:`\omega = \mathbf{g}^T (\mathbf{M}\,\mathbf{g})`.
+
+        Returns ``(omega, g_t)`` where ``g_t`` is any intermediate reused by
+        :meth:`_apply_update`, or ``None`` when the cut has no effect.
+        """
+        raise NotImplementedError
+
+    def _apply_update(
+        self,
+        g: ArrayType,
+        omega: float,
+        g_t: Optional[ArrayType],
+        rho: float,
+        sigma: float,
+        delta: float,
+    ) -> bool:
+        """Apply the strategy-specific center and shape-matrix update.
+
+        Returns ``False`` to stop before the scale-factor (``delta``) update.
         """
         raise NotImplementedError

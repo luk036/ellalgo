@@ -64,6 +64,22 @@ class EllCalc:
         self._n_f = float(n)
         self.helper = EllCalcCore(n)
 
+    def _cut_betas(self, beta: CutChoice) -> Tuple[float, Optional[float]]:
+        """Single strategy-selection point for single vs. parallel cuts.
+
+        Normalizes a cut choice into ``(beta0, beta1)``; ``beta1 is None``
+        means a single cut. This is the only place the ``isinstance``/length
+        test and the ``use_parallel_cut`` policy are applied, so the three
+        public ``calc_*`` entry points no longer each re-implement it.
+        """
+        if isinstance(beta, (int, float)):
+            return beta, None
+        if len(beta) < 2 or not self.use_parallel_cut:
+            return beta[0], None
+        b1 = beta[1]
+        assert b1 is not None
+        return beta[0], b1
+
     def calc_single_or_parallel(
         self, beta: CutChoice, tsq: float
     ) -> Tuple[CutStatus, Optional[Tuple[float, float, float]]]:
@@ -88,13 +104,10 @@ class EllCalc:
             A tuple containing the `CutStatus` and an optional tuple of the
             update parameters (rho, sigma, delta) if the cut is successful.
         """
-        if isinstance(beta, (int, float)):
-            return self.calc_bias_cut(beta, tsq)
-        elif len(beta) < 2 or not self.use_parallel_cut:  # unlikely
-            return self.calc_bias_cut(beta[0], tsq)
-        b1 = beta[1]
-        assert b1 is not None
-        return self.calc_parallel(beta[0], b1, tsq)
+        b0, b1 = self._cut_betas(beta)
+        if b1 is None:
+            return self.calc_bias_cut(b0, tsq)
+        return self.calc_parallel(b0, b1, tsq)
 
     def calc_single_or_parallel_central_cut(
         self, beta: CutChoice, tsq: float
@@ -122,10 +135,9 @@ class EllCalc:
             >>> result[0] == approx(0.02)
             True
         """
-        if isinstance(beta, (int, float)) or len(beta) < 2 or not self.use_parallel_cut:
+        _, b1 = self._cut_betas(beta)
+        if b1 is None:
             return (CutStatus.Success, self.helper.calc_central_cut(sqrt(tsq)))
-        b1 = beta[1]
-        assert b1 is not None
         if b1 < 0.0:
             return (CutStatus.NoSoln, None)
         b1sq = b1 * b1
@@ -222,13 +234,10 @@ class EllCalc:
         Returns:
             Status and optional result tuple.
         """
-        if isinstance(beta, (int, float)):
-            return self.calc_bias_cut_q(beta, tsq)
-        elif len(beta) < 2 or not self.use_parallel_cut:  # unlikely
-            return self.calc_bias_cut_q(beta[0], tsq)
-        b1 = beta[1]
-        assert b1 is not None
-        return self.calc_parallel_q(beta[0], b1, tsq)
+        b0, b1 = self._cut_betas(beta)
+        if b1 is None:
+            return self.calc_bias_cut_q(b0, tsq)
+        return self.calc_parallel_q(b0, b1, tsq)
 
     def calc_parallel_q(
         self, beta0: float, beta1: float, tsq: float

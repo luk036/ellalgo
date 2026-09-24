@@ -17,15 +17,32 @@ cutting-plane algorithm uses to iteratively narrow the search space.
 
 import copy
 import math
-from typing import Optional, Tuple
+from typing import Callable, Optional, Tuple
 
 import numpy as np
 
 from ellalgo.cutting_plane import OracleOptim, OracleOptimQ
+from ellalgo.ell_typing import Constraint
 from ellalgo.round_robin import RoundRobin
 
 Arr = np.ndarray
 Cut = Tuple[Arr, float]
+
+
+class _BoundConstraint(Constraint[Arr]):
+    """Adapter binding a violation/gradient method pair into a Constraint."""
+
+    __slots__ = ("_violation", "_gradient")
+
+    def __init__(self, violation: Callable, gradient: Callable) -> None:
+        self._violation = violation
+        self._gradient = gradient
+
+    def violation(self, x: Arr, gamma: float) -> float:
+        return self._violation(x, gamma)
+
+    def gradient(self, gamma: float) -> Arr:
+        return self._gradient(gamma)
 
 
 class ProfitOracle(OracleOptim):
@@ -82,6 +99,10 @@ class ProfitOracle(OracleOptim):
         self._rr = RoundRobin(2, start=-1)  # round-robin over the two constraints
         self.fns = (self.fn1, self.fn2)  # Constraint functions
         self.grads = (self.grad1, self.grad2)  # Gradient functions
+        self.constraints = (
+            _BoundConstraint(self.fn1, self.grad1),
+            _BoundConstraint(self.fn2, self.grad2),
+        )
 
     def fn1(self, x: Arr, _: float) -> float:
         """Constraint function for y₁ ≤ k (in log-space).
@@ -150,10 +171,11 @@ class ProfitOracle(OracleOptim):
             Cut (gradient, violation) if constraint violated
             None if all constraints satisfied
         """
-        for _ in [0, 1]:
+        for _ in range(len(self.constraints)):
             self.idx = self._rr.next()
-            if (fj := self.fns[self.idx](xc, gamma)) > 0:
-                return self.grads[self.idx](gamma), fj
+            constraint = self.constraints[self.idx]
+            if (fj := constraint.violation(xc, gamma)) > 0:
+                return constraint.gradient(gamma), fj
         return None
 
     def assess_optim(self, xc: Arr, gamma: float) -> Tuple[Cut, Optional[float]]:
