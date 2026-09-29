@@ -2,6 +2,7 @@ import pytest
 from pytest import approx
 
 from ellalgo.ell_calc_core import EllCalcCore
+from ellalgo.ell_calc_legacy import EllCalcCoreLegacy
 
 
 def test_construct() -> None:
@@ -37,7 +38,7 @@ def test_calc_parallel_central_cut() -> None:
     assert rho == approx(0.4)
     assert sigma == approx(0.8)
     assert delta == approx(1.2)
-    rho, sigma, delta = ell_calc_core.calc_parallel_central_cut_old(1.0, 4.0)
+    rho, sigma, delta = EllCalcCoreLegacy(4).calc_parallel_central_cut_old(1.0, 4.0)
     assert rho == approx(0.4)
     assert sigma == approx(0.8)
     assert delta == approx(1.2)
@@ -50,7 +51,7 @@ def test_calc_parallel() -> None:
     assert sigma == approx(0.8)
     assert delta == approx(1.2)
 
-    rho, sigma, delta = ell_calc_core.calc_parallel_bias_cut_old(0.0, 0.05, 0.01)
+    rho, sigma, delta = EllCalcCoreLegacy(4).calc_parallel_bias_cut_old(0.0, 0.05, 0.01)
     assert rho == approx(0.02)
     assert sigma == approx(0.8)
     assert delta == approx(1.2)
@@ -111,8 +112,8 @@ def test_calc_parallel_bias_cut_fast_k_le_eta() -> None:
 
 
 def test_calc_parallel_bias_cut_fast_old() -> None:
-    """Test calc_parallel_bias_cut_fast_old (lines 426-441)."""
-    ell_calc_core = EllCalcCore(4)
+    """Test calc_parallel_bias_cut_fast_old (legacy module)."""
+    ell_calc_core = EllCalcCoreLegacy(4)
     rho, sigma, delta = ell_calc_core.calc_parallel_bias_cut_fast_old(
         0.11, 0.01, 0.01, 0.0011, 0.0144
     )
@@ -130,8 +131,8 @@ def test_calc_parallel_bias_cut_fast_old() -> None:
 
 
 def test_calc_parallel_bias_cut_fast2_valid() -> None:
-    """Test calc_parallel_bias_cut_fast2 with non-symmetric inputs (lines 535-537)."""
-    ell_calc_core = EllCalcCore(4)
+    """Test calc_parallel_bias_cut_fast2 with non-symmetric inputs."""
+    ell_calc_core = EllCalcCoreLegacy(4)
     rho, sigma, delta = ell_calc_core.calc_parallel_bias_cut_fast2(
         0.0, 0.09, 0.01, 0.0, 0.01
     )
@@ -149,6 +150,6 @@ def test_calc_parallel_bias_cut_fast2_zerodiv() -> None:
     when computing sigma. Use `calc_parallel_bias_cut_fast`
     instead for such symmetric cases.
     """
-    ell_calc_core = EllCalcCore(4)
+    ell_calc_core = EllCalcCoreLegacy(4)
     with pytest.raises(ZeroDivisionError):
         ell_calc_core.calc_parallel_bias_cut_fast2(-0.25, 0.25, 1.0, -0.0625, 0.75)
