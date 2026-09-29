@@ -14,7 +14,7 @@ Cut types supported:
 """
 
 from math import sqrt
-from typing import Optional, Tuple
+from typing import Callable, Optional, Tuple
 
 from .ell_calc_core import EllCalcCore
 from .ell_config import CutStatus
@@ -41,11 +41,11 @@ class EllCalc:
     cut type and returning the results.
     """
 
-    use_parallel_cut: bool = True  # Flag to enable/disable parallel cut optimization
     _n_f: float  # Dimension of the space as a float
     helper: EllCalcCore  # Helper class for core calculations
+    use_parallel_cut: bool  # Flag to enable/disable parallel cut optimization
 
-    def __init__(self, n: int) -> None:
+    def __init__(self, n: int, use_parallel_cut: bool = True) -> None:
         """
         Initialize the EllCalc instance with the given dimension.
 
@@ -63,6 +63,7 @@ class EllCalc:
         assert n >= 2  # do not accept one-dimensional
         self._n_f = float(n)
         self.helper = EllCalcCore(n)
+        self.use_parallel_cut = use_parallel_cut
 
     def _cut_betas(self, beta: CutChoice) -> Tuple[float, Optional[float]]:
         """Single strategy-selection point for single vs. parallel cuts.
@@ -79,6 +80,24 @@ class EllCalc:
         b1 = beta[1]
         assert b1 is not None
         return beta[0], b1
+
+    def _dispatch_single_or_parallel(
+        self,
+        beta: CutChoice,
+        tsq: float,
+        single: Callable[
+            [float, float], Tuple[CutStatus, Optional[Tuple[float, float, float]]]
+        ],
+        parallel: Callable[
+            [float, float, float],
+            Tuple[CutStatus, Optional[Tuple[float, float, float]]],
+        ],
+    ) -> Tuple[CutStatus, Optional[Tuple[float, float, float]]]:
+        """Shared single-vs-parallel dispatch for the normal and ``_q`` variants."""
+        b0, b1 = self._cut_betas(beta)
+        if b1 is None:
+            return single(b0, tsq)
+        return parallel(b0, b1, tsq)
 
     def calc_single_or_parallel(
         self, beta: CutChoice, tsq: float
@@ -104,10 +123,9 @@ class EllCalc:
             A tuple containing the `CutStatus` and an optional tuple of the
             update parameters (rho, sigma, delta) if the cut is successful.
         """
-        b0, b1 = self._cut_betas(beta)
-        if b1 is None:
-            return self.calc_bias_cut(b0, tsq)
-        return self.calc_parallel(b0, b1, tsq)
+        return self._dispatch_single_or_parallel(
+            beta, tsq, self.calc_bias_cut, self.calc_parallel
+        )
 
     def calc_single_or_parallel_central_cut(
         self, beta: CutChoice, tsq: float
@@ -234,10 +252,9 @@ class EllCalc:
         Returns:
             Status and optional result tuple.
         """
-        b0, b1 = self._cut_betas(beta)
-        if b1 is None:
-            return self.calc_bias_cut_q(b0, tsq)
-        return self.calc_parallel_q(b0, b1, tsq)
+        return self._dispatch_single_or_parallel(
+            beta, tsq, self.calc_bias_cut_q, self.calc_parallel_q
+        )
 
     def calc_parallel_q(
         self, beta0: float, beta1: float, tsq: float
