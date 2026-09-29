@@ -10,7 +10,7 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 
-from ellalgo.cutting_plane import OracleFeas
+from ellalgo.ell_typing import OracleFeas
 from ellalgo.oracles.ldlt_mgr import LDLTMgr
 from ellalgo.oracles.lmi_oracle_base import LMIBase
 
