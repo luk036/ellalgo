@@ -17,6 +17,7 @@ implementations structurally aligned across the hot cutting-plane loop.
 
 from __future__ import annotations
 
+import copy
 from abc import ABC, abstractmethod
 from typing import Any, Generic, List, Optional, Tuple, TypeVar, Union
 
@@ -43,12 +44,6 @@ class OracleFeas(Generic[ArrayType]):
     Override update() if the oracle needs to respond to gamma changes
     (used by BSearchAdaptor).
     """
-
-    @abstractmethod
-    def __init__(
-        self, mat_f: List[np.ndarray], mat_b: Optional[np.ndarray] = None
-    ) -> None:
-        ...
 
     @abstractmethod
     def assess_feas(self, x_center: ArrayType) -> Optional[Cut]:
@@ -186,3 +181,12 @@ class SearchSpace(Generic[ArrayType]):
     def set_xc(self, x_center: ArrayType) -> None:
         """Default no-op. Override to allow external center updates."""
         return
+
+    def clone(self) -> SearchSpace[ArrayType]:
+        """Return an independent copy of this search space (Prototype).
+
+        Drivers that need a scratch search space (e.g. ``BSearchAdaptor``)
+        call this instead of hard-coding ``copy.deepcopy``. Subclasses may
+        override with a cheaper copy.
+        """
+        return copy.deepcopy(self)

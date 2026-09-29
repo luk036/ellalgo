@@ -51,8 +51,9 @@ except PackageNotFoundError:  # pragma: no cover
 finally:
     del version, PackageNotFoundError
 
-from .conjugate_gradient import conjugate_gradient
+from .conjugate_gradient import ConvergenceError, conjugate_gradient
 from .cutting_plane import (
+    SolverResult,
     bsearch,
     cutting_plane_feas,
     cutting_plane_optim,
@@ -61,7 +62,7 @@ from .cutting_plane import (
 
 # Public API exports
 from .ell import Ell
-from .ell_config import CutStatus, Options
+from .ell_config import CutStatus, Options, SolverStatus
 from .ell_stable import EllStable
 from .ell_typing import (
     ArrayType,
@@ -90,8 +91,11 @@ __all__ = [
     "cutting_plane_optim_q",
     "bsearch",
     "conjugate_gradient",
+    "ConvergenceError",
     "CutStatus",
     "Options",
+    "SolverResult",
+    "SolverStatus",
     "ArrayType",
     "Cut",
     "CutChoice",

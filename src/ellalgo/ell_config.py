@@ -8,6 +8,7 @@ throughout the ellipsoid method implementation.
 - Options: Algorithm control parameters (iterations, tolerance, verbosity)
 """
 
+from dataclasses import dataclass
 from enum import Enum
 
 
@@ -30,6 +31,21 @@ class CutStatus(Enum):
     Unknown = 3
 
 
+class SolverStatus(Enum):
+    """Termination status of a cutting-plane / binary-search solve.
+
+    Attributes:
+        Success: A solution (or converged bracket) was produced.
+        Infeasible: The search space was exhausted; no solution exists.
+        MaxIters: The iteration cap was reached before terminating.
+    """
+
+    Success = 0
+    Infeasible = 1
+    MaxIters = 2
+
+
+@dataclass
 class Options:
     """Control parameters for cutting-plane algorithms.
 

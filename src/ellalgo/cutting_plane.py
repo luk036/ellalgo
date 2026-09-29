@@ -16,29 +16,41 @@ or iteration limit.
 """
 
 import copy
-from typing import Any, MutableSequence, Optional, Tuple, Union
+from typing import Any, Optional, Tuple
 
-from .ell_config import CutStatus, Options
+from .ell_config import CutStatus, Options, SolverStatus
 from .ell_typing import (
     ArrayType,
+    Num,
     OracleBS,
     OracleFeas,
     OracleOptim,
     OracleOptimQ,
     SearchSpace,
-    SingleCut,
 )
 
-CutChoice = Union[SingleCut, MutableSequence]  # Single cut or parallel cuts
-Cut = Tuple[ArrayType, CutChoice]  # Cut representation: (gradient, intercept)
 
-Num = Union[float, int]
+class SolverResult(tuple):
+    """Result of a cutting-plane / binary-search solve.
+
+    Unpacks exactly like the historical plain tuples (``x, niter = ...``) while
+    additionally exposing :attr:`status`, so callers can tell an exhausted
+    search space (``Infeasible``) apart from an iteration-cap stop
+    (``MaxIters``) — both previously surfaced only as ``None``.
+    """
+
+    status: SolverStatus
+
+    def __new__(cls, values: Tuple[Any, ...], status: SolverStatus) -> "SolverResult":
+        result = super().__new__(cls, values)
+        result.status = status
+        return result
 
 
 def cutting_plane_feas(
     omega: OracleFeas[ArrayType],
     space: SearchSpace[ArrayType],
-    options: Options = Options(),
+    options: Optional[Options] = None,
 ) -> Tuple[Optional[ArrayType], int]:
     r"""Cutting-plane algorithm for convex feasibility problems.
 
@@ -114,23 +126,25 @@ def cutting_plane_feas(
         >>> x is not None
         True
     """
+    if options is None:
+        options = Options()
     for niter in range(options.max_iters):
         # Evaluate current solution
         cut = omega.assess_feas(space.xc())
         if cut is None:  # Found feasible point
-            return space.xc(), niter
+            return SolverResult((space.xc(), niter), SolverStatus.Success)
         # Update search space with new constraint
         status = space.update_bias_cut(cut)
         if status != CutStatus.Success or space.tsq() < options.tolerance:
-            return None, niter
-    return None, options.max_iters
+            return SolverResult((None, niter), SolverStatus.Infeasible)
+    return SolverResult((None, options.max_iters), SolverStatus.MaxIters)
 
 
 def cutting_plane_optim(
     omega: OracleOptim[ArrayType],
     space: SearchSpace[ArrayType],
     gamma: float,
-    options: Options = Options(),
+    options: Optional[Options] = None,
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for convex optimization problems.
 
@@ -183,6 +197,8 @@ def cutting_plane_optim(
         >>> x is not None
         True
     """
+    if options is None:
+        options = Options()
     x_best = None
     for niter in range(options.max_iters):
         # Get optimality/feasibility cut and possible better g
@@ -194,8 +210,11 @@ def cutting_plane_optim(
         else:
             status = space.update_bias_cut(cut)  # Maintain feasibility
         if status != CutStatus.Success or space.tsq() < options.tolerance:
-            return x_best, gamma, niter
-    return x_best, gamma, options.max_iters
+            outcome = (
+                SolverStatus.Success if x_best is not None else SolverStatus.Infeasible
+            )
+            return SolverResult((x_best, gamma, niter), outcome)
+    return SolverResult((x_best, gamma, options.max_iters), SolverStatus.MaxIters)
 
 
 class OptimQState:
@@ -258,7 +277,7 @@ def cutting_plane_optim_q(
     omega: OracleOptimQ[ArrayType],
     space_q: SearchSpace[ArrayType],
     gamma: float,
-    options: Options = Options(),
+    options: Optional[Options] = None,
 ) -> Tuple[Optional[ArrayType], float, int]:
     """Cutting-plane method for discrete convex optimization.
 
@@ -282,6 +301,8 @@ def cutting_plane_optim_q(
     Returns:
         (Best discrete solution, achieved g, iterations)
     """
+    if options is None:
+        options = Options()
     state = OptimQState()
     for niter in range(options.max_iters):
         # Get cut and possible discrete solution
@@ -292,14 +313,24 @@ def cutting_plane_optim_q(
             gamma = gamma1
             state.on_shrunk(x_q)
         if not state.on_update(space_q.update_q(cut), more_alt):
-            return state.x_best, gamma, niter
+            outcome = (
+                SolverStatus.Success
+                if state.x_best is not None
+                else SolverStatus.Infeasible
+            )
+            return SolverResult((state.x_best, gamma, niter), outcome)
         if space_q.tsq() < options.tolerance:
-            return state.x_best, gamma, niter
-    return state.x_best, gamma, options.max_iters
+            outcome = (
+                SolverStatus.Success
+                if state.x_best is not None
+                else SolverStatus.Infeasible
+            )
+            return SolverResult((state.x_best, gamma, niter), outcome)
+    return SolverResult((state.x_best, gamma, options.max_iters), SolverStatus.MaxIters)
 
 
 def bsearch(
-    omega: OracleBS, intrvl: Tuple[Any, Any], options: Options = Options()
+    omega: OracleBS, intrvl: Tuple[Any, Any], options: Optional[Options] = None
 ) -> Tuple[Any, int]:
     """Binary search with feasibility oracle.
 
@@ -327,12 +358,14 @@ def bsearch(
         >>> upper > 0.5
         True
     """
+    if options is None:
+        options = Options()
     lower, upper = intrvl
     T = type(upper)  # Preserve numerical type (int/float)
     for niter in range(options.max_iters):
         tau = (upper - lower) / 2
         if tau < options.tolerance:  # Convergence check
-            return upper, niter
+            return SolverResult((upper, niter), SolverStatus.Success)
         gamma = T(lower + tau)
         # The midpoint stops moving once the bracket reaches floating-point
         # resolution. `tau < options.tolerance` is then unreachable for any
@@ -340,12 +373,12 @@ def bsearch(
         # underflows at ~1e-16 of its own magnitude), so without this guard the
         # loop would spin until max_iters without refining anything.
         if not lower < gamma < upper:
-            return upper, niter
+            return SolverResult((upper, niter), SolverStatus.Success)
         if omega.assess_bs(gamma):  # Feasible -> move upper bound down
             upper = gamma
         else:  # Infeasible -> move lower bound up
             lower = gamma
-    return upper, options.max_iters
+    return SolverResult((upper, options.max_iters), SolverStatus.MaxIters)
 
 
 class BSearchAdaptor(OracleBS):
@@ -359,7 +392,7 @@ class BSearchAdaptor(OracleBS):
     """
 
     def __init__(
-        self, omega: OracleFeas, space: SearchSpace, options: Options = Options()
+        self, omega: OracleFeas, space: SearchSpace, options: Optional[Options] = None
     ) -> None:
         """
         :param omega: g-parameterized feasibility oracle
@@ -368,7 +401,7 @@ class BSearchAdaptor(OracleBS):
         """
         self.omega = omega  # Gamma-sensitive feasibility oracle
         self.space = space  # Search space for subproblems
-        self.options = options  # Subproblem solver parameters
+        self.options = options if options is not None else Options()
 
     @property
     def x_best(self) -> Any:
@@ -384,7 +417,7 @@ class BSearchAdaptor(OracleBS):
         3. Solve feasibility subproblem
         4. Update main space if feasible solution found
         """
-        space = copy.deepcopy(self.space)  # Isolate subproblem space
+        space = self.space.clone()  # Isolate subproblem space
         self.omega.update(gamma)  # Set current g level
         x_feas, _ = cutting_plane_feas(self.omega, space, self.options)
         if x_feas is not None:  # Feasible solution found
