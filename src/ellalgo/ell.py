@@ -15,16 +15,11 @@ Key operations:
     - update_q: Apply a cut for discrete/quantized optimization
 """
 
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 import numpy as np
 
 from .ell_base import EllBase
-
-# Type aliases for better code readability
-Mat = np.ndarray
-CutChoice = Union[float, np.ndarray]  # single or parallel cut
-Cut = Tuple[np.ndarray, CutChoice]  # A cut consists of a gradient and a beta value
 
 _TINY = float(np.finfo(np.float64).tiny)
 

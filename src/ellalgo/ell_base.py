@@ -21,12 +21,7 @@ import numpy as np
 
 from .ell_calc import EllCalc
 from .ell_config import CutStatus
-from .ell_typing import ArrayType, SearchSpace, SingleCut
-
-# Type aliases for better code readability
-Mat = np.ndarray
-CutChoice = Union[SingleCut, ArrayType]  # single or parallel cut
-Cut = Tuple[ArrayType, CutChoice]  # A cut consists of a gradient and a beta value
+from .ell_typing import ArrayType, Cut, SearchSpace
 
 
 class EllBase(SearchSpace[ArrayType]):
@@ -41,17 +36,20 @@ class EllBase(SearchSpace[ArrayType]):
     cutting plane to the ellipsoid using a specific matrix update strategy.
     """
 
-    # Class variable to control whether to defer the matrix scaling trick
-    no_defer_trick: bool = False
-
     # Instance variables:
-    _mq: Mat  # Shape matrix
+    _mq: np.ndarray  # Shape matrix
     _xc: ArrayType  # Center point of the ellipsoid
     _kappa: float  # Scaling factor for the ellipsoid matrix
     _tsq: float  # Measure of distance between current center and optimal point
     helper: EllCalc  # Helper object for ellipsoid calculations
+    no_defer_trick: bool  # Defer the matrix scaling trick (see _update_core)
 
-    def __init__(self, val: Union[float, ArrayType], x_center: ArrayType) -> None:
+    def __init__(
+        self,
+        val: Union[float, ArrayType],
+        x_center: ArrayType,
+        no_defer_trick: bool = False,
+    ) -> None:
         """
         Initialize the ellipsoid with given parameters.
 
@@ -81,6 +79,7 @@ class EllBase(SearchSpace[ArrayType]):
         self.helper = EllCalc(ndim)
         self._xc = x_center
         self._tsq = 0.0
+        self.no_defer_trick = no_defer_trick
         if isinstance(val, (int, float)):
             # Case 1: val is a scalar (kappa), create identity matrix
             self._kappa = val

@@ -20,10 +20,6 @@ import numpy as np
 
 from .ell_base import EllBase
 
-Matrix = np.ndarray
-CutChoice = Union[float, np.ndarray]  # single or parallel
-Cut = Tuple[np.ndarray, CutChoice]
-
 
 class EllStable(EllBase[np.ndarray]):
     """Numerically stable ellipsoid search space using LDL^T factorization.
