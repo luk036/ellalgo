@@ -9,13 +9,14 @@ single call.
 
 from __future__ import annotations
 
-from typing import List, Optional, Tuple
+from typing import Callable, List, Optional, Tuple
 
 import numpy as np
 
 from ellalgo.cutting_plane import cutting_plane_feas
 from ellalgo.ell_config import Options
 from ellalgo.ell_stable import EllStable
+from ellalgo.ell_typing import SearchSpace
 from ellalgo.oracles.lmi_oracle import LMIOracle
 
 
@@ -34,23 +35,31 @@ class LMIProblem:
     Args:
         mat_f: List of symmetric coefficient matrices [F₁, F₂, ..., Fₙ].
         mat_b: Constant matrix B defining the LMI constraint.
+        space_factory: Callable building the ellipsoidal search space from
+            ``(val, x_center)``. Defaults to :class:`~ellalgo.ell_stable.EllStable`.
     """
 
-    def __init__(self, mat_f: List[np.ndarray], mat_b: np.ndarray) -> None:
+    def __init__(
+        self,
+        mat_f: List[np.ndarray],
+        mat_b: np.ndarray,
+        space_factory: Callable[..., SearchSpace] = EllStable,
+    ) -> None:
         self.mat_f = mat_f
         self.mat_b = mat_b
         self.omega = LMIOracle(mat_f, mat_b)
+        self._space_factory = space_factory
 
     def solve_feas(
         self,
         val: float | np.ndarray,
         x_center: np.ndarray,
-        options: Options = Options(),
+        options: Optional[Options] = None,
     ) -> Tuple[Optional[np.ndarray], int]:
         """Solve the LMI feasibility problem.
 
-        Builds an EllStable search space with the given initial ellipsoid
-        parameters and runs the cutting-plane feasibility method.
+        Builds a search space via the injected factory and runs the
+        cutting-plane feasibility method.
 
         Args:
             val: Either a scalar (kappa) or per-axis values for the initial
@@ -72,5 +81,5 @@ class LMIProblem:
             >>> x is not None
             True
         """
-        space = EllStable(val, x_center)
+        space = self._space_factory(val, x_center)
         return cutting_plane_feas(self.omega, space, options)

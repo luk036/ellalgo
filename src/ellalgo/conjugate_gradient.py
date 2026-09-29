@@ -12,6 +12,10 @@ from typing import Optional
 import numpy as np
 
 
+class ConvergenceError(ValueError):
+    """Raised when an iterative solver fails to converge within ``max_iter``."""
+
+
 def conjugate_gradient(
     A: np.ndarray,
     b: np.ndarray,
@@ -70,7 +74,9 @@ def conjugate_gradient(
 
         # Check for zero or near-zero denominator to avoid division by zero
         if direction_dot_A_direction == 0:
-            raise ValueError(f"Conj Grad did not converge after {max_iter} iterations")
+            raise ConvergenceError(
+                f"Conj Grad did not converge after {max_iter} iterations"
+            )
 
         step_size = (
             residual_norm_sq / direction_dot_A_direction
@@ -93,4 +99,4 @@ def conjugate_gradient(
             residual_norm_sq_new  # Update residual norm for next iteration
         )
 
-    raise ValueError(f"Conj Grad did not converge after {max_iter} iterations")
+    raise ConvergenceError(f"Conj Grad did not converge after {max_iter} iterations")
