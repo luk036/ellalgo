@@ -21,8 +21,7 @@ from typing import Callable, Optional, Tuple
 
 import numpy as np
 
-from ellalgo.cutting_plane import OracleOptim, OracleOptimQ
-from ellalgo.ell_typing import Constraint
+from ellalgo.ell_typing import Constraint, OracleOptim, OracleOptimQ
 from ellalgo.round_robin import RoundRobin
 
 Arr = np.ndarray
@@ -97,8 +96,6 @@ class ProfitOracle(OracleOptim):
         self.price_out = price_out
         self.elasticities = elasticities
         self._rr = RoundRobin(2, start=-1)  # round-robin over the two constraints
-        self.fns = (self.fn1, self.fn2)  # Constraint functions
-        self.grads = (self.grad1, self.grad2)  # Gradient functions
         self.constraints = (
             _BoundConstraint(self.fn1, self.grad1),
             _BoundConstraint(self.fn2, self.grad2),
@@ -156,7 +153,7 @@ class ProfitOracle(OracleOptim):
         """
         return self.q / (gamma + self.vy) - self.elasticities
 
-    def assess_feas(self, xc: Arr, gamma: float) -> Optional[Cut]:
+    def _feasibility_cut(self, xc: Arr, gamma: float) -> Optional[Cut]:
         """Feasibility assessment using round-robin constraint checking.
 
         Implements:
@@ -200,7 +197,7 @@ class ProfitOracle(OracleOptim):
             `(g, beta)` and the updated profit `gamma_new`. If the solution is
             infeasible, `gamma_new` is `None`.
         """
-        cut = self.assess_feas(xc, gamma)
+        cut = self._feasibility_cut(xc, gamma)
         if cut is not None:
             return cut, None
         # Calculate new profit estimate: pA x^α - vy
@@ -265,8 +262,13 @@ class ProfitRbOracle(OracleOptim):
         a_rb = copy.copy(self.elasticities)
         for i in [0, 1]:
             a_rb[i] += -self.uie[i] if xc[i] > 0.0 else self.uie[i]
-        self.omega.elasticities = a_rb
-        return self.omega.assess_optim(xc, gamma)
+        omega = self.omega
+        saved = omega.elasticities
+        omega.elasticities = a_rb
+        try:
+            return omega.assess_optim(xc, gamma)
+        finally:
+            omega.elasticities = saved
 
 
 class ProfitQOracle(OracleOptimQ):
@@ -309,7 +311,7 @@ class ProfitQOracle(OracleOptimQ):
         """
         if not retry:
             # First attempt with continuous solution
-            if cut := self.omega.assess_feas(xc, gamma):
+            if cut := self.omega._feasibility_cut(xc, gamma):
                 return cut, xc, None, True
 
             # Round to nearest integer (with 0 → 1 protection)

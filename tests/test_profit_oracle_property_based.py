@@ -108,9 +108,8 @@ class TestProfitOracleProperties:
         assert oracle.log_pA == approx(expected_log_pA)
         assert oracle.log_k == approx(expected_log_k)
 
-        # Constraint functions should be available
-        assert len(oracle.fns) == 2
-        assert len(oracle.grads) == 2
+        # Constraint objects should be available
+        assert len(oracle.constraints) == 2
 
     @given(
         valid_profit_params(),
@@ -230,7 +229,7 @@ class TestProfitOracleProperties:
         """Test properties of feasibility assessment."""
         oracle = ProfitOracle(params, elasticities, price_out)
 
-        cut = oracle.assess_feas(x, gamma)
+        cut = oracle._feasibility_cut(x, gamma)
 
         # If cut is returned, it should be valid
         if cut is not None:
@@ -297,7 +296,7 @@ class TestProfitOracleProperties:
 
         # Should be feasible for some gamma
         gamma = 1.0
-        oracle.assess_feas(feasible_x, gamma)
+        oracle._feasibility_cut(feasible_x, gamma)
 
         # May or may not be feasible depending on parameters
         # But the assessment should not crash
