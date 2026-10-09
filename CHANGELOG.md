@@ -1,5 +1,21 @@
 # Changelog
 
+## Version 0.9 (2026-10-09)
+
+### Features
+- **`SolverResult` status + `SearchSpace.clone`**: Added a `SolverResult` status object and `SearchSpace.clone`, together with an oracle-interface cleanup that injects the LMI search space. (#b398ecd)
+
+### Code Cleanup
+- **Design-pattern cleanup pass**: Hoisted the shared `_update_core` Template Method into `EllBase` with `_omega`/`_apply_update` hooks; centralized single/parallel cut dispatch in `EllCalc._cut_betas` (Strategy); `LMI0Oracle` now implements `OracleFeas` uniformly; `ProfitOracle` scans a `Constraint` strategy list; `LowpassOracle`'s three bands are unified via a `_Band` composite; `spectral_fact` replaced a broad `try/except` with explicit validation; the deliberate POD-tuple `Cut` representation is now documented. (#e4c3b9b)
+- **Quarantined legacy ellipsoid formulas**: Moved the legacy formulas into `ell_calc_legacy.py`. (#d21192e)
+- **Unified cut dispatch**: Made `EllCalc` centralize single/parallel cut dispatch. (#2f33675)
+- **Per-instance update flags**: Ellipsoid update flags are now per-instance instead of shared. (#777165e)
+- **Oracle tidy-up**: Aligned the CG convergence error, renamed the profit feasibility helper, stopped mutating the wrapped oracle, and imported oracle traits from `ell_typing`. (#8cfc54e, #8cdaaa9, #b2d3053)
+
+### Documentation
+- **Tunable parameter reference**: Added `tunable_parameter.md`. (#1405f52)
+- **Transpile templates**: Moved the stale `.tpy` porting templates into `transpile/` with a README. (#e4c3b9b)
+
 ## Version 0.8 (2026-09-17)
 
 ### Features
