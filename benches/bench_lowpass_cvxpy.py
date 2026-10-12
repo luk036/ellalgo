@@ -18,8 +18,11 @@ The benchmark compares:
     1. CVXPY (CLARABEL, reference) — same spectral-factorization LP
     2. ellalgo Ellipsoid method (LowpassOracle + cutting_plane_optim)
 
-across several filter lengths.  Reports solve time, iterations, and the
-achieved stopband attenuation in dB.
+across several filter lengths.  Reports robust (median) solve time,
+iterations, the achieved stopband attenuation in dB, and the solution
+quality (max constraint violation, objective gap) of both solvers.
+CLARABEL's ``tol_gap_abs``/``tol_gap_rel``/``tol_feas`` are all set to the
+same ``TOLERANCE`` used for the ellipsoid ``Options.tolerance``.
 
 Run it with:
 
@@ -28,11 +31,11 @@ Run it with:
 
 from __future__ import annotations
 
-import time
 from typing import Tuple
 
 import cvxpy as cp
 import numpy as np
+from _bench_util import Quality, quality_from_violations, time_alternating
 
 from ellalgo import Ell, Options, cutting_plane_optim
 from ellalgo.oracles.lowpass_oracle import LowpassOracle
@@ -47,6 +50,7 @@ DELTA0_WSTOP = 0.125  # stopband attenuation tolerance
 NDIM_SIZES = [24, 32, 48, 64, 80]
 REPEATS = 3
 SEED = 0
+TOLERANCE = 1e-14  # ellipsoid Options.tolerance, mirrored by CLARABEL
 
 
 def make_lowpass_bounds() -> Tuple[float, float, float]:
@@ -70,15 +74,21 @@ def build_spectrum(ndim: int) -> np.ndarray:
     return np.concatenate((np.ones((mdim, 1)), temp), axis=1)
 
 
-def time_cvxpy(ndim: int) -> Tuple[float, float]:
-    """Solve the FIR lowpass LP with CVXPY; return (wall time, stopband max)."""
-    lp_sq, up_sq, sp_sq = make_lowpass_bounds()
+def build_constraint_data(
+    ndim: int,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, float, float]:
+    """Return (A, Ap, As, lp_sq, up_sq) for the lowpass LP."""
+    lp_sq, up_sq, _ = make_lowpass_bounds()
     A = build_spectrum(ndim)
     w = np.linspace(0, np.pi, 15 * ndim)
     ipass = w <= NPASS * np.pi
     istop = w >= NSTOP * np.pi
-    Ap, As = A[ipass, :], A[istop, :]
+    return A, A[ipass, :], A[istop, :], lp_sq, up_sq
 
+
+def solve_cvxpy(ndim: int) -> Tuple[np.ndarray, float]:
+    """Solve the FIR lowpass LP with CVXPY; return (r, stopband max)."""
+    A, Ap, As, lp_sq, up_sq = build_constraint_data(ndim)
     r = cp.Variable(ndim)
     t = cp.Variable()
     constraints = [
@@ -89,16 +99,19 @@ def time_cvxpy(ndim: int) -> Tuple[float, float]:
         A @ r >= 0,
     ]
     prob = cp.Problem(cp.Minimize(t), constraints)
-    t0 = time.perf_counter()
-    prob.solve()
-    t1 = time.perf_counter()
-    return t1 - t0, float(t.value)
+    prob.solve(
+        solver=cp.CLARABEL,
+        tol_gap_abs=TOLERANCE,
+        tol_gap_rel=TOLERANCE,
+        tol_feas=TOLERANCE,
+    )
+    return np.asarray(r.value), float(t.value)
 
 
-def time_ellipsoid(ndim: int) -> Tuple[float, float, int]:
+def solve_ellipsoid(ndim: int) -> Tuple[np.ndarray, float, int]:
     """Solve the FIR lowpass problem with the Ellipsoid method.
 
-    Returns (wall time, stopband max, iterations).
+    Returns (r, stopband max, iterations).
     """
     lp_sq, up_sq, sp_sq = make_lowpass_bounds()
     omega = LowpassOracle(ndim, NPASS, NSTOP, lp_sq, up_sq, sp_sq)
@@ -106,36 +119,59 @@ def time_ellipsoid(ndim: int) -> Tuple[float, float, int]:
     ellip = Ell(40.0, r0)
     ellip.helper.use_parallel_cut = True
     options = Options()
-    options.tolerance = 1e-14
+    options.tolerance = TOLERANCE
     options.max_iters = 50000
-    t0 = time.perf_counter()
     x_best, gamma, num_iters = cutting_plane_optim(omega, ellip, omega.sp_sq, options)
-    t1 = time.perf_counter()
-    if x_best is None:
-        return t1 - t0, float("nan"), num_iters
-    return t1 - t0, gamma, num_iters
+    return x_best, gamma, num_iters
+
+
+def violation(ndim: int, r: np.ndarray, t: float) -> np.ndarray:
+    """Constraint residuals for the lowpass LP (positive = violated)."""
+    A, Ap, As, lp_sq, up_sq = build_constraint_data(ndim)
+    return np.concatenate(
+        [
+            Ap @ r - up_sq,
+            lp_sq - Ap @ r,
+            As @ r - t,
+            -As @ r - t,
+            -(A @ r),
+        ]
+    )
 
 
 def main() -> None:
     """Run the benchmark: solve each filter length with both methods, compare."""
     print(
-        f"{'n':>3} {'CVXPY (s)':>10} {'Ellipsoid (s)':>14} {'iters':>6} "
-        f"{'ratio':>8} {'cvxpy_dB':>9} {'ellip_dB':>9}"
+        f"{'n':>3} {'cvxpy_med':>10} {'cvx_iqr':>8} {'ellip_med':>10} {'ell_iqr':>8} "
+        f"{'iters':>6} {'ratio':>8} {'viol_cvx':>9} {'viol_ell':>9} {'cvx_dB':>8} "
+        f"{'ell_dB':>8} {'gap_dB':>8}"
     )
-    print("-" * 70)
+    print("-" * 116)
 
     for ndim in NDIM_SIZES:
-        t_cvxpy, t_ref = time_cvxpy(ndim)
-        t_ell, t_em, num_iters = time_ellipsoid(ndim)
-        for _ in range(REPEATS - 1):
-            t_ell = min(t_ell, time_ellipsoid(ndim)[0])
+        (t_cvxpy, cvx_results), (t_ell, ell_results) = time_alternating(
+            [lambda: solve_cvxpy(ndim), lambda: solve_ellipsoid(ndim)],
+            repeat=REPEATS,
+            warmup=1,
+        )
+        r_ref, t_ref = cvx_results[0]
+        r_em, t_em, num_iters = ell_results[0]
 
-        db_cvxpy = 20 * np.log10(np.sqrt(t_ref))
-        db_em = 20 * np.log10(np.sqrt(t_em))
-        ratio = t_ell / t_cvxpy
+        q_cvx = quality_from_violations(violation(ndim, r_ref, t_ref), t_ref)
+        if r_em is None:
+            q_ell = Quality(float("nan"), float("nan"))
+        else:
+            q_ell = quality_from_violations(violation(ndim, r_em, t_em), t_em)
+
+        db_cvxpy = 20 * np.log10(np.sqrt(q_cvx.objective))
+        db_em = 20 * np.log10(np.sqrt(q_ell.objective))
+        gap_db = abs(db_cvxpy - db_em)
+        ratio = t_ell.median / t_cvxpy.median
         print(
-            f"{ndim:>3} {t_cvxpy:>10.4f} {t_ell:>14.4f} {num_iters:>6} "
-            f"{ratio:>8.1f}x {db_cvxpy:>9.2f} {db_em:>9.2f}"
+            f"{ndim:>3} {t_cvxpy.median:>10.4f} {t_cvxpy.iqr:>8.4f} "
+            f"{t_ell.median:>10.4f} {t_ell.iqr:>8.4f} {num_iters:>6} "
+            f"{ratio:>7.1f}x {q_cvx.max_violation:>9.1e} {q_ell.max_violation:>9.1e} "
+            f"{db_cvxpy:>8.2f} {db_em:>8.2f} {gap_db:>8.2f}"
         )
 
 

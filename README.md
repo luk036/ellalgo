@@ -18,6 +18,19 @@ The method has a wide range of practical applications in operations research. It
 
 In the context of the Ellipsoid Method, a parallel cut refers to a pair of linear constraints of the form aTx <= b and -aTx <= -b, where a is a vector of coefficients and b is a scalar constant. These constraints are said to be parallel because they have the same normal vector a, but opposite signs. When a parallel cut is encountered during the Ellipsoid Method, both constraints can be used simultaneously to generate a new ellipsoid. This can improve the convergence rate of the method, especially for problems with many parallel constraints.
 
+## Known limitations
+
+- **No sparsity exploitation.** The method treats the problem data as dense, so it cannot take advantage of sparse constraint matrices the way tuned interior-point/LP solvers do.
+- **Iteration budget grows ~O(n²).** As dimensionality grows, interior-point methods (e.g. CVXPY/CLARABEL) usually scale better than the ellipsoid method.
+- **Interpreted per-iteration overhead.** Each iteration runs in Python, so pure-Python overhead can reverse the ranking against compiled code, especially on small problems.
+- **Positive definiteness can be lost silently.** The direct `Ell` representation may lose positive definiteness; mitigate with `Options(check_pd=True)` or use `EllStable`.
+- **Stopping threshold.** An absolute stopping threshold should be paired with the stall guard (enabled by default via `Options(stall_guard=True)`) so the loop stops with `SolverStatus.Stalled` at floating-point resolution instead of spinning to `max_iters`.
+- **Oracle correctness.** Custom oracles must be verified (see `ellalgo.oracle_checks`: `check_cut_valid`, `check_subgradient`, `check_lmi_witness`).
+- **Approximate oracles.** Affine-arithmetic and difference-of-convex oracles carry inherent approximation error/bias.
+- **Discrete/quantized design.** Discretizing the design space carries sampling-grid artifacts.
+
+`EllStable` is preferred in compiled code, while `Ell` is preferred for pure-Python prototyping.
+
 ## Used by
 
 - [netoptim](https://github.com/luk036/netoptim)

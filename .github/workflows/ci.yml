@@ -115,6 +115,24 @@ jobs:
       - name: Run benchmarks
         run: pytest benches/ --benchmark-only --benchmark-autosave
 
+  comparison:
+    # Non-blocking: CVXPY drift or numerical differences must not fail the build.
+    if: github.event_name == 'push'
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install package with comparison dependencies
+        run: pip install -e ".[bench]"
+      - name: Run CVXPY comparison benchmarks
+        run: |
+          python benches/bench_chebyshev.py
+          python benches/bench_lmi_evp.py
+          python benches/bench_lowpass_cvxpy.py
+
   # publish:
   #   needs: finalize
   #   if: ${{ github.event_name == 'push' && contains(github.ref, 'refs/tags/') }}
