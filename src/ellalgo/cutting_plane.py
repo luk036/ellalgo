@@ -18,6 +18,8 @@ or iteration limit.
 import copy
 from typing import Any, Optional, Tuple
 
+import numpy as np
+
 from .ell_config import CutStatus, Options, SolverStatus
 from .ell_typing import (
     ArrayType,
@@ -28,6 +30,40 @@ from .ell_typing import (
     OracleOptimQ,
     SearchSpace,
 )
+
+_EPS = float(np.finfo(np.float64).eps)
+
+
+def _stalled(tsq: float, tsq_prev: Optional[float]) -> bool:
+    r"""Report whether ``tsq`` has stopped decreasing beyond float resolution.
+
+    An absolute threshold on ``tsq`` (which scales with the problem data) can be
+    unreachable once the search space shrinks to the representable limit; the
+    quantity then stalls above the tolerance and the loop would spin to
+    ``max_iters`` without refining anything. This companion test detects that
+    stagnation, mirroring the bracket guard already used by :func:`bsearch`.
+    """
+    if tsq_prev is None or tsq <= 0.0:
+        return False
+    return abs(tsq_prev - tsq) <= _EPS * tsq
+
+
+def _apply_options(space: SearchSpace[ArrayType], options: Options) -> None:
+    """Propagate the positive-definiteness check from ``Options`` to ``space``."""
+    if hasattr(space, "check_pd"):
+        space.check_pd = options.check_pd  # type: ignore[attr-defined]
+
+
+def half_nonnegative(n: Num) -> Num:
+    r"""Return :math:`\lfloor n/2 \rfloor` for a non-negative ``n``.
+
+    Mirrors the C++/Rust ``half_nonnegative`` helper. For integers, unsigned
+    (floor) division avoids overflow and the float-conversion drift of ``n / 2``;
+    for floats it is ordinary division.
+    """
+    if isinstance(n, int) and not isinstance(n, bool):
+        return n // 2
+    return n / 2
 
 
 class SolverResult(tuple):
@@ -128,6 +164,8 @@ def cutting_plane_feas(
     """
     if options is None:
         options = Options()
+    _apply_options(space, options)
+    tsq_prev: Optional[float] = None
     for niter in range(options.max_iters):
         # Evaluate current solution
         cut = omega.assess_feas(space.xc())
@@ -135,8 +173,16 @@ def cutting_plane_feas(
             return SolverResult((space.xc(), niter), SolverStatus.Success)
         # Update search space with new constraint
         status = space.update_bias_cut(cut)
-        if status != CutStatus.Success or space.tsq() < options.tolerance:
+        if status == CutStatus.Unknown:  # Numerical breakdown
+            return SolverResult((None, niter), SolverStatus.Failed)
+        if status != CutStatus.Success:
             return SolverResult((None, niter), SolverStatus.Infeasible)
+        tsq = space.tsq()
+        if tsq < options.tolerance:
+            return SolverResult((None, niter), SolverStatus.Infeasible)
+        if options.stall_guard and _stalled(tsq, tsq_prev):
+            return SolverResult((None, niter), SolverStatus.Stalled)
+        tsq_prev = tsq
     return SolverResult((None, options.max_iters), SolverStatus.MaxIters)
 
 
@@ -199,6 +245,8 @@ def cutting_plane_optim(
     """
     if options is None:
         options = Options()
+    _apply_options(space, options)
+    tsq_prev: Optional[float] = None
     x_best = None
     for niter in range(options.max_iters):
         # Get optimality/feasibility cut and possible better g
@@ -209,11 +257,25 @@ def cutting_plane_optim(
             status = space.update_central_cut(cut)  # Focus search around improvement
         else:
             status = space.update_bias_cut(cut)  # Maintain feasibility
-        if status != CutStatus.Success or space.tsq() < options.tolerance:
+        if status == CutStatus.Unknown:  # Numerical breakdown
+            return SolverResult((x_best, gamma, niter), SolverStatus.Failed)
+        if status != CutStatus.Success:
             outcome = (
                 SolverStatus.Success if x_best is not None else SolverStatus.Infeasible
             )
             return SolverResult((x_best, gamma, niter), outcome)
+        tsq = space.tsq()
+        if tsq < options.tolerance:
+            outcome = (
+                SolverStatus.Success if x_best is not None else SolverStatus.Infeasible
+            )
+            return SolverResult((x_best, gamma, niter), outcome)
+        if options.stall_guard and _stalled(tsq, tsq_prev):
+            outcome = (
+                SolverStatus.Success if x_best is not None else SolverStatus.Stalled
+            )
+            return SolverResult((x_best, gamma, niter), outcome)
+        tsq_prev = tsq
     return SolverResult((x_best, gamma, options.max_iters), SolverStatus.MaxIters)
 
 
@@ -303,7 +365,9 @@ def cutting_plane_optim_q(
     """
     if options is None:
         options = Options()
+    _apply_options(space_q, options)
     state = OptimQState()
+    tsq_prev: Optional[float] = None
     for niter in range(options.max_iters):
         # Get cut and possible discrete solution
         cut, x_q, gamma1, more_alt = omega.assess_optim_q(
@@ -312,20 +376,32 @@ def cutting_plane_optim_q(
         if gamma1 is not None:  # Improved objective value
             gamma = gamma1
             state.on_shrunk(x_q)
-        if not state.on_update(space_q.update_q(cut), more_alt):
+        status = space_q.update_q(cut)
+        if status == CutStatus.Unknown:  # Numerical breakdown
+            return SolverResult((state.x_best, gamma, niter), SolverStatus.Failed)
+        if not state.on_update(status, more_alt):
             outcome = (
                 SolverStatus.Success
                 if state.x_best is not None
                 else SolverStatus.Infeasible
             )
             return SolverResult((state.x_best, gamma, niter), outcome)
-        if space_q.tsq() < options.tolerance:
+        tsq = space_q.tsq()
+        if tsq < options.tolerance:
             outcome = (
                 SolverStatus.Success
                 if state.x_best is not None
                 else SolverStatus.Infeasible
             )
             return SolverResult((state.x_best, gamma, niter), outcome)
+        if options.stall_guard and _stalled(tsq, tsq_prev):
+            outcome = (
+                SolverStatus.Success
+                if state.x_best is not None
+                else SolverStatus.Stalled
+            )
+            return SolverResult((state.x_best, gamma, niter), outcome)
+        tsq_prev = tsq
     return SolverResult((state.x_best, gamma, options.max_iters), SolverStatus.MaxIters)
 
 
@@ -363,7 +439,7 @@ def bsearch(
     lower, upper = intrvl
     T = type(upper)  # Preserve numerical type (int/float)
     for niter in range(options.max_iters):
-        tau = (upper - lower) / 2
+        tau = half_nonnegative(upper - lower)
         if tau < options.tolerance:  # Convergence check
             return SolverResult((upper, niter), SolverStatus.Success)
         gamma = T(lower + tau)

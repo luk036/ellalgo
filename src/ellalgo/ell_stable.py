@@ -109,3 +109,13 @@ class EllStable(EllBase[np.ndarray]):
             self._mq[j + 1 :, j] += beta2 * self._g_t[j + 1 :]
             oldt = newt
         return True
+
+    def _validate_pd(self) -> bool:
+        r"""Check positive definiteness directly from the ``LDL^T`` factors.
+
+        Because the shape is :math:`\kappa L D L^T` with unit lower-triangular
+        :math:`L`, definiteness is equivalent to :math:`\kappa > 0` and every
+        diagonal entry of :math:`D` being positive. This is an ``O(n)`` check,
+        unlike the ``O(n^3)`` Cholesky used by the direct representation.
+        """
+        return bool(self._kappa > 0.0 and np.all(np.diagonal(self._mq) > 0.0))

@@ -43,6 +43,7 @@ class EllBase(SearchSpace[ArrayType]):
     _tsq: float  # Measure of distance between current center and optimal point
     helper: EllCalc  # Helper object for ellipsoid calculations
     no_defer_trick: bool  # Defer the matrix scaling trick (see _update_core)
+    check_pd: bool  # Validate shape-matrix positive definiteness on each update
 
     def __init__(
         self,
@@ -80,6 +81,7 @@ class EllBase(SearchSpace[ArrayType]):
         self._xc = x_center
         self._tsq = 0.0
         self.no_defer_trick = no_defer_trick
+        self.check_pd = False
         if isinstance(val, (int, float)):
             # Case 1: val is a scalar (kappa), create identity matrix
             self._kappa = val
@@ -248,13 +250,39 @@ class EllBase(SearchSpace[ArrayType]):
         if result is None:
             return status
         rho, sigma, delta = result
+        if not self._invariants_hold(sigma, delta):
+            return CutStatus.Unknown
         if not self._apply_update(g, omega, g_t, rho, sigma, delta):
             return status
         self._kappa *= delta
         if self.no_defer_trick:
             self._mq *= self._kappa
             self._kappa = 1.0
+        if self.check_pd and not self._validate_pd():
+            return CutStatus.Unknown
         return status
+
+    def _invariants_hold(self, sigma: float, delta: float) -> bool:
+        r"""Cheap algebraic guards that keep the shape matrix positive definite.
+
+        For every admissible cut in exact arithmetic
+        :math:`\sigma \in (0, 1)`, :math:`\delta > 0`, and
+        :math:`\kappa > 0`. The rank-one downdate multiplies
+        :math:`\det Q` by :math:`(1-\sigma)` and :math:`\kappa` by
+        :math:`\delta`, so a violation means the accumulated rounding error has
+        corrupted the state. Detecting it here turns the otherwise silent
+        failure into ``CutStatus.Unknown``. ``NaN`` fails the comparisons and is
+        therefore also rejected.
+        """
+        return delta > 0.0 and sigma <= 1.0 + 1e-12 and self._kappa > 0.0
+
+    def _validate_pd(self) -> bool:
+        r"""Validate positive definiteness of the current shape (opt-in).
+
+        Called only when :attr:`check_pd` is set. Subclasses inspect their own
+        representation; the default conservatively reports a valid shape.
+        """
+        return True
 
     def _omega(self, g: ArrayType) -> Optional[Tuple[float, Optional[ArrayType]]]:
         r"""Compute :math:`\omega = \mathbf{g}^T (\mathbf{M}\,\mathbf{g})`.

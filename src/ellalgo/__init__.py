@@ -78,6 +78,14 @@ from .ell_typing import (
     SingleCut,
 )
 from .lmi_problem import LMIProblem
+from .oracle_checks import (
+    check_cut_valid,
+    check_lmi_witness,
+    check_subgradient,
+    verify_cut_valid,
+    verify_lmi_witness,
+    verify_subgradient,
+)
 from .oracles.lmi0_oracle import LMI0Oracle
 from .oracles.lmi_oracle import LMIOracle
 from .oracles.lowpass_oracle import LowpassOracle
@@ -114,4 +122,10 @@ __all__ = [
     "ProfitRbOracle",
     "ProfitQOracle",
     "LowpassOracle",
+    "check_cut_valid",
+    "check_subgradient",
+    "check_lmi_witness",
+    "verify_cut_valid",
+    "verify_subgradient",
+    "verify_lmi_witness",
 ]

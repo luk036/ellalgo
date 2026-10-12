@@ -89,3 +89,18 @@ class Ell(EllBase[np.ndarray]):
         self._xc -= (rho / omega) * g_t
         self._mq -= (sigma / omega) * (g_t[:, None] * g_t)
         return True
+
+    def _validate_pd(self) -> bool:
+        r"""Check that :math:`\kappa\,\mathbf{M}` is positive definite.
+
+        Uses a Cholesky factorization, which succeeds iff the symmetric matrix
+        is positive definite. This is the direct detection of the silent drift
+        described in the numerical-stability literature: once a rank-one
+        downdate drives an eigenvalue of ``M`` through zero, the factorization
+        raises and the driver can stop with ``CutStatus.Unknown``.
+        """
+        try:
+            np.linalg.cholesky(self._kappa * self._mq)
+        except np.linalg.LinAlgError:
+            return False
+        return True
