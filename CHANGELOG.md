@@ -1,5 +1,18 @@
 # Changelog
 
+## Version 0.10 (2026-11-20)
+
+### Features
+- **Definiteness checks and stall/failure statuses**: Added opt-in `Options.check_pd` (O(n^3) Cholesky for `Ell`, O(n) `D > 0` for `EllStable`), always-on sigma/delta/kappa invariants, and new `SolverStatus.Stalled` / `SolverStatus.Failed` outcomes so the drivers stop at float resolution and report a numerical breakdown instead of a silent sentinel. (#6bbaac9)
+- **Oracle verification helpers**: Added `ellalgo.oracle_checks` with cut-validity, finite-difference subgradient, and LMI negative-curvature witness checks. (#6bbaac9)
+
+### Testing & Code Quality
+- **Numerical guards suite**: Added tests for the new invariants, the oracle checks, and a ported numerical-stability suite. (#6bbaac9)
+- **CVXPY benchmark harness**: Added a `bench` extra and a non-blocking CI job that compares against CVXPY/CLARABEL with matched tolerances and reports median/IQR over repeated alternating runs. (#bab7984)
+
+### Documentation
+- **Known limitations**: Documented the solver's known limitations in the README. (#bab7984)
+
 ## Version 0.9 (2026-10-09)
 
 ### Features
